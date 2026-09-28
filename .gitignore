@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+
+# Node
+node_modules/
+frontend/dist/
+frontend/test-results/
+frontend/playwright-report/
+*.tsbuildinfo
+
+# Built frontend copied into the backend package
+backend/mdos/static/*
+!backend/mdos/static/.gitkeep
+
+# Local data and secrets
+.env
+*.db
+*.sqlite
+*.sqlite3
+data/
+.mdos-data/
+
+# OS and editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

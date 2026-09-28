@@ -1,0 +1,192 @@
+AI Marketing Research Lab: 
+Think: "Qualtrics + SPSS/SmartPLS + research consultant + AI agents", but designed around the actual workflow of a marketer.
+This is probably the most naturally aligned with Marketing Research background.
+When a user enters:
+"I want to know whether tourists would pay Rp 150,000 for a new Lake Toba cultural experience."
+Then the AI Marketing Research Lab software (the web-based and the local exe) could automatically create a research project:
+Research Agent → Questionnaire Agent → Sampling Agent → Fieldwork Agent → Data Cleaning Agent → Statistical Agent → Insight Agent → Report Agent
+It could produce:
+- research objectives
+- hypotheses
+- variables and constructs
+- questionnaire
+- screening questions
+- sampling plan
+- segmentation
+- descriptive statistics
+- cross-tabs
+- regression
+- PROCESS analysis
+- PLS-SEM
+- conjoint
+- MaxDiff
+- price sensitivity
+- sentiment analysis
+- customer personas
+- positioning map
+- executive report
+- presentation
+The key is not making another AI survey generator. That market is already moving toward AI agent-based research platforms such as Sprig and Qualtrics and the others. Sprig, and the others, for example, now positions AI specialized AI agents around study design, adaptive fielding and synthesis. 
+The opportunity would be to create a research decision engine specifically for emerging-market businesses, SMEs, tourism, universities, and Indonesian researchers.
+A particularly interesting differentiator would be:
+"From business question → defensible marketing evidence."
+That is much more valuable than:
+"Generate me a questionnaire."
+----------
+Marketing Strategy Simulator: 
+Think: "CAD software, but for marketing strategy."
+Instead of drawing mechanical parts like CAD, the user builds a digital model of a market. For example:
+MARKET
+   ↓
+Customer segments
+   ↓
+Needs / JTBD
+   ↓
+Competitors
+   ↓
+Positioning
+   ↓
+Price
+   ↓
+Channels
+   ↓
+Advertising
+   ↓
+Conversion
+   ↓
+Revenue. . 
+And then the marketer can manipulate the model:
+"What happens if I reduce price from Rp 180,000 to Rp 150,000?"
+"What happens if I move 30% of my advertising budget from Instagram to TikTok?"
+"What happens if Gen Z becomes 40% of the target market?"
+"What happens if competitor X launches a cheaper product?"
+The application could visually show:
+Budget → Reach → Engagement → Leads → Conversion → Revenue → Profit. . 
+And then allow the user to run scenarios. 
+You could have agents such as:
+Market Analyst Agent
+Builds the market model.
+Customer Agent
+Models different customer segments.
+Competitor Agent
+Tracks competitors.
+Pricing Agent
+Tests pricing scenarios.
+Media Agent
+Allocates advertising budgets.
+Experiment Agent
+Designs A/B tests.
+Forecast Agent
+Produces scenario forecasts.
+Strategy Agent
+Explains the implications.
+This would move the product from content generation into decision support.
+That distinction matters because generic campaign generation is already becoming heavily automated. HubSpot, and the others, for example, now has an AI campaign AI agent that uses campaign goals, audiences, historical performance, industry benchmarks, brand identity and CRM data. Jasper, and the others, likewise provides large numbers of AI marketing AI agents for campaign production and optimization. 
+So don't build:
+"AI writes 50 Facebook posts."
+Build:
+"AI lets a marketer experiment with an entire marketing system."
+That gap is much more interesting and important. It can think in terms of systems, variables, constraints, feedback loops, optimization and scenarios, not merely advertising. 
+----------
+AI Customer Journey And Experience Designer
+Think: Figma + journey mapping + analytics + storytelling + AI simulation.
+This one is especially powerful for tourism marketing, hospitality, retail, food, education, and local businesses.
+Instead of simply creating a customer journey diagram, the application would create a living customer journey model. Example: 
+DISCOVER
+   ↓
+SEARCH
+   ↓
+COMPARE
+   ↓
+BOOK
+   ↓
+ARRIVE
+   ↓
+EXPERIENCE
+   ↓
+SHARE
+   ↓
+RETURN
+   ↓
+RECOMMEND. . 
+The user uploads:
+- customer reviews
+- social-media comments
+- Google reviews
+- survey responses
+- customer interviews
+- website analytics
+- sales data
+- competitor information
+Then agents reconstruct the experience.
+You could have:
+Voice-of-Customer Agent
+Extracts customer needs and pain points.
+Journey Agent
+Builds the journey automatically.
+Emotion Agent
+Maps emotional states and friction.
+Storytelling Agent
+Turns the journey into narratives and experiences.
+UX Agent
+Designs website/app improvements.
+Conversion Agent
+Identifies leakage points.
+Experiment Agent
+Creates interventions.
+Simulation Agent
+Simulates what happens if a particular pain point is fixed.
+For example:
+"What happens if we reduce booking friction from five steps to two?"
+or:
+"What if the first 15 minutes of the Lake Toba tourist experience is redesigned around local storytelling?"
+Now the system could show:
+Journey → Friction → Intervention → Expected behavioral effect → Experiment. . 
+That is much more sophisticated than a normal journey-map application. 
+----------
+                 MARKETING AI ENGINE
+                         │
+        ┌────────────────┼────────────────┐
+        ↓                ↓                ↓
+  Research Engine   Strategy Engine   Experience Engine
+        │                │                │
+        ↓                ↓                ↓
+   Data Agent        Market Agent      VOC Agent
+   Survey Agent      Segment Agent     Journey Agent
+   Stats Agent       Pricing Agent     UX Agent
+   Insight Agent     Media Agent       Story Agent
+   Report Agent      Forecast Agent    Experiment Agent. . 
+----------
+Not start with a giant SaaS platform.
+Start build this progression:
+Phase 1
+AI Marketing Research Lab
+A narrow MVP:
+Business question → research design → questionnaire → data upload → analysis → insight report. . 
+This is the easiest way to exploit knowledge you already possess.
+Phase 2
+Add:
+Marketing Strategy Simulator
+Now research findings become inputs to strategic decisions.
+Phase 3
+Add:
+Customer Journey & Experience Designer
+Now you can connect research → strategy → customer experience → experimentation. . 
+----------
+          CUSTOMER / MARKET DATA
+                    ↓
+             AI RESEARCH LAB
+                    ↓
+          MARKET UNDERSTANDING
+                    ↓
+          STRATEGY SIMULATOR
+                    ↓
+          DECISION + SCENARIOS
+                    ↓
+       CUSTOMER JOURNEY DESIGNER
+                    ↓
+             EXPERIMENTATION
+                    ↓
+               RESULTS
+                    │
+                    └──────────────→ back to research. . 

@@ -1,0 +1,5 @@
+* text=auto eol=lf
+*.bat text eol=crlf
+docs/source/graph1-founder-vision.txt -text
+*.png binary
+*.xlsx binary
