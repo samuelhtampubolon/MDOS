@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { api, errorMessage } from "../../api/client";
 import { useProject, useProjectMutation, useScenarios, useWorkflows } from "../../api/hooks";
 import type { Scenario } from "../../api/types";
@@ -65,10 +65,8 @@ export default function Strategy({ pid }: { pid: string }) {
 
 function Scenarios({ pid, scenarios, baseline, currency }: { pid: string; scenarios: Scenario[]; baseline: Scenario; currency: string }) {
   const children = scenarios.filter((s) => s.kind === "scenario");
+  // A new scenario is selected before the list refreshes; until it arrives (or after a delete) the baseline shows.
   const [selected, setSelected] = useState<string>(children[0]?.id ?? baseline.id);
-  useEffect(() => {
-    if (!scenarios.some((s) => s.id === selected)) setSelected(baseline.id);
-  }, [scenarios, selected, baseline.id]);
   const current = scenarios.find((s) => s.id === selected) ?? baseline;
   const ranked = [baseline, ...children].map((s) => ({ label: s.name, value: s.results.kpis.profit })).sort((a, b) => b.value - a.value);
   return (

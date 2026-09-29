@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { api, errorMessage } from "../../api/client";
+import { api, ApiError, errorMessage } from "../../api/client";
 import { useEvidence, useGraph, useInsights, useProjectMutation, useRecommendations } from "../../api/hooks";
 import type { Evidence, Insight, Recommendation } from "../../api/types";
 import { EvidenceModal } from "../../components/domain";
@@ -109,12 +109,16 @@ function NewInsight({ pid, evidence }: { pid: string; evidence: Evidence[] }) {
   const empty = { title: "", statement: "", implication: "", uncertainty: "", confidence: "medium", evidence_ids: [] as string[] };
   const [form, setForm] = useState(empty);
   const [error, setError] = useState("");
+  const [suggestion, setSuggestion] = useState("");
   const create = useProjectMutation(pid, (body: typeof empty) => api.post(`/projects/${pid}/insights`, body));
   const submit = (e: FormEvent) => {
     e.preventDefault();
     create.mutate(form, {
-      onSuccess: () => { toast("Insight saved as a draft."); setForm(empty); setError(""); },
-      onError: (err) => setError(errorMessage(err)),
+      onSuccess: () => { toast("Insight saved as a draft."); setForm(empty); setError(""); setSuggestion(""); },
+      onError: (err) => {
+        setError(errorMessage(err));
+        setSuggestion(err instanceof ApiError && typeof err.details.suggestion === "string" ? err.details.suggestion : "");
+      },
     });
   };
   return (
@@ -138,7 +142,18 @@ function NewInsight({ pid, evidence }: { pid: string; evidence: Evidence[] }) {
             <option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option>
           </select></div>
         <EvidencePicker evidence={evidence} value={form.evidence_ids} onChange={(ids) => setForm({ ...form, evidence_ids: ids })} />
-        {error && <Callout tone="critical">{error}</Callout>}
+        {error && (
+          <Callout tone="critical">
+            {error}
+            {suggestion && (
+              <div style={{ marginTop: 6 }}>
+                <span className="small">Associational wording: "{suggestion}"</span>{" "}
+                <button type="button" className="btn sm" onClick={() => { setForm({ ...form, statement: suggestion }); setError(""); setSuggestion(""); }}>
+                  Use this wording</button>
+              </div>
+            )}
+          </Callout>
+        )}
         <div><button className="btn primary" disabled={create.isPending}>Save draft insight</button></div>
       </form>
     </details>

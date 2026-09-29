@@ -116,10 +116,8 @@ function matches(c: ColumnProfile, filter: ColumnFilter = "any"): boolean {
 
 export default function AnalysisStudio({ pid }: { pid: string }) {
   const { data: analyses } = useAnalyses(pid);
-  const [viewId, setViewId] = useState<string | undefined>();
-  useEffect(() => {
-    if (!viewId && analyses?.length) setViewId(analyses[0].id);
-  }, [analyses, viewId]);
+  const [chosen, setViewId] = useState<string | undefined>();
+  const viewId = chosen ?? analyses?.[0]?.id;
   return (
     <div className="stack">
       <RunPanel pid={pid} onRan={setViewId} />

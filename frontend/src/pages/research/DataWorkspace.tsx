@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { api, errorMessage } from "../../api/client";
 import { useApi, useApprovals, useDataset, useDatasets, useProjectMutation } from "../../api/hooks";
 import type { ColumnProfile, Dataset, DatasetVersion, Json, QualityIssue } from "../../api/types";
@@ -38,11 +38,8 @@ function actor(id: string | null | undefined): string {
 
 export default function DataWorkspace({ pid }: { pid: string }) {
   const { data: datasets } = useDatasets(pid);
-  const [selected, setSelected] = useState<string | undefined>();
-  useEffect(() => {
-    if (!selected && datasets?.length) setSelected((datasets.find((d) => d.kind === "survey") ?? datasets[0]).id);
-    if (selected && datasets && !datasets.some((d) => d.id === selected)) setSelected(datasets[0]?.id);
-  }, [datasets, selected]);
+  const [chosen, setSelected] = useState<string | undefined>();
+  const selected = chosen ?? (datasets?.find((d) => d.kind === "survey") ?? datasets?.[0])?.id;
   return (
     <div className="stack">
       <div className="grid grid-2">
@@ -69,7 +66,7 @@ export default function DataWorkspace({ pid }: { pid: string }) {
         </Card>
         <UploadCard pid={pid} onUploaded={setSelected} />
       </div>
-      {selected && <DatasetDetail key={selected} pid={pid} did={selected} />}
+      {selected && <DatasetDetail key={selected} pid={pid} did={selected} onDeleted={() => setSelected(undefined)} />}
     </div>
   );
 }
@@ -119,7 +116,7 @@ function UploadCard({ pid, onUploaded }: { pid: string; onUploaded: (id: string)
   );
 }
 
-function DatasetDetail({ pid, did }: { pid: string; did: string }) {
+function DatasetDetail({ pid, did, onDeleted }: { pid: string; did: string; onDeleted: () => void }) {
   const { data: dataset } = useDataset(pid, did);
   const [versionId, setVersionId] = useState<string | undefined>();
   const toast = useToast();
@@ -149,7 +146,7 @@ function DatasetDetail({ pid, did }: { pid: string; did: string }) {
           )}
           <button className="btn ghost icon" aria-label="Delete dataset" title="Delete dataset"
             onClick={() => window.confirm(`Delete ${dataset.name} and all its versions?`) && remove.mutate(undefined, {
-              onSuccess: () => toast("Dataset deleted."), onError: (e) => toast(errorMessage(e), "error"),
+              onSuccess: () => { toast("Dataset deleted."); onDeleted(); }, onError: (e) => toast(errorMessage(e), "error"),
             })}><Icon name="trash" size={16} /></button>
         </>}>
         <VersionLineage pid={pid} dataset={dataset} versions={versions} currentId={current?.id} shownId={shown.id} onShow={setVersionId} />

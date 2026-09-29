@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState, type ReactNode } from "react";
+import { Fragment, useState, type ReactNode } from "react";
 import { api, download, errorMessage, openHtml } from "../../api/client";
 import { useEvidence, useExperiments, useProjectMutation, useReport, useReports } from "../../api/hooks";
 import type { Report, ReportBlock } from "../../api/types";
@@ -24,19 +24,17 @@ export default function ReportBuilder({ pid, kinds = ["research_report", "execut
   pid: string; kinds?: string[];
 }) {
   const { data: reports } = useReports(pid);
-  const [selected, setSelected] = useState<string | undefined>();
-  useEffect(() => {
-    if (reports && (!selected || !reports.some((r) => r.id === selected))) setSelected(reports[0]?.id);
-  }, [reports, selected]);
+  const [chosen, setChosen] = useState<string | undefined>();
+  const selected = chosen ?? reports?.[0]?.id;
   return (
     <div className="grid" style={{ gridTemplateColumns: "minmax(250px, 320px) minmax(0, 1fr)", alignItems: "start" }}>
       <div className="stack">
-        <Generate pid={pid} kinds={kinds} onCreated={setSelected} />
+        <Generate pid={pid} kinds={kinds} onCreated={setChosen} />
         <Card title="Reports">
           {!reports?.length ? <span className="small muted">No reports yet.</span> : (
             <div className="stack-sm">
               {reports.map((r) => (
-                <button key={r.id} onClick={() => setSelected(r.id)} className="list-item"
+                <button key={r.id} onClick={() => setChosen(r.id)} className="list-item"
                   style={{ textAlign: "left", width: "100%", border: 0, borderRadius: 8, padding: "8px 10px", cursor: "pointer", color: "inherit",
                     background: selected === r.id ? "var(--accent-soft)" : "transparent" }}>
                   <div className="grow">
@@ -50,7 +48,7 @@ export default function ReportBuilder({ pid, kinds = ["research_report", "execut
           )}
         </Card>
       </div>
-      {selected ? <ReportView pid={pid} rid={selected} /> : <Empty title="Generate a report">Reports are assembled from approved and draft evidence. Drafts are labeled.</Empty>}
+      {selected ? <ReportView pid={pid} rid={selected} onDeleted={() => setChosen(undefined)} /> : <Empty title="Generate a report">Reports are assembled from approved and draft evidence. Drafts are labeled.</Empty>}
     </div>
   );
 }
@@ -91,7 +89,7 @@ function Generate({ pid, kinds, onCreated }: { pid: string; kinds: string[]; onC
   );
 }
 
-function ReportView({ pid, rid }: { pid: string; rid: string }) {
+function ReportView({ pid, rid, onDeleted }: { pid: string; rid: string; onDeleted: () => void }) {
   const { data: report } = useReport(pid, rid);
   const { data: evidence } = useEvidence(pid);
   const [evidenceId, setEvidenceId] = useState<string | null>(null);
@@ -123,7 +121,7 @@ function ReportView({ pid, rid }: { pid: string; rid: string }) {
             <Icon name="lock" size={14} />Finalize</button>
         )}
         <button className="btn ghost icon sm" aria-label="Delete report" onClick={() => window.confirm("Delete this report?")
-          && remove.mutate(undefined, { onSuccess: () => toast("Report deleted."), onError: (e) => toast(errorMessage(e), "error") })}><Icon name="trash" size={14} /></button>
+          && remove.mutate(undefined, { onSuccess: () => { toast("Report deleted."); onDeleted(); }, onError: (e) => toast(errorMessage(e), "error") })}><Icon name="trash" size={14} /></button>
       </>}>
       <article className="report-doc">
         {doc.blocks.map((b, i) => <Block key={i} block={b} cite={cite} />)}
