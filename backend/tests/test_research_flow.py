@@ -167,6 +167,7 @@ def test_upload_limits_and_formula_injection(make_client):
     from mdos.research.questionnaire import safe_cell
 
     assert safe_cell("=1+1") == "'=1+1" and safe_cell("hello") == "hello"
+    assert all(safe_cell(v).startswith("'") for v in ("+1+1", "-2", "@SUM(A1)")) and safe_cell(5) == 5
 
 
 def test_viewer_cannot_mutate(make_client):

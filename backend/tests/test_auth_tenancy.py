@@ -102,3 +102,16 @@ def test_security_headers_and_cloud_allowed_hosts(make_client):
     cloud = make_client("cloud", ALLOWED_HOSTS="mdos.example.com,testserver")
     assert cloud.get("/api/health").status_code == 200
     assert cloud.get("/api/health", headers={"Host": "other.example"}).status_code == 400
+
+
+def test_invalid_expired_and_forged_tokens_are_rejected(local_client):
+    import jwt
+
+    from mdos.security import create_access_token
+
+    me = local_client.get("/api/v1/auth/me").json()
+    expired = create_access_token(me["id"], me["org_id"], minutes=-5)
+    forged = jwt.encode({"sub": me["id"], "org": me["org_id"], "exp": 9_999_999_999, "typ": "access"},
+                        "not-the-server-key-" * 3, algorithm="HS256")
+    for token in (expired, forged, "not-a-token"):
+        assert local_client.get("/api/v1/projects", headers={"Authorization": f"Bearer {token}"}).status_code == 401

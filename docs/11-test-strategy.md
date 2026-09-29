@@ -16,11 +16,20 @@
 | Analytics unit tests | pytest | Each statistical method against an oracle (below) | Yes |
 | Engine unit tests | pytest | Strategy simulation math, sensitivity, Monte Carlo reproducibility; journey simulation, prioritization | Yes |
 | Agent tests | pytest | Contract shape for every agent, offline determinism, tool allowlists, fallback on LLM failure, numeric grounding check, prompt-injection containment | Yes |
-| API integration tests | pytest with FastAPI TestClient on SQLite | Auth, projects, uploads, analyses, evidence, insights, approvals, reports, scenarios, journeys, experiments, audit entries | Yes |
+| API integration tests | pytest with FastAPI TestClient on SQLite, and on PostgreSQL via `TEST_DATABASE_URL` | Auth, projects, uploads, analyses, evidence, insights, approvals, reports, scenarios, journeys, experiments, audit entries | Yes (both databases) |
 | Security tests | pytest | Cross-tenant access returns 404, viewer cannot mutate, upload limits, formula-injection neutralization, rate limiting | Yes |
-| Frontend unit tests | Vitest | Formatting (rupiah, percentages), API client error handling | Yes |
-| Type checks and lint | ruff, TypeScript `tsc --noEmit` | Static correctness | Yes |
-| End-to-end | Playwright (Chromium) | Demo project: research design, adopt, upload, analyze, insights, report, scenario, journey, experiment | Yes (smoke) |
+| Frontend unit tests | Vitest | Formatting (rupiah, percentages, p-values, signed changes) | Yes |
+| Type checks and lint | ruff, TypeScript `tsc -b` (strict), Alembic drift check | Static correctness; migrations match the models | Yes |
+| End-to-end | Playwright (Chromium) against the real server in desktop mode | Demo loads through the agents; every module renders without console errors; insight approval; causal-language gate and suggested rewrite; hypothesis add; sample size; pricing scenario; touchpoint; intervention to A/B test to experimental evidence; approvals; dark theme | Yes |
+| Packaging smoke tests | Docker, PyInstaller | The image starts in cloud mode and serves the UI; the desktop executable starts and answers the health check on Windows, macOS and Linux | Yes |
+
+## Current counts (version 0.1.0)
+
+| Suite | Count | Location |
+|---|---|---|
+| Backend tests | 61 | `backend/tests` (analytics 24, auth and tenancy 11, strategy 10, agents 7, journey 6, research flow 3) |
+| Frontend unit tests | 4 | `frontend/src/lib/format.test.ts` |
+| End-to-end tests | 9 | `frontend/e2e/closed-loop.spec.ts` |
 
 ## Statistical oracles
 

@@ -315,6 +315,8 @@ def test_sentiment_handles_negation_intensifiers_and_bilingual_text():
         "Kami tiba jam sepuluh pagi": "neutral",
         "The boat was late but the cultural show was amazing": "positive",
         "Tempatnya bagus tapi jalannya rusak parah dan macet": "negative",
+        "Very little information on the official website.": "negative",
+        "No clear schedule online.": "negative",
     }
     for text_value, expected in cases.items():
         assert sentiment.score_text(text_value)["label"] == expected, text_value
