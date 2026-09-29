@@ -32,14 +32,18 @@ def default_data_dir() -> Path:
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+    # Empty values (``SECRET_KEY=``) count as unset, so a copied .env.example never sets a blank secret.
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore", env_ignore_empty=True)
 
     mdos_mode: Literal["local", "cloud"] = "local"
     mdos_data_dir: Path = Field(default_factory=default_data_dir)
     database_url: str | None = None
     secret_key: str | None = None
     access_token_minutes: int = 12 * 60
-    allow_registration: bool = True
+    # Cloud sign-up. Unset: only the first account may register (it becomes the workspace owner), so a fresh
+    # server cannot be claimed by strangers later or use your Claude key. true: anyone who can reach the
+    # server can create their own isolated workspace. false: closed.
+    allow_registration: bool | None = None
 
     anthropic_api_key: str | None = None
     mdos_llm_model: str = "claude-opus-5-5"
@@ -49,6 +53,7 @@ class Settings(BaseSettings):
     mdos_llm_max_input_chars: int = 60_000
 
     max_upload_mb: int = 25
+    max_json_mb: int = 5  # any request that is not a file upload
     max_rows: int = 100_000
     max_cols: int = 500
 

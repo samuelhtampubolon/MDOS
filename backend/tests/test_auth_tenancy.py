@@ -48,7 +48,7 @@ def test_register_login_and_wrong_password(make_client):
 
 
 def test_cross_tenant_access_is_not_found(make_client):
-    client = make_client("cloud")
+    client = make_client("cloud", ALLOW_REGISTRATION="true")
     a = register(client, "a@example.com", "Org A")
     b = register(client, "b@example.com", "Org B")
     created = client.post(
@@ -59,8 +59,8 @@ def test_cross_tenant_access_is_not_found(make_client):
     pid = created.json()["id"]
     assert client.get(f"/api/v1/projects/{pid}", headers=auth(a["access_token"])).status_code == 200
     assert client.get(f"/api/v1/projects/{pid}", headers=auth(b["access_token"])).status_code == 404
-    assert client.delete(f"/api/v1/projects/{pid}", params={"confirm": "Secret"},
-                         headers=auth(b["access_token"])).status_code == 404
+    assert client.request("DELETE", f"/api/v1/projects/{pid}", json={"confirm": "Secret"},
+                          headers=auth(b["access_token"])).status_code == 404
     listed = client.get("/api/v1/projects", headers=auth(b["access_token"])).json()
     assert listed == []
 
@@ -91,9 +91,10 @@ def test_project_crud_and_audit(local_client, project):
     assert res.json()["decision_to_inform"] == "Set launch price"
     actions = [e["action"] for e in local_client.get(f"/api/v1/projects/{pid}/audit").json()]
     assert "project.create" in actions and "project.update" in actions
-    assert local_client.delete(f"/api/v1/projects/{pid}").status_code == 422  # the name must be repeated
-    assert local_client.delete(f"/api/v1/projects/{pid}", params={"confirm": "Wrong name"}).status_code == 422
-    assert local_client.delete(f"/api/v1/projects/{pid}", params={"confirm": project["name"]}).status_code == 204
+    url = f"/api/v1/projects/{pid}"
+    assert local_client.delete(url).status_code == 422  # the name must be repeated
+    assert local_client.request("DELETE", url, json={"confirm": "Wrong name"}).status_code == 422
+    assert local_client.request("DELETE", url, json={"confirm": project["name"]}).status_code == 204
     assert local_client.get(f"/api/v1/projects/{pid}").status_code == 404
 
 

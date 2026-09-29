@@ -62,7 +62,7 @@ def to_xlsform(survey: dict[str, Any], questions: list[dict[str, Any]]) -> bytes
                     labels_en = scale.get("labels") or ["1", "2", "3", "4", "5"]
                     labels_id = scale.get("labels_id") or labels_en
                     for i in range(5):
-                        choices.append(["agree5", str(i + 1), labels_en[i], labels_id[i]])
+                        choices.append(["agree5", str(i + 1), safe_cell(labels_en[i]), safe_cell(labels_id[i])])
                     agree_added = True
             else:
                 xtype = "integer"

@@ -164,7 +164,7 @@ function ProjectSettings({ pid }: { pid: string }) {
   const rows = (audit ?? []).filter((a) => !filter || `${a.action} ${a.entity_type} ${a.actor_id}`.toLowerCase().includes(filter.toLowerCase()));
   const remove = async () => {
     try {
-      await api.del(`/projects/${pid}?confirm=${encodeURIComponent(confirm)}`);
+      await api.del(`/projects/${pid}`, { confirm });
       await qc.invalidateQueries({ queryKey: ["projects"] });
       try {
         window.localStorage.removeItem("mdos.lastProject");

@@ -46,7 +46,9 @@ SmartScreen or Gatekeeper warnings; an installer and auto-update are Phase 2.
 | `SECRET_KEY` | 48+ random characters from the platform's secret store |
 | `DATABASE_URL` | `postgresql+psycopg://user:password@host:5432/mdos?sslmode=require` |
 | `ALLOWED_HOSTS` | Public host name(s), for example `mdos.example.com` |
-| `ALLOW_REGISTRATION` | `true` for the first sign-ups, then `false` |
+| `ALLOW_REGISTRATION` | Empty (default): only the first account may sign up. `true`: open sign-up. `false`: closed |
+| `FORWARDED_ALLOW_IPS` | Your reverse proxy's address (default `127.0.0.1`); only it may set client IP and https headers |
+| `COOKIE_SECURE` | Empty: Secure cookie when the request arrived over https. `true` to always require https |
 | `ANTHROPIC_API_KEY` | Optional; enables Claude drafting |
 | `MDOS_LLM_MODEL`, `MDOS_LLM_EFFORT`, `MDOS_LLM_FALLBACKS` | Optional model settings (defaults `claude-opus-5-5`, `medium`, `true`) |
 

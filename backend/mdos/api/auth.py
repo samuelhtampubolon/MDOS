@@ -7,6 +7,7 @@ body for API clients that prefer ``Authorization: Bearer``; the web app never st
 from __future__ import annotations
 
 import hmac
+from functools import lru_cache
 
 from fastapi import APIRouter, Depends, Request, Response
 from pydantic import BaseModel, EmailStr, Field
@@ -69,6 +70,20 @@ def _session(request: Request, response: Response, user: User) -> TokenOut:
     return TokenOut(access_token=token, user=_user_out(user))
 
 
+@lru_cache(maxsize=1)
+def _dummy_hash() -> str:
+    return hash_password("timing-equalizer-for-unknown-accounts")
+
+
+def registration_open(db: Session) -> bool:
+    settings = get_settings()
+    if settings.is_local or settings.allow_registration is False:
+        return False
+    if settings.allow_registration:
+        return True
+    return db.scalar(select(User.id).limit(1)) is None  # default: only the first account (the workspace owner)
+
+
 def _user_out(user: User) -> UserOut:
     return UserOut(
         id=user.id,
@@ -86,8 +101,8 @@ def register(body: RegisterIn, request: Request, response: Response, db: Session
     settings = get_settings()
     if settings.is_local:
         raise Forbidden("Registration is not used in local mode.")
-    if not settings.allow_registration:
-        raise Forbidden("Registration is disabled on this server.")
+    if not registration_open(db):
+        raise Forbidden("Sign-up is closed on this server. Ask the person who runs it for access.")
     email = body.email.lower()
     if db.scalar(select(User).where(User.email == email)):
         raise Conflict("An account with this email already exists.")
@@ -109,7 +124,9 @@ def register(body: RegisterIn, request: Request, response: Response, db: Session
 @router.post("/login", response_model=TokenOut, dependencies=[Depends(limit_auth), Depends(require_csrf_header)])
 def login(body: LoginIn, request: Request, response: Response, db: Session = Depends(get_db)) -> TokenOut:
     user = db.scalar(select(User).where(User.email == body.email.lower()))
-    if not user or not user.is_active or not verify_password(body.password, user.password_hash):
+    # Hash the password even for unknown emails, so response time does not reveal which accounts exist.
+    valid = verify_password(body.password, user.password_hash if user else _dummy_hash())
+    if not user or not valid or not user.is_active:
         raise Unauthorized("Incorrect email or password.")
     audit.record(db, org_id=user.org_id, actor_type="user", actor_id=user.id, action="auth.login",
                  entity_type="user", entity_id=user.id)
@@ -154,7 +171,7 @@ def me(user: User = Depends(get_current_user)) -> UserOut:
 
 
 @router.get("/mode")
-def mode() -> dict:
+def mode(db: Session = Depends(get_db)) -> dict:
     settings = get_settings()
-    return {"mode": settings.mdos_mode, "registration": settings.allow_registration and not settings.is_local,
+    return {"mode": settings.mdos_mode, "registration": registration_open(db),
             "local_key_required": settings.is_local and bool(settings.mdos_local_key)}

@@ -156,3 +156,121 @@ def test_desktop_launcher_file_is_private_and_escaped(tmp_path):
         assert path.stat().st_mode & 0o777 == 0o600
     again = _write_launcher(tmp_path / "data", "http://127.0.0.1:8765/#key=new")  # a stale file is replaced
     assert "key=new" in again.read_text(encoding="utf-8")
+
+
+def test_personal_identifiers_are_masked():
+    from mdos.privacy import mask_pii
+
+    text = ("Contact ana.putri@example.co.id or 0812-3456-7890, +62 812 3456 7890, 081234567890, "
+            "+1 415 555 0100. NIK 3201234567890123.")
+    masked, count = mask_pii(text)
+    assert "example.co.id" not in masked and "3456" not in masked and "0100" not in masked and "3201" not in masked
+    assert masked.count("[phone]") == 4 and "[email]" in masked and "[id number]" in masked and count == 6
+    stats = ("Price Rp 150.000 (n = 385, p = 0.032) on 2026-08-15 at 08:30; effect +15.2 (95% CI 12.1 to 18.3), "
+             "coefficient 0.85, 628 respondents, 1,250,000 visitors.")
+    assert mask_pii(stats) == (stats, 0)
+
+
+def test_prompts_sent_to_claude_are_masked(monkeypatch):
+    import httpx
+    from pydantic import BaseModel
+
+    from mdos.agents.providers import AnthropicProvider
+    from mdos.config import Settings
+
+    provider = AnthropicProvider(Settings(anthropic_api_key="sk-ant-test-not-a-real-key", mdos_mode="local"))
+    sent: dict = {}
+
+    class FakeMessages:
+        def parse(self, **kwargs):
+            sent.update(kwargs)
+            raise provider._anthropic.APIConnectionError(request=httpx.Request("POST", "https://api.anthropic.com"))
+
+    class FakeClient:
+        class beta:  # noqa: N801 - mirrors the SDK attribute
+            messages = FakeMessages()
+
+    provider.client = FakeClient()
+
+    class Out(BaseModel):
+        text: str
+
+    result = provider.generate(system="Project owner: budi@example.com", prompt="Review: call me on 0812 3456 7890",
+                               schema=Out)
+    assert result.parsed is None and result.meta["masked_identifiers"] == 2
+    assert "budi@example.com" not in sent["system"] and "[email]" in sent["system"]
+    assert sent["messages"][0]["content"] == "Review: call me on [phone]"
+
+
+def test_oversized_requests_are_refused(make_client):
+    client = make_client("local", MAX_JSON_MB="1", MAX_UPLOAD_MB="1")
+    assert client.post("/api/v1/auth/local-session").status_code == 200
+    big = b'{"name": "' + b"x" * (2 * 1024 * 1024) + b'"}'
+    declared = client.post("/api/v1/projects", content=big, headers={"Content-Type": "application/json"})
+    assert declared.status_code == 413 and declared.json()["error"]["code"] == "too_large"
+
+    def chunks():  # no Content-Length: counted while streaming
+        for _ in range(3):
+            yield b"x" * (1024 * 1024)
+
+    streamed = client.post("/api/v1/projects", content=chunks(), headers={"Content-Type": "application/json"})
+    assert streamed.status_code == 413
+
+
+def test_upload_over_the_limit_is_refused(local_client):
+    pid = local_client.post("/api/v1/projects", json=PROJECT).json()["id"]
+    too_big = b"a,b\n" + b"1,2\n" * (8 * 1024 * 1024)  # 32 MB, above the 25 MB default
+    res = local_client.post(f"/api/v1/projects/{pid}/datasets", files={"file": ("big.csv", too_big, "text/csv")},
+                            data={"kind": "survey"})
+    assert res.status_code == 413
+
+
+def test_xlsx_zip_bombs_are_refused(monkeypatch):
+    import io
+    import zipfile
+
+    from mdos.errors import ValidationFailed
+    from mdos.services import datasets
+
+    monkeypatch.setattr(datasets, "XLSX_MIN_EXPANDED_MB", 1)
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as archive:
+        archive.writestr("xl/worksheets/sheet1.xml", b"0" * (30 * 1024 * 1024))  # 30 MB that compresses to ~30 KB
+    with pytest.raises(ValidationFailed, match="expands"):
+        datasets._check_xlsx(buffer.getvalue(), max_upload_mb=1)  # may expand to 20 MB; this one expands to 30
+    with pytest.raises(ValidationFailed, match="not a valid XLSX"):
+        datasets.parse_upload("fake.xlsx", b"this is not a zip file")
+
+
+def test_sign_up_closes_after_the_first_account(make_client):
+    body = {"email": "owner@example.com", "password": "correct horse battery", "name": "Owner", "organization": "Org"}
+    client = make_client("cloud")
+    assert client.get("/api/v1/auth/mode").json()["registration"] is True
+    assert client.post("/api/v1/auth/register", json=body).status_code == 200
+    assert client.get("/api/v1/auth/mode").json()["registration"] is False
+    stranger = {**body, "email": "stranger@example.com"}
+    assert client.post("/api/v1/auth/register", json=stranger).status_code == 403
+    opened = make_client("cloud", ALLOW_REGISTRATION="true")
+    assert opened.post("/api/v1/auth/register", json=stranger).status_code == 200
+    closed = make_client("cloud", ALLOW_REGISTRATION="false")
+    assert closed.post("/api/v1/auth/register", json={**body, "email": "third@example.com"}).status_code == 403
+
+
+def test_login_hashes_even_for_unknown_emails(make_client, monkeypatch):
+    from mdos.api import auth as auth_api
+
+    calls: list[str | None] = []
+    real = auth_api.verify_password
+    monkeypatch.setattr(auth_api, "verify_password", lambda pw, h: calls.append(h) or real(pw, h))
+    client = make_client("cloud")
+    res = client.post("/api/v1/auth/login", json={"email": "nobody@example.com", "password": "whatever-123"})
+    assert res.status_code == 401 and len(calls) == 1 and calls[0]  # a real hash was checked
+
+
+def test_empty_settings_values_count_as_unset(monkeypatch, tmp_path):
+    from mdos.config import Settings
+
+    monkeypatch.setenv("SECRET_KEY", "")
+    monkeypatch.setenv("ALLOW_REGISTRATION", "")
+    settings = Settings(mdos_data_dir=tmp_path)
+    assert settings.secret_key is None and settings.allow_registration is None

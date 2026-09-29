@@ -5,6 +5,7 @@ from __future__ import annotations
 import csv
 import io
 import re
+import zipfile
 from typing import Any
 
 import pandas as pd
@@ -32,6 +33,22 @@ def _decode(raw: bytes) -> str:
     raise ValidationFailed("Could not decode the file. Save it as UTF-8 CSV.")
 
 
+XLSX_MAX_ENTRIES = 10_000
+XLSX_MIN_EXPANDED_MB = 200  # a workbook may always expand to this much, or 20 times the upload limit if larger
+
+
+def _check_xlsx(raw: bytes, max_upload_mb: int) -> None:
+    """Refuse workbooks that would expand far beyond their file size ("zip bombs") before opening them."""
+    try:
+        with zipfile.ZipFile(io.BytesIO(raw)) as archive:
+            entries = archive.infolist()
+    except zipfile.BadZipFile as exc:
+        raise ValidationFailed("This file is not a valid XLSX workbook. Save it again from Excel, or upload a CSV.") from exc
+    expanded = sum(entry.file_size for entry in entries)  # zipfile never inflates an entry past its declared size
+    if len(entries) > XLSX_MAX_ENTRIES or expanded > max(XLSX_MIN_EXPANDED_MB, 20 * max_upload_mb) * 1024 * 1024:
+        raise ValidationFailed("This workbook expands to far more data than MDOS accepts. Save the sheet as CSV and upload that.")
+
+
 def parse_upload(filename: str, raw: bytes) -> tuple[pd.DataFrame, str]:
     settings = get_settings()
     if len(raw) > settings.max_upload_mb * 1024 * 1024:
@@ -41,6 +58,7 @@ def parse_upload(filename: str, raw: bytes) -> tuple[pd.DataFrame, str]:
         raise ValidationFailed("Upload a CSV, TSV or XLSX file.")
     try:
         if suffix == ".xlsx":
+            _check_xlsx(raw, settings.max_upload_mb)
             # openpyxl uses defusedxml when installed, which protects against XML entity attacks.
             df = pd.read_excel(io.BytesIO(raw), engine="openpyxl", sheet_name=0, dtype=object)
             fmt = "xlsx"

@@ -3,6 +3,8 @@
 The model only returns JSON validated against a Pydantic schema. It has no tools, so it cannot act on the
 system; the calling agent decides what to do with the draft. Any failure (network, rate limit, refusal,
 truncation, invalid JSON) returns ``None`` and the agent falls back to its deterministic path.
+
+Emails, phone numbers and ID numbers are masked before anything is sent (see ``mdos.privacy``).
 """
 
 from __future__ import annotations
@@ -15,6 +17,7 @@ from typing import Any
 from pydantic import BaseModel, ValidationError
 
 from ..config import Settings, get_settings
+from ..privacy import mask_pii
 
 logger = logging.getLogger("mdos.agents")
 
@@ -62,6 +65,8 @@ class AnthropicProvider:
 
     def generate(self, *, system: str, prompt: str, schema: type[BaseModel], max_tokens: int = 16000) -> LLMResult:
         anthropic = self._anthropic
+        system, masked_system = mask_pii(system)
+        prompt, masked_prompt = mask_pii(prompt)
         kwargs: dict[str, Any] = {
             "model": self.model,
             "max_tokens": max_tokens,
@@ -75,7 +80,8 @@ class AnthropicProvider:
             kwargs["betas"] = ["server-side-fallback-2026-07-01"]
             kwargs["fallbacks"] = "default"
         started = time.monotonic()
-        meta: dict[str, Any] = {"provider": self.name, "model": self.model}
+        meta: dict[str, Any] = {"provider": self.name, "model": self.model,
+                                "masked_identifiers": masked_system + masked_prompt}
         try:
             response = self.client.beta.messages.parse(**kwargs)
         except anthropic.RateLimitError as exc:

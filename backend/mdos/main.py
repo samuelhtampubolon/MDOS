@@ -12,6 +12,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from . import __version__
+from .bodylimit import MB, BodySizeLimitMiddleware
 from .config import get_settings
 from .db import configure
 from .errors import install_handlers
@@ -57,13 +58,17 @@ def create_app(*, run_migrations: bool = True) -> FastAPI:
         redoc_url=None,
     )
     install_handlers(app)
+    # Innermost middleware, so a refused request still gets the security headers below.
+    app.add_middleware(BodySizeLimitMiddleware, json_limit=settings.max_json_mb * MB,
+                       upload_limit=(settings.max_upload_mb + 1) * MB)
 
     if settings.is_local:
         # Defends the passwordless local mode against DNS-rebinding style attacks.
         app.add_middleware(TrustedHostMiddleware, allowed_hosts=["127.0.0.1", "localhost"])
     elif settings.allowed_hosts.strip() != "*":
-        app.add_middleware(TrustedHostMiddleware,
-                           allowed_hosts=[h.strip() for h in settings.allowed_hosts.split(",") if h.strip()])
+        # Loopback names stay allowed for the container health check; browsers cannot be steered to them remotely.
+        hosts = {h.strip() for h in settings.allowed_hosts.split(",") if h.strip()} | {"127.0.0.1", "localhost"}
+        app.add_middleware(TrustedHostMiddleware, allowed_hosts=sorted(hosts))
 
     @app.middleware("http")
     async def security_headers(request, call_next):

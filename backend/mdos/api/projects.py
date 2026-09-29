@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -119,16 +119,21 @@ def update_project(body: ProjectPatch, access: ProjectAccess = Depends(project_a
     return project_out(access.project, access.role)
 
 
+class DeleteProjectIn(BaseModel):
+    confirm: str = Field(default="", max_length=200)
+
+
 @router.delete("/{project_id}", status_code=204)
-def delete_project(confirm: str = Query(default="", max_length=200), access: ProjectAccess = Depends(project_access),
+def delete_project(body: DeleteProjectIn | None = None, access: ProjectAccess = Depends(project_access),
                    db: Session = Depends(get_db)) -> None:
     """Data deletion workflow: removes every project row (cascade) and every stored file.
 
-    Irreversible, so the caller must repeat the project name in ``confirm``.
+    Irreversible, so the request body must repeat the project name: ``{"confirm": "<project name>"}``. It is not
+    a query parameter, so the name never lands in access logs.
     """
     access.require("owner")
     project = access.project
-    if confirm.strip() != project.name.strip():
+    if (body.confirm if body else "").strip() != project.name.strip():
         raise ValidationFailed("Type the project name exactly to confirm deletion.")
     org_id, project_id = project.org_id, project.id
     db.delete(project)

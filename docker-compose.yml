@@ -1,7 +1,8 @@
 # Local trial of the cloud deployment: the app plus PostgreSQL.
 #   cp .env.example .env   (set SECRET_KEY and POSTGRES_PASSWORD)
 #   docker compose up --build
-# Then open http://localhost:8000 and create the first account.
+# Then open http://localhost:8000 and create the first account (sign-up closes after it unless you open it).
+# The port is published on this computer only. To serve a team, put a TLS reverse proxy in front.
 services:
   db:
     image: postgres:16-alpine
@@ -11,6 +12,8 @@ services:
       POSTGRES_DB: mdos
     volumes:
       - pgdata:/var/lib/postgresql/data
+    security_opt:
+      - no-new-privileges:true
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U mdos -d mdos"]
       interval: 5s
@@ -23,15 +26,23 @@ services:
       MDOS_MODE: cloud
       DATABASE_URL: postgresql+psycopg://mdos:${POSTGRES_PASSWORD}@db:5432/mdos
       SECRET_KEY: ${SECRET_KEY:?Set SECRET_KEY (at least 32 characters) in .env}
-      ALLOW_REGISTRATION: ${ALLOW_REGISTRATION:-true}
-      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-*}
+      ALLOW_REGISTRATION: ${ALLOW_REGISTRATION:-}   # empty: only the first account may sign up
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1}
+      FORWARDED_ALLOW_IPS: ${FORWARDED_ALLOW_IPS:-127.0.0.1}
       CORS_ORIGINS: ""
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       MDOS_LLM_MODEL: ${MDOS_LLM_MODEL:-claude-opus-5-5}
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     volumes:
       - mdosdata:/data
+    read_only: true          # only /data (volume) and /tmp (memory) are writable
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
     depends_on:
       db:
         condition: service_healthy
