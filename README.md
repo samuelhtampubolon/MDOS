@@ -18,6 +18,7 @@
   <a href="frontend/package.json"><img alt="React" src="https://img.shields.io/badge/React-18-1c5cab?logo=react&logoColor=white"/></a>
   <a href="#5-claude-drafting-optional"><img alt="Claude" src="https://img.shields.io/badge/Claude-optional-1c5cab"/></a>
   <a href="SECURITY.md"><img alt="Security policy" src="https://img.shields.io/badge/Security-policy-1c5cab"/></a>
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-1c5cab"/></a>
 </div>
 
 <p align="center">
@@ -80,8 +81,9 @@ and color-blind-safe charts, each with a table view ([docs/18-interface-brief.md
    app starts; the link is also shown in the MDOS window.
 3. Click **Load the Lake Toba demo** to see the whole loop on synthetic data.
 
-Data stays in your user data folder: `%LOCALAPPDATA%\MDOS`, `~/Library/Application Support/MDOS` or
-`~/.local/share/mdos`. The app only accepts connections from your own computer.
+Data stays in your user data folder, which only your account can open: `%LOCALAPPDATA%\MDOS`,
+`~/Library/Application Support/MDOS` or `~/.local/share/mdos`. The app only accepts connections from your own
+computer. To remove MDOS completely, close it, delete the unzipped app folder and delete that data folder.
 
 ### 4.2 From source
 
@@ -194,7 +196,8 @@ and [docs/05-agent-architecture.md](docs/05-agent-architecture.md). Design syste
 
 ## 11. License
 
-Not yet chosen. Until a license is added, all rights are reserved by the repository owner.
+MDOS is released under the [MIT License](LICENSE). The open-source components it ships, and their licenses, are
+listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 ## 12. Contact
 

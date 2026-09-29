@@ -41,6 +41,8 @@ def create_app(*, run_migrations: bool = True) -> FastAPI:
     @asynccontextmanager
     async def lifespan(_app: FastAPI):
         settings.resolved_secret_key()  # fail fast in cloud mode without a key
+        if settings.is_local:
+            settings.ensure_data_dir()  # owner-only before the database and uploads are written
         if not settings.is_local and settings.allowed_hosts.strip() == "*":
             logger.warning("ALLOWED_HOSTS is '*': the host check is off. Set your public domain instead.")
         if run_migrations:

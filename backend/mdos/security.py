@@ -83,8 +83,12 @@ def session_cookie_name(request: Request) -> str:
 
 
 def set_session_cookie(response: Response, request: Request, token: str) -> None:
-    response.set_cookie(session_cookie_name(request), token, max_age=get_settings().access_token_minutes * 60,
-                        path="/", httponly=True, secure=_cookie_secure(request), samesite="strict")
+    """Desktop: a browser-session cookie (gone when the browser closes, and useless once MDOS restarts).
+    Cloud: kept until the token expires."""
+    settings = get_settings()
+    max_age = None if settings.is_local else settings.access_token_minutes * 60
+    response.set_cookie(session_cookie_name(request), token, max_age=max_age, path="/", httponly=True,
+                        secure=_cookie_secure(request), samesite="strict")
 
 
 def clear_session_cookie(response: Response, request: Request) -> None:

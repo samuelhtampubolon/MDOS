@@ -56,6 +56,7 @@ jobs:
           EXE=dist/MDOS/MDOS
           [ -f dist/MDOS/MDOS.exe ] && EXE=dist/MDOS/MDOS.exe
           export MDOS_LOCAL_KEY="$(python -c 'import secrets; print(secrets.token_urlsafe(32))')"
+          echo "::add-mask::$MDOS_LOCAL_KEY"  # the launcher prints its private link; keep the key out of public logs
           "$EXE" --no-browser --strict-port --port 8765 --data-dir "$RUNNER_TEMP/mdos-data" &
           for i in $(seq 1 60); do curl -sf http://127.0.0.1:8765/api/health && break; sleep 2; done
           curl -sf http://127.0.0.1:8765/api/health

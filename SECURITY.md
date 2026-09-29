@@ -25,7 +25,7 @@ Please test only against your own installation. Do not access other people's dat
 | Area | Protection | Where |
 |---|---|---|
 | Sessions | HttpOnly, SameSite=Strict cookie (`__Host-` prefixed over HTTPS). Changes need the `X-Requested-With: mdos` header, which other sites cannot send. Tokens carry an account session version, so "sign out on all devices" revokes them all. | `backend/mdos/security.py`, `deps.py`, `api/auth.py` |
-| Desktop mode | Bound to 127.0.0.1 with a trusted-host check. A random key is created at every launch and reaches the browser through a private (0600) redirect file, not the command line; sessions end when MDOS closes. | `backend/mdos/desktop.py` |
+| Desktop mode | Bound to 127.0.0.1 with a trusted-host check. A random key is created at every launch and reaches the browser through a private (0600) redirect file, not the command line; the session cookie ends with the browser session and is refused once MDOS restarts. The data folder is owner-only (0700), and a `.env` file in the folder MDOS starts from is ignored. | `backend/mdos/desktop.py`, `config.py` |
 | Browser | Strict Content Security Policy (no inline scripts, no third-party requests), `frame-ancestors 'none'`, COOP and CORP, Permissions-Policy, `no-store` on API responses, HSTS over HTTPS. HTML report exports are served sandboxed. | `backend/mdos/main.py`, `api/reports.py` |
 | Accounts (cloud) | Argon2id passwords, login rate limit, equal work for unknown emails, sign-up open only for the first account unless `ALLOW_REGISTRATION=true`. | `api/auth.py`, `ratelimit.py` |
 | Tenancy | Every project route checks organization and role; other organizations' projects answer "not found". | `deps.py` |

@@ -103,6 +103,21 @@ class Settings(BaseSettings):
     def llm_enabled(self) -> bool:
         return bool(self.anthropic_api_key)
 
+    def ensure_data_dir(self) -> Path:
+        """Create the data folder so only its owner can open it (database, uploads, keys).
+
+        On Windows the per-user folder is already private. In local mode an existing folder that other accounts
+        could read is tightened, because the desktop build is always single-user.
+        """
+        self.mdos_data_dir.mkdir(parents=True, exist_ok=True, mode=0o700)
+        if os.name != "nt" and self.is_local:
+            try:
+                if self.mdos_data_dir.stat().st_mode & 0o077:
+                    self.mdos_data_dir.chmod(0o700)
+            except OSError:  # pragma: no cover - read-only or foreign-owned folder
+                pass
+        return self.mdos_data_dir
+
     def resolved_secret_key(self) -> str:
         """Return the JWT signing key.
 
@@ -118,7 +133,7 @@ class Settings(BaseSettings):
         key_file = self.mdos_data_dir / "secret.key"
         if key_file.exists():
             return key_file.read_text(encoding="utf-8").strip()
-        self.mdos_data_dir.mkdir(parents=True, exist_ok=True)
+        self.ensure_data_dir()
         key = secrets.token_urlsafe(48)
         key_file.write_text(key, encoding="utf-8")
         try:
@@ -130,4 +145,7 @@ class Settings(BaseSettings):
 
 @lru_cache
 def get_settings() -> Settings:
-    return Settings()
+    # The desktop launcher sets MDOS_ENV_FILE to an empty value: a desktop app must not pick up a .env file from
+    # whatever folder it happens to be started in (one planted there could point it at another database).
+    env_file = os.environ.get("MDOS_ENV_FILE", ".env")
+    return Settings(_env_file=env_file or None)

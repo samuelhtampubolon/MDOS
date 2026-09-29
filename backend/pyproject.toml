@@ -3,6 +3,7 @@ name = "mdos"
 version = "0.1.0"
 description = "Marketing Decision OS: agentic marketing research, strategy simulation and customer journey design"
 readme = "README.md"
+license = "MIT"
 requires-python = ">=3.11"
 dependencies = [
     "fastapi>=0.115",
@@ -34,7 +35,7 @@ desktop = ["pyinstaller>=6.6"]
 mdos = "mdos.desktop:main"
 
 [build-system]
-requires = ["setuptools>=69"]
+requires = ["setuptools>=77"]  # 77+ reads the SPDX license string above
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]

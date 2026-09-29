@@ -35,7 +35,8 @@ a = Analysis(
     pathex=[str(BACKEND)],
     datas=datas,
     hiddenimports=hiddenimports,
-    excludes=["tkinter", "matplotlib", "IPython", "pytest", "notebook", "PyQt5", "PySide6"],
+    # The desktop app uses SQLite: leave out the PostgreSQL driver and GUI or notebook toolkits.
+    excludes=["tkinter", "matplotlib", "IPython", "pytest", "notebook", "PyQt5", "PySide6", "psycopg", "psycopg_binary"],
     noarchive=False,
 )
 pyz = PYZ(a.pure)

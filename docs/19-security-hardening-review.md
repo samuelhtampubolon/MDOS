@@ -52,6 +52,12 @@ Severity follows the Repair Protocol scale. "Your hands" lists what only the own
 | L5 | Low | Configuration | `.env.example` suggested `ALLOWED_HOSTS=*` and open sign-up; blank values counted as set. | Safe examples; empty values count as unset. | Revert ce88a79 | None |
 | L6 | Low | Headers | No Permissions-Policy, COOP, CORP, HSTS or `no-store`. | Added. | Revert f592e07 | None |
 | L7 | Low | Launcher | The private link file stayed on disk after SIGTERM. | Removed on SIGTERM, SIGHUP and Ctrl+C. | Revert fa69499 | None |
+| M12 | Medium | Desktop data folder | The folder was created readable by other accounts (755), so on a shared Mac or Linux computer they could read the database and uploads. | Created owner-only (700) and tightened at start in desktop mode; `/data` is 700 in the image. | Revert the second review commit | None |
+| M13 | Medium | Desktop settings | A `.env` file in the folder MDOS was started from was read, so a planted file could point the app at another database. | The desktop launcher ignores `.env` files; developers running from source still use theirs. | Same | None |
+| L8 | Low | Desktop cookie | The session cookie was kept on disk for 12 hours. | A browser-session cookie in desktop mode (tokens from earlier launches were already refused). | Same | None |
+| L9 | Low | Desktop server | Responses announced `server: uvicorn`. | Header removed, as in the Docker image. | Same | None |
+| L10 | Low | CI logs | The desktop smoke test's throwaway key appeared in public logs. | Masked with `::add-mask::`; CI also verifies npm registry signatures. | Same | None |
+| L11 | Low | Robustness | Two `assert` statements guarded database setup (removed under `python -O`). | Explicit errors. | Same | None |
 
 No live secret was found in the working tree or in any commit, so nothing needs rotating.
 
@@ -64,8 +70,11 @@ No live secret was found in the working tree or in any commit, so nothing needs 
 | npm dependencies (`npm audit`) | 0 vulnerabilities |
 | Banned patterns (`shell=True`, `eval`, `exec`, `os.system`, `verify=False`, CORS `*`, token storage, header or cookie logging) | None in application code; subprocesses only in build scripts with fixed arguments |
 | Deletion paths | Three, each guarded: storage (UUID and depth checks, tested with `..` paths), the launcher file, the E2E folder (temp-directory prefix check) |
+| Static analysis (Ruff with the Bandit `S` rules, all rules forced on) | No findings after replacing two `assert` statements |
+| Live server probe (plain HTTP requests against a running desktop server) | Headers, no-store, key gating, cookie flags, CSRF refusal, host check, docs off, no cross-site CORS, 413 for large bodies, owner-only folder: all as designed |
+| Personal data in the repository | None: sample emails use the reserved `example.com` domain, no phone or ID numbers, commits are authored by `noreply` addresses, the Excel sample's metadata names only openpyxl |
 | Outbound calls | The Anthropic SDK only; the launcher's health check is a fixed loopback URL; the web app calls its own origin |
-| Backend tests (SQLite and PostgreSQL in CI) | 84 passed, including 22 security tests |
+| Backend tests (SQLite and PostgreSQL in CI) | 87 passed, including 25 security tests |
 | Frontend unit tests | 7 passed, including the no-shadow, no-gradient guard |
 | End-to-end tests | 13 passed: locked desktop screen, wrong key refused, HttpOnly Strict cookie, cookie without header refused, sandboxed export, phone widths |
 | Desktop builds (Windows, macOS, Linux) | Built and smoke-tested with the launch key, the session cookie and the demo |
@@ -85,8 +94,8 @@ No live secret was found in the working tree or in any commit, so nothing needs 
    security updates, private vulnerability reporting and CodeQL (default setup).
 2. Choose the default branch you will release from and protect it: require pull requests, the CI checks and a
    review; block force pushes and deletion.
-3. Review the four Dependabot pull requests opened when Dependabot was switched on: #2 (dev tools, minor versions)
-   can be merged if CI is green; #1 (a single `pydantic-core` bump) and #3 and #4 (React 19, a major migration) can be
+3. Review the Dependabot pull requests opened when Dependabot was switched on: #2 (dev tools, minor versions) can be
+   merged if CI is green; #1 (a single `pydantic-core` bump) and #3 and #4 (React 19, a major migration) can be
    closed. The configuration now stops proposing those two kinds of update.
 4. When deploying the cloud version: set `SECRET_KEY`, your domain in `ALLOWED_HOSTS` and your proxy address in
    `FORWARDED_ALLOW_IPS`, and keep `ALLOW_REGISTRATION` empty.

@@ -274,3 +274,45 @@ def test_empty_settings_values_count_as_unset(monkeypatch, tmp_path):
     monkeypatch.setenv("ALLOW_REGISTRATION", "")
     settings = Settings(mdos_data_dir=tmp_path)
     assert settings.secret_key is None and settings.allow_registration is None
+
+
+def test_desktop_data_folder_is_private(tmp_path, monkeypatch):
+    import os
+
+    from mdos.config import Settings
+
+    if os.name == "nt":
+        pytest.skip("Windows user folders are private through their access lists")
+    shared = tmp_path / "data"
+    shared.mkdir(mode=0o755)
+    shared.chmod(0o755)
+    Settings(mdos_mode="local", mdos_data_dir=shared).ensure_data_dir()
+    assert shared.stat().st_mode & 0o777 == 0o700
+    fresh = tmp_path / "new" / "data"
+    Settings(mdos_mode="local", mdos_data_dir=fresh).ensure_data_dir()
+    assert fresh.stat().st_mode & 0o077 == 0
+
+
+def test_desktop_ignores_a_dotenv_in_the_start_folder(tmp_path, monkeypatch):
+    from mdos.config import get_settings
+
+    (tmp_path / ".env").write_text("DATABASE_URL=postgresql://attacker.example/steal\n", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.delenv("DATABASE_URL", raising=False)
+    monkeypatch.setenv("MDOS_ENV_FILE", "")  # what the desktop launcher sets
+    get_settings.cache_clear()
+    try:
+        assert get_settings().database_url is None
+        monkeypatch.delenv("MDOS_ENV_FILE")  # developers running from source still get their .env
+        get_settings.cache_clear()
+        assert get_settings().database_url == "postgresql://attacker.example/steal"
+    finally:
+        get_settings.cache_clear()
+
+
+def test_desktop_cookie_ends_with_the_browser_session(make_client):
+    local = make_client("local")
+    assert "max-age" not in local.post("/api/v1/auth/local-session").headers["set-cookie"].lower()
+    cloud = make_client("cloud", ALLOW_REGISTRATION="true")  # same database: the local owner already exists
+    body = {"email": "ana@example.com", "password": "correct horse battery", "name": "Ana", "organization": "Org"}
+    assert "max-age=" in cloud.post("/api/v1/auth/register", json=body).headers["set-cookie"].lower()

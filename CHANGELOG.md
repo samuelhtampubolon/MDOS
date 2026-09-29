@@ -17,6 +17,13 @@ versioning.
 - Supply chain: hash-pinned Python dependencies, npm without install scripts, actions pinned to commits,
   Dependabot, `pip-audit`, `npm audit` and a secret scan in CI; vulnerable packages upgraded; Node.js 24 LTS.
 - New [SECURITY.md](SECURITY.md) and [docs/19-security-hardening-review.md](docs/19-security-hardening-review.md).
+- Second review: owner-only desktop data folder, stray `.env` files ignored by the desktop app, a browser-session
+  cookie on the desktop, no server header, masked CI keys, npm registry signature checks, explicit setup errors.
+
+### Added
+
+- MIT License and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md); the desktop bundle leaves out the PostgreSQL
+  driver.
 
 ### Changed
 

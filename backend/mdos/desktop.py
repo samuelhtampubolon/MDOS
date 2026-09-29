@@ -81,6 +81,7 @@ def main(argv: list[str] | None = None) -> None:
     args = parser.parse_args(argv)
 
     os.environ["MDOS_MODE"] = "local"  # the desktop build is always single-user and loopback-only
+    os.environ["MDOS_ENV_FILE"] = ""  # never read a .env file from the folder MDOS was started in
     if args.data_dir:
         os.environ["MDOS_DATA_DIR"] = args.data_dir
     key = os.environ.get("MDOS_LOCAL_KEY") or secrets.token_urlsafe(32)  # set by tests; otherwise new per launch
@@ -97,7 +98,7 @@ def main(argv: list[str] | None = None) -> None:
     url = f"http://127.0.0.1:{port}/"
     open_url = f"{url}#key={key}"
     app = create_app()
-    launcher = _write_launcher(settings.mdos_data_dir, open_url)
+    launcher = _write_launcher(settings.ensure_data_dir(), open_url)
     if not args.no_browser:
         threading.Thread(target=_open_when_ready, args=(url, launcher), daemon=True).start()
     print("Marketing Decision OS is running.")
@@ -109,7 +110,7 @@ def main(argv: list[str] | None = None) -> None:
         if hasattr(signal, name):
             signal.signal(getattr(signal, name), _exit_on_signal)
     try:
-        uvicorn.run(app, host="127.0.0.1", port=port, log_level="warning")
+        uvicorn.run(app, host="127.0.0.1", port=port, log_level="warning", server_header=False)
     finally:
         launcher.unlink(missing_ok=True)
 

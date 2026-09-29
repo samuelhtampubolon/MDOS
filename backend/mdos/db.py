@@ -78,14 +78,16 @@ def configure(settings: Settings | None = None, engine: Engine | None = None) ->
 def get_engine() -> Engine:
     if _engine is None:
         configure()
-    assert _engine is not None
+    if _engine is None:  # an explicit check survives python -O, unlike assert
+        raise RuntimeError("The database engine is not configured.")
     return _engine
 
 
 def session_factory() -> sessionmaker[Session]:
     if _SessionLocal is None:
         configure()
-    assert _SessionLocal is not None
+    if _SessionLocal is None:
+        raise RuntimeError("The database session factory is not configured.")
     return _SessionLocal
 
 

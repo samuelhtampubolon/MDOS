@@ -31,7 +31,7 @@ RUN pip install --require-hashes --only-binary=:all: -r requirements.txt
 COPY backend/mdos ./mdos
 COPY --from=frontend /app/backend/mdos/static ./mdos/static
 RUN useradd --create-home --uid 10001 mdos \
-    && mkdir -p /data && chown mdos:mdos /data
+    && mkdir -p /data && chown mdos:mdos /data && chmod 700 /data
 
 USER mdos
 VOLUME ["/data"]
