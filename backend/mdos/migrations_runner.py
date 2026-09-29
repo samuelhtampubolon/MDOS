@@ -19,8 +19,9 @@ def _alembic_config():
     from alembic.config import Config
 
     cfg = Config()
-    cfg.set_main_option("script_location", str(MIGRATIONS_DIR))
-    cfg.set_main_option("sqlalchemy.url", get_engine().url.render_as_string(hide_password=False))
+    # ConfigParser treats "%" as interpolation; file URLs contain it (for example "D%3A" for a Windows drive).
+    cfg.set_main_option("script_location", str(MIGRATIONS_DIR).replace("%", "%%"))
+    cfg.set_main_option("sqlalchemy.url", get_engine().url.render_as_string(hide_password=False).replace("%", "%%"))
     return cfg
 
 
@@ -35,11 +36,12 @@ def upgrade_database() -> None:
     engine = get_engine()
     tables = set(inspect(engine).get_table_names())
     cfg = _alembic_config()
-    if tables and "alembic_version" not in tables:
-        # Database created before migrations existed: record it as current.
+    legacy = bool(tables) and "alembic_version" not in tables
+    if legacy:  # database created before migrations existed: complete it, then record it as current
         create_all()
-        command.stamp(cfg, "head")
-        return
     with engine.begin() as connection:
         cfg.attributes["connection"] = connection
-        command.upgrade(cfg, "head")
+        if legacy:
+            command.stamp(cfg, "head")
+        else:
+            command.upgrade(cfg, "head")

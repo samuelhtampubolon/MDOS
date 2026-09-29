@@ -115,3 +115,13 @@ def test_invalid_expired_and_forged_tokens_are_rejected(local_client):
                         "not-the-server-key-" * 3, algorithm="HS256")
     for token in (expired, forged, "not-a-token"):
         assert local_client.get("/api/v1/projects", headers={"Authorization": f"Bearer {token}"}).status_code == 401
+
+
+def test_startup_with_percent_in_database_path(make_client, tmp_path):
+    """Windows file URLs contain %3A for the drive; migrations must not choke on the percent sign."""
+    folder = tmp_path / "data:folder"  # rendered as data%3Afolder, like a Windows drive letter
+    folder.mkdir()
+    client = make_client("local", DATABASE_URL=f"sqlite:///{(folder / 'mdos.db').as_posix()}")
+    assert client.get("/api/health").status_code == 200
+    token = client.post("/api/v1/auth/local-session").json()["access_token"]
+    assert client.get("/api/v1/projects", headers={"Authorization": f"Bearer {token}"}).status_code == 200

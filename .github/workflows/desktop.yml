@@ -12,6 +12,10 @@ on:
       - "scripts/build_desktop.py"
       - "backend/pyproject.toml"
       - "backend/mdos/desktop.py"
+      - "backend/mdos/main.py"
+      - "backend/mdos/config.py"
+      - "backend/mdos/migrations_runner.py"
+      - "backend/mdos/migrations/**"
       - ".github/workflows/desktop.yml"
 
 permissions:
