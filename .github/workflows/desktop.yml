@@ -1,10 +1,18 @@
 name: Desktop build
 
-# Builds the desktop app for Windows, macOS and Linux. Run it from the Actions tab, or push a tag like v0.1.0.
+# Builds the desktop app for Windows, macOS and Linux. Runs from the Actions tab, on a tag like v0.1.0,
+# and on branch pushes that change the packaging.
 on:
   workflow_dispatch:
   push:
     tags: ["v*"]
+    branches: [main, "claude/**"]
+    paths:
+      - "packaging/**"
+      - "scripts/build_desktop.py"
+      - "backend/pyproject.toml"
+      - "backend/mdos/desktop.py"
+      - ".github/workflows/desktop.yml"
 
 permissions:
   contents: read
