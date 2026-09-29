@@ -20,14 +20,18 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def run(cmd: list[str], cwd: Path) -> None:
+    """Run a fixed command without a shell. npm is npm.cmd on Windows, so resolve the program's full path first."""
+    program = shutil.which(cmd[0])
+    if program is None:
+        raise SystemExit(f"{cmd[0]} was not found. Install it and try again.")
     print("+", " ".join(cmd))
-    subprocess.run(cmd, cwd=cwd, check=True, shell=sys.platform == "win32")  # noqa: S603
+    subprocess.run([program, *cmd[1:]], cwd=cwd, check=True)  # noqa: S603
 
 
 def main() -> None:
     frontend = ROOT / "frontend"
     if "--skip-frontend" not in sys.argv:
-        run(["npm", "ci"], frontend)
+        run(["npm", "ci", "--ignore-scripts"], frontend)  # exact lockfile versions; package scripts never run
         run(["npm", "run", "build"], frontend)
     run([sys.executable, "-m", "PyInstaller", str(ROOT / "packaging" / "mdos.spec"), "--noconfirm", "--clean",
          "--distpath", str(ROOT / "dist"), "--workpath", str(ROOT / "build" / "pyinstaller")], ROOT)

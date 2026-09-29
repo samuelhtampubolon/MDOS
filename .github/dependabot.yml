@@ -1,0 +1,22 @@
+# Weekly update proposals. Security updates also arrive as soon as an advisory is published
+# (turn on "Dependabot alerts" and "Dependabot security updates" in the repository settings).
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]
+  - package-ecosystem: npm
+    directory: /frontend
+    schedule:
+      interval: weekly
+    groups:
+      frontend-dev-tools:
+        dependency-type: development
+  - package-ecosystem: pip
+    directory: /backend
+    schedule:
+      interval: weekly

@@ -15,6 +15,7 @@ import html
 import multiprocessing
 import os
 import secrets
+import signal
 import socket
 import sys
 import threading
@@ -64,6 +65,10 @@ def _open_when_ready(url: str, launcher: Path, timeout: float = 60.0) -> None:
             time.sleep(0.4)
 
 
+def _exit_on_signal(*_args: object) -> None:
+    raise SystemExit(0)  # lets the launcher's clean-up run when MDOS is stopped or its terminal is closed
+
+
 def main(argv: list[str] | None = None) -> None:
     if getattr(sys, "frozen", False):
         multiprocessing.freeze_support()  # required for worker processes in the packaged build on Windows
@@ -99,6 +104,10 @@ def main(argv: list[str] | None = None) -> None:
     print(f"  Open this private link (it works until MDOS is closed): {open_url}")
     print(f"  Data folder: {settings.mdos_data_dir}")
     print("  Press Ctrl+C to stop.")
+    # uvicorn stops gracefully on these signals, then re-raises them to the handler set here.
+    for name in ("SIGTERM", "SIGHUP", "SIGBREAK"):
+        if hasattr(signal, name):
+            signal.signal(getattr(signal, name), _exit_on_signal)
     try:
         uvicorn.run(app, host="127.0.0.1", port=port, log_level="warning")
     finally:

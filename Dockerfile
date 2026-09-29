@@ -2,10 +2,11 @@
 # Marketing Decision OS: cloud image. One process serves the API and the built web app.
 
 # ---- 1. Build the React frontend ---------------------------------------------------------------
-FROM node:20-alpine AS frontend
+FROM node:24-alpine AS frontend
 WORKDIR /app/frontend
 COPY frontend/package.json frontend/package-lock.json ./
-RUN npm ci --no-audit --no-fund
+# Exact versions from the lockfile; package install scripts never run.
+RUN npm ci --ignore-scripts --no-audit --no-fund
 COPY frontend/ ./
 # Vite writes the build into ../backend/mdos/static
 RUN npm run build
@@ -21,16 +22,15 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     FORWARDED_ALLOW_IPS=127.0.0.1
 WORKDIR /app/backend
 
-# Dependencies first, so source changes do not reinstall them.
-COPY backend/pyproject.toml ./
-RUN python -c "import tomllib; d = tomllib.load(open('pyproject.toml', 'rb'))['project']; \
-print('\n'.join(d['dependencies'] + d['optional-dependencies']['postgres']))" > /tmp/requirements.txt \
-    && pip install -r /tmp/requirements.txt "setuptools>=69"
+# Dependencies first, so source changes do not reinstall them. Every package is pinned with its hash in
+# requirements.txt and installed from prebuilt wheels only, so no package build script runs.
+COPY backend/requirements.txt ./
+RUN pip install --require-hashes --only-binary=:all: -r requirements.txt
 
-COPY backend/ ./
+# The app runs from source (uvicorn imports mdos from this folder); tests and tooling stay out of the image.
+COPY backend/mdos ./mdos
 COPY --from=frontend /app/backend/mdos/static ./mdos/static
-RUN pip install --no-deps --no-build-isolation . \
-    && useradd --create-home --uid 10001 mdos \
+RUN useradd --create-home --uid 10001 mdos \
     && mkdir -p /data && chown mdos:mdos /data
 
 USER mdos
