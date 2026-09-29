@@ -28,10 +28,26 @@ services:
       SECRET_KEY: ${SECRET_KEY:?Set SECRET_KEY (at least 32 characters) in .env}
       ALLOW_REGISTRATION: ${ALLOW_REGISTRATION:-}   # empty: only the first account may sign up
       ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1}
+      # The address the proxy connects from as the container sees it (for a proxy on this host, the Compose
+      # network's gateway; see docs/13-deployment.md). The default matches no proxy, so proxy headers are ignored.
       FORWARDED_ALLOW_IPS: ${FORWARDED_ALLOW_IPS:-127.0.0.1}
+      COOKIE_SECURE: ${COOKIE_SECURE:-}              # set true behind a TLS proxy
       CORS_ORIGINS: ""
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       MDOS_LLM_MODEL: ${MDOS_LLM_MODEL:-claude-opus-5-5}
+      # Optional settings from .env (see .env.example). Empty values keep the app's own defaults.
+      ENABLE_API_DOCS: ${ENABLE_API_DOCS:-}
+      ACCESS_TOKEN_MINUTES: ${ACCESS_TOKEN_MINUTES:-}
+      MDOS_LLM_EFFORT: ${MDOS_LLM_EFFORT:-}
+      MDOS_LLM_FALLBACKS: ${MDOS_LLM_FALLBACKS:-}
+      MDOS_LLM_TIMEOUT_SECONDS: ${MDOS_LLM_TIMEOUT_SECONDS:-}
+      MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-}
+      MAX_JSON_MB: ${MAX_JSON_MB:-}
+      MAX_ROWS: ${MAX_ROWS:-}
+      MAX_COLS: ${MAX_COLS:-}
+      RATE_LIMIT_AUTH_PER_MINUTE: ${RATE_LIMIT_AUTH_PER_MINUTE:-}
+      RATE_LIMIT_AGENTS_PER_MINUTE: ${RATE_LIMIT_AGENTS_PER_MINUTE:-}
+      RATE_LIMIT_UPLOADS_PER_MINUTE: ${RATE_LIMIT_UPLOADS_PER_MINUTE:-}
     ports:
       - "127.0.0.1:8000:8000"
     volumes:

@@ -19,11 +19,18 @@ versioning.
 - New [SECURITY.md](SECURITY.md) and [docs/19-security-hardening-review.md](docs/19-security-hardening-review.md).
 - Second review: owner-only desktop data folder, stray `.env` files ignored by the desktop app, a browser-session
   cookie on the desktop, no server header, masked CI keys, npm registry signature checks, explicit setup errors.
+- Cloud settings: `docker-compose.yml` now passes every documented setting to the app (`COOKIE_SECURE`, the limits
+  and the model options were ignored), and the deployment guide explains which proxy address the container sees;
+  `COOKIE_SECURE=true` is recommended behind TLS.
 
 ### Added
 
 - MIT License and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md); the desktop bundle leaves out the PostgreSQL
   driver.
+- User and operations manual in Word,
+  [docs/MDOS-User-and-Operations-Manual.docx](docs/MDOS-User-and-Operations-Manual.docx): installation, every module,
+  Claude drafting, security, administration, troubleshooting, the owner's checklist, a glossary and a settings
+  reference.
 
 ### Changed
 

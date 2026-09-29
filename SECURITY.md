@@ -42,11 +42,11 @@ The threat model is in [docs/12-security-threat-model.md](docs/12-security-threa
 |---|---|
 | `SECRET_KEY` | 48 or more random characters from your secret store (the app refuses to start without 32) |
 | `ALLOWED_HOSTS` | Your public host name(s); never `*` unless your proxy checks hosts |
-| `FORWARDED_ALLOW_IPS` | Your reverse proxy's address only |
+| `FORWARDED_ALLOW_IPS` | Your reverse proxy's address as the app sees it, never `*` (in Docker, the Compose network's gateway for a proxy on the same host; see docs/13-deployment.md) |
 | `ALLOW_REGISTRATION` | Empty (first account only) or `false` |
 | `CORS_ORIGINS` | Empty; `*` is refused |
 | `ENABLE_API_DOCS` | `false` |
-| `COOKIE_SECURE` | Empty behind a TLS proxy that sets the scheme, or `true` |
+| `COOKIE_SECURE` | `true` behind a TLS proxy |
 
 ## 5. Sandbox rules for contributors and AI coding agents
 

@@ -189,7 +189,11 @@ The backend suite also runs on PostgreSQL when `TEST_DATABASE_URL` is set (CI do
 
 ## 10. Documentation
 
-Start with [docs/00-synthesis.md](docs/00-synthesis.md). Architecture: [docs/04-architecture.md](docs/04-architecture.md)
+**User manual:** [docs/MDOS-User-and-Operations-Manual.docx](docs/MDOS-User-and-Operations-Manual.docx), a Word
+guide of about 26 pages with screenshots: installing the desktop app and the cloud version, every module, security,
+administration, troubleshooting and the owner's checklist.
+
+For the design, start with [docs/00-synthesis.md](docs/00-synthesis.md). Architecture: [docs/04-architecture.md](docs/04-architecture.md)
 and [docs/05-agent-architecture.md](docs/05-agent-architecture.md). Design system:
 [docs/09-design-system.md](docs/09-design-system.md). Rules for contributors and coding agents:
 [AGENTS.md](AGENTS.md).

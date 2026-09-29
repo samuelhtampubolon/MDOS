@@ -58,6 +58,7 @@ Severity follows the Repair Protocol scale. "Your hands" lists what only the own
 | L9 | Low | Desktop server | Responses announced `server: uvicorn`. | Header removed, as in the Docker image. | Same | None |
 | L10 | Low | CI logs | The desktop smoke test's throwaway key appeared in public logs. | Masked with `::add-mask::`; CI also verifies npm registry signatures. | Same | None |
 | L11 | Low | Robustness | Two `assert` statements guarded database setup (removed under `python -O`). | Explicit errors. | Same | None |
+| M14 | Medium | Cloud settings | `docker-compose.yml` passed only some settings to the app, so `COOKIE_SECURE`, the limits and the model options set in `.env` were silently ignored. Inside Docker a proxy on the same host connects from the Compose network's gateway, so the documented `FORWARDED_ALLOW_IPS=127.0.0.1` never matched it and, behind TLS, the session cookie was not marked Secure. | Compose passes every documented setting (empty values keep the defaults); the deployment guide, `.env.example` and SECURITY.md recommend `COOKIE_SECURE=true` and explain how to find the gateway address. | Revert the manual commit | Set `COOKIE_SECURE=true` and the gateway address when deploying |
 
 No live secret was found in the working tree or in any commit, so nothing needs rotating.
 
@@ -94,11 +95,12 @@ No live secret was found in the working tree or in any commit, so nothing needs 
    security updates, private vulnerability reporting and CodeQL (default setup).
 2. Choose the default branch you will release from and protect it: require pull requests, the CI checks and a
    review; block force pushes and deletion.
-3. Review the Dependabot pull requests opened when Dependabot was switched on: #2 (dev tools, minor versions) can be
-   merged if CI is green; #1 (a single `pydantic-core` bump) and #3 and #4 (React 19, a major migration) can be
-   closed. The configuration now stops proposing those two kinds of update.
-4. When deploying the cloud version: set `SECRET_KEY`, your domain in `ALLOWED_HOSTS` and your proxy address in
-   `FORWARDED_ALLOW_IPS`, and keep `ALLOW_REGISTRATION` empty.
+3. Dependabot's first pull requests (#1 to #5) are closed, and the Playwright update from #5 is in the branch. Delete
+   the leftover branch `dependabot/npm_and_yarn/frontend/frontend-dev-tools-a948c343a0` and turn on **Automatically
+   delete head branches** (Settings, General).
+4. When deploying the cloud version: set `SECRET_KEY`, your domain in `ALLOWED_HOSTS`, `COOKIE_SECURE=true` and your
+   proxy's address as the container sees it in `FORWARDED_ALLOW_IPS` (docs/13-deployment.md), and keep
+   `ALLOW_REGISTRATION` empty.
 5. Sign the desktop releases (Windows code signing, Apple Developer ID and notarization) so users do not see
    SmartScreen or Gatekeeper warnings.
 6. Confirm or change the answers in section 1 and in [18-interface-brief.md](18-interface-brief.md).

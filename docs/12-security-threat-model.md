@@ -58,8 +58,9 @@ the control that exists today, how it is verified, and what remains open.
 
 1. Set a random `SECRET_KEY` (48+ characters) and keep it in the host's secret store.
 2. Use PostgreSQL with TLS, daily backups and point-in-time recovery.
-3. Terminate TLS at a proxy; set `ALLOWED_HOSTS` to the public host name and `FORWARDED_ALLOW_IPS` to the proxy's
-   address (the app then sends HSTS and marks the session cookie Secure).
+3. Terminate TLS at a proxy; set `ALLOWED_HOSTS` to the public host name, `COOKIE_SECURE=true`, and
+   `FORWARDED_ALLOW_IPS` to the proxy's address as the app sees it (in Docker, the Compose network's gateway for a
+   proxy on the same host; see docs/13). The app then sees real client addresses and sends HSTS.
 4. Leave `ALLOW_REGISTRATION` empty: only the first account can sign up. Set it to `true` only for an open,
    multi-workspace service (every stranger's workspace would use your Claude key).
 5. Keep `CORS_ORIGINS` empty unless another domain must call the API.

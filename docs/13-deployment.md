@@ -32,9 +32,11 @@ SmartScreen or Gatekeeper warnings; an installer and auto-update are Phase 2.
 
 ### Container
 
-* `Dockerfile`: stage 1 builds the web app with Node 20; stage 2 is `python:3.11-slim` with the dependencies, runs as
-  user `mdos` (uid 10001), exposes 8000, has a health check on `/api/health` and stores files in the `/data` volume.
-* Start command: `uvicorn mdos.main:create_app --factory --host 0.0.0.0 --port $PORT --proxy-headers`.
+* `Dockerfile`: stage 1 builds the web app with Node 24; stage 2 is `python:3.11-slim` with the hash-pinned
+  dependencies, runs as user `mdos` (uid 10001), exposes 8000, has a health check on `/api/health` and stores files
+  in the `/data` volume (owner-only).
+* Start command: `uvicorn mdos.main:create_app --factory --host 0.0.0.0 --port $PORT --proxy-headers
+  --forwarded-allow-ips=$FORWARDED_ALLOW_IPS --no-server-header`.
 * Migrations run at start-up (Alembic). With several replicas, start one first or run
   `alembic -c alembic.ini upgrade head` as a release step.
 
@@ -47,12 +49,13 @@ SmartScreen or Gatekeeper warnings; an installer and auto-update are Phase 2.
 | `DATABASE_URL` | `postgresql+psycopg://user:password@host:5432/mdos?sslmode=require` |
 | `ALLOWED_HOSTS` | Public host name(s), for example `mdos.example.com` |
 | `ALLOW_REGISTRATION` | Empty (default): only the first account may sign up. `true`: open sign-up. `false`: closed |
-| `FORWARDED_ALLOW_IPS` | Your reverse proxy's address (default `127.0.0.1`); only it may set client IP and https headers |
-| `COOKIE_SECURE` | Empty: Secure cookie when the request arrived over https. `true` to always require https |
+| `FORWARDED_ALLOW_IPS` | The address your reverse proxy connects from, as the container sees it (default `127.0.0.1`); only it may set client IP and https headers. See "A single server with Docker Compose" below |
+| `COOKIE_SECURE` | `true` behind a TLS proxy. Empty: Secure cookie only when the request is known to have arrived over https |
 | `ANTHROPIC_API_KEY` | Optional; enables Claude drafting |
 | `MDOS_LLM_MODEL`, `MDOS_LLM_EFFORT`, `MDOS_LLM_FALLBACKS` | Optional model settings (defaults `claude-opus-5-5`, `medium`, `true`) |
 
-See `.env.example` for limits and rate limits.
+See `.env.example` for limits and rate limits; `docker-compose.yml` passes every one of them to the app, and empty
+values keep the defaults.
 
 ### Hosting options (choose one)
 
@@ -61,6 +64,27 @@ See `.env.example` for limits and rate limits.
 | A container platform (Google Cloud Run, AWS App Runner, Azure Container Apps, Fly.io, Railway, Render) with managed PostgreSQL | Recommended for the MVP | Mount or attach persistent storage for `/data`, or move files to object storage (Phase 2). Keep one instance until the rate limiter uses a shared store |
 | A single VM with `docker compose` (the included `docker-compose.yml`) behind Caddy or Nginx | Cheapest; fine for pilots | Add TLS in the proxy, daily `pg_dump` backups and OS updates |
 | Kubernetes | Later, for enterprise customers | Needs a shared rate limit store and object storage first |
+
+### A single server with Docker Compose
+
+1. `cp .env.example .env`, then set `SECRET_KEY` (for example `python3 -c "import secrets;
+   print(secrets.token_urlsafe(48))"`) and a long random `POSTGRES_PASSWORD`. Start with `docker compose up --build -d`.
+2. Put a TLS proxy on the same server in front of `127.0.0.1:8000`. With Caddy, this `Caddyfile` is enough; Caddy
+   keeps the original host name and obtains the certificate:
+
+   ```
+   mdos.example.com {
+       reverse_proxy 127.0.0.1:8000
+   }
+   ```
+
+3. In `.env`, set `ALLOWED_HOSTS=mdos.example.com,localhost` and `COOKIE_SECURE=true`.
+4. The container does not see the proxy as `127.0.0.1`: Docker forwards the published port from the Compose
+   network's gateway. Print that address with
+   `docker inspect -f '{{range .NetworkSettings.Networks}}{{.Gateway}}{{end}}' $(docker compose ps -q app)` and set it
+   as `FORWARDED_ALLOW_IPS` (check it again if you recreate the network). Until then MDOS ignores proxy headers,
+   which is safe, but it sees every visitor as the gateway, so the sign-in rate limit is shared by everyone.
+5. Apply the changes with `docker compose up -d`.
 
 For Indonesian customers, choose a Jakarta region (available on the major clouds) to keep latency low and to simplify
 personal data residency conversations.
