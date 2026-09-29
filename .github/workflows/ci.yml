@@ -1,0 +1,124 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "claude/**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend (${{ matrix.database }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        database: [sqlite, postgres]
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: mdos
+          POSTGRES_PASSWORD: mdos
+          POSTGRES_DB: mdos_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U mdos -d mdos_test"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: backend/pyproject.toml
+      - run: pip install -e ".[dev,postgres]"
+      - name: Lint
+        if: matrix.database == 'sqlite'
+        run: ruff check mdos tests
+      - name: Tests
+        env:
+          TEST_DATABASE_URL: ${{ matrix.database == 'postgres' && 'postgresql+psycopg://mdos:mdos@localhost:5432/mdos_test' || '' }}
+        run: pytest -q
+      - name: Migrations match the models
+        if: matrix.database == 'sqlite'
+        run: |
+          alembic -c alembic.ini upgrade head
+          alembic -c alembic.ini check
+
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+
+  e2e:
+    name: End-to-end (Playwright)
+    needs: [backend, frontend]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: backend/pyproject.toml
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: pip install -e "backend[dev]"
+      - working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+          npx playwright install --with-deps chromium
+      - working-directory: frontend
+        run: npx playwright test
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            frontend/playwright-report
+            frontend/test-results
+          retention-days: 7
+
+  docker:
+    name: Docker image
+    needs: [backend, frontend]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t mdos:ci .
+      - name: Smoke test (cloud mode, SQLite in the data volume)
+        run: |
+          docker run -d --name mdos -p 8000:8000 -e SECRET_KEY="$(openssl rand -base64 48)" mdos:ci
+          for i in $(seq 1 30); do curl -sf http://127.0.0.1:8000/api/health && break; sleep 2; done
+          curl -sf http://127.0.0.1:8000/api/health
+          curl -sf http://127.0.0.1:8000/ | grep -q "<div id=\"root\">"
+      - if: always()
+        run: docker logs mdos || true

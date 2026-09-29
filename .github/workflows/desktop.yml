@@ -1,0 +1,46 @@
+name: Desktop build
+
+# Builds the desktop app for Windows, macOS and Linux. Run it from the Actions tab, or push a tag like v0.1.0.
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: backend/pyproject.toml
+      - run: pip install -e "backend[desktop]"
+      - run: python scripts/build_desktop.py
+      - name: Smoke test the executable
+        shell: bash
+        run: |
+          EXE=dist/MDOS/MDOS
+          [ -f dist/MDOS/MDOS.exe ] && EXE=dist/MDOS/MDOS.exe
+          "$EXE" --no-browser --strict-port --port 8765 --data-dir "$RUNNER_TEMP/mdos-data" &
+          for i in $(seq 1 60); do curl -sf http://127.0.0.1:8765/api/health && break; sleep 2; done
+          curl -sf http://127.0.0.1:8765/api/health
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MDOS-${{ runner.os }}
+          path: dist/MDOS-*.zip
+          retention-days: 30
