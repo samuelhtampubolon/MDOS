@@ -76,14 +76,15 @@ def analyze(df: pd.DataFrame, text_column: str, template_key: str = "tourism", r
         sub = mapped[mapped["stage"] == key]
         mentions = int(sub["doc"].nunique())
         neg = sub[sub["label"] == "negative"]
+        pos = sub[sub["label"] == "positive"]
         stage_rows.append({
             "key": key, "name": names[key], "mentions": mentions, "mention_share": mentions / n_docs,
             "emotion": float(sub["compound"].mean()) if len(sub) else None,
             "negative_share": float((sub["label"] == "negative").mean()) if len(sub) else None,
             "positive_share": float((sub["label"] == "positive").mean()) if len(sub) else None,
             "negative_mentions": int(neg["doc"].nunique()),
-            "top_positive": sub.nlargest(2, "compound")["sentence"].tolist() if len(sub) else [],
-            "top_negative": neg.nsmallest(2, "compound")["sentence"].tolist() if len(neg) else [],
+            "top_positive": pos.drop_duplicates("sentence").nlargest(2, "compound")["sentence"].tolist(),
+            "top_negative": neg.drop_duplicates("sentence").nsmallest(2, "compound")["sentence"].tolist(),
         })
 
     negatives = mapped[mapped["label"] == "negative"].copy()
@@ -99,7 +100,7 @@ def analyze(df: pd.DataFrame, text_column: str, template_key: str = "tourism", r
             continue
         severity = float(np.clip(-grp["compound"].mean(), 0, 1))
         frequency = mentions / n_docs
-        quotes = grp.nsmallest(3, "compound")["sentence"].tolist()
+        quotes = grp.drop_duplicates("sentence").nsmallest(3, "compound")["sentence"].tolist()
         pain_points.append({"stage": stage, "stage_name": names[stage], "theme": theme,
                             "title": f"{names[stage]}: {theme}", "mentions": mentions, "frequency": frequency,
                             "severity": severity, "quotes": quotes})

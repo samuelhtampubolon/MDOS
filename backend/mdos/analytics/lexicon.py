@@ -36,7 +36,7 @@ POSITIVE = {
     "stunning": 3.0, "breathtaking": 3.2, "lovely": 2.6, "nice": 1.8, "friendly": 2.2, "helpful": 2.0, "clean": 1.9,
     "comfortable": 2.0, "cozy": 2.0, "peaceful": 2.1, "relaxing": 2.1, "fun": 2.2, "enjoyable": 2.3, "enjoyed": 2.2,
     "enjoy": 2.0, "love": 3.0, "loved": 2.9, "loving": 2.5, "perfect": 3.0, "fantastic": 3.1, "memorable": 2.5,
-    "authentic": 2.2, "unique": 1.8, "interesting": 1.7, "informative": 1.8, "knowledgeable": 2.0, "worth": 1.8,
+    "authentic": 2.2, "unique": 1.8, "interesting": 1.7, "informative": 1.8, "clear": 1.0, "knowledgeable": 2.0, "worth": 1.8,
     "worthwhile": 2.1, "recommend": 2.2, "recommended": 2.2, "affordable": 1.6, "reasonable": 1.3, "fair": 1.1,
     "safe": 1.6, "easy": 1.6, "smooth": 1.7, "fast": 1.3, "quick": 1.3, "delicious": 2.8, "tasty": 2.3, "fresh": 1.6,
     "welcoming": 2.2, "warm": 1.4, "hospitable": 2.3, "impressive": 2.4, "impressed": 2.3, "happy": 2.4,
@@ -69,7 +69,8 @@ NEGATIVE = {
     "lacking": -1.5, "missing": -1.3, "hassle": -1.8, "problem": -1.7, "problems": -1.7, "issue": -1.2,
     "issues": -1.2, "worse": -2.1, "mediocre": -1.4, "meh": -1.0, "touristy": -1.1, "hate": -3.0, "annoying": -2.0,
     "unprofessional": -2.2, "overcrowded": -2.0, "potholes": -1.8, "bumpy": -1.3, "sad": -1.8, "angry": -2.4,
-    "unhelpful": -2.0, "fake": -2.2, "commercial": -0.8, "neglected": -2.0, "damaged": -2.0,
+    "unhelpful": -2.0, "fake": -2.2, "commercial": -0.8, "neglected": -2.0, "damaged": -2.0, "outdated": -1.4,
+    "unavailable": -1.3,
     # Indonesian
     "buruk": -2.6, "jelek": -2.4, "parah": -2.5, "kotor": -2.4, "jorok": -2.8, "bau": -2.2, "kumuh": -2.4,
     "kasar": -2.4, "judes": -2.3, "jutek": -2.3, "mahal": -1.7, "kemahalan": -2.3, "membosankan": -2.1,
@@ -94,6 +95,8 @@ PHRASES = {
     "waste of money": -3.0, "waste of time": -2.8, "rip off": -3.0, "buang uang": -2.8, "buang waktu": -2.5,
     "tidak sesuai": -2.0, "tidak worth": -2.0, "not worth": -2.0, "kurang terawat": -2.0, "never again": -2.8,
     "tidak akan kembali": -2.6, "gak lagi": -1.8, "bikin kecewa": -2.6, "kurang informasi": -1.6,
+    "little information": -1.6, "no information": -1.8, "hard to find": -1.5, "sulit dicari": -1.5,
+    "susah dicari": -1.5, "tidak jelas": -1.6, "gak jelas": -1.6, "nggak jelas": -1.6,
 }
 
 NEGATORS = {

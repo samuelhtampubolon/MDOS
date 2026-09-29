@@ -67,6 +67,8 @@ def test_quality_flags_planted_issues():
     straight = next(i for i in report["issues"] if i["check"] == "straightlining")
     assert 3 in straight["rows"]
     assert 0 <= report["quality_score"] < 100
+    cleaned, _ = cleaning.apply_operations(df, [{"op": "pseudonymize", "columns": ["email"]}])
+    assert "personal_data" not in {i["check"] for i in quality.diagnose(cleaned)["issues"]}
 
 
 def test_cleaning_plan_and_lineage_log():

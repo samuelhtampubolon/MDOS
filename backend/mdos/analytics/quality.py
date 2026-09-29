@@ -18,6 +18,7 @@ from .profiling import infer_type
 
 EMAIL_RE = re.compile(r"[^@\s]+@[^@\s]+\.[a-z]{2,}", re.I)
 PHONE_RE = re.compile(r"(?:\+?62|0)8[0-9\-\s]{7,13}")
+PSEUDONYM_RE = re.compile(r"[0-9a-f]{12}")  # output of the pseudonymize cleaning operation
 PII_NAMES = re.compile(
     r"(e-?mail|phone|telp|telepon|hp$|^hp|whatsapp|^wa$|^wa_|nama|^name$|full_?name|address|alamat|nik|ktp|passport)",
     re.I,
@@ -202,8 +203,9 @@ def diagnose(
     for col in df.columns:
         name = str(col)
         sample = df[col].dropna().astype(str).head(200)
-        by_value = bool(len(sample)) and (sample.str.contains(EMAIL_RE).mean() > 0.3 or
-                                          sample.str.contains(PHONE_RE).mean() > 0.3)
+        if not len(sample) or sample.str.fullmatch(PSEUDONYM_RE).all():
+            continue  # empty or already pseudonymized
+        by_value = sample.str.contains(EMAIL_RE).mean() > 0.3 or sample.str.contains(PHONE_RE).mean() > 0.3
         if PII_NAMES.search(name) or by_value:
             pii_cols.append(name)
     if pii_cols:

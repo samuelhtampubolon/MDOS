@@ -20,6 +20,7 @@ from ..models import (
     Experiment,
     Hypothesis,
     Insight,
+    Intervention,
     Journey,
     PainPoint,
     Project,
@@ -210,6 +211,10 @@ def evidence_graph(db: Session, project: Project) -> dict[str, Any]:
             edges += [{"from": f"evidence:{eid}", "to": f"pain_point:{pp.id}"} for eid in (pp.evidence_ids or [])]
     for x in db.scalars(select(Experiment).where(Experiment.project_id == pid)).all():
         node(f"experiment:{x.id}", "experiment", x.name, status=x.status)
+        source = db.get(Intervention, x.source_id) if x.source_type == "journey_intervention" and x.source_id else None
+        if source is not None:  # close the loop: the pain point (or journey) the test addresses
+            origin = f"pain_point:{source.pain_point_id}" if source.pain_point_id else f"journey:{source.journey_id}"
+            edges.append({"from": origin, "to": f"experiment:{x.id}"})
         if x.evidence_id:
             edges.append({"from": f"experiment:{x.id}", "to": f"evidence:{x.evidence_id}"})
     valid = set(nodes)
