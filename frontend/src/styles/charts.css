@@ -1,0 +1,202 @@
+.viz {
+  margin: 0;
+  min-width: 0;
+}
+
+.viz-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.viz-title {
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.viz-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.viz-plot {
+  position: relative;
+  width: 100%;
+}
+
+.viz-plot svg {
+  display: block;
+  overflow: visible;
+}
+
+.viz-plot text {
+  font-family: var(--font-sans);
+}
+
+.viz-axis text,
+.viz-label {
+  font-size: 11px;
+  fill: var(--chart-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.viz-value {
+  font-size: 11px;
+  fill: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.viz-strong {
+  font-size: 11px;
+  fill: var(--text-primary);
+  font-weight: 600;
+}
+
+.viz-grid line {
+  stroke: var(--grid);
+  stroke-width: 1;
+}
+
+.viz-baseline {
+  stroke: var(--axis);
+  stroke-width: 1;
+}
+
+.viz-hit {
+  fill: transparent;
+  cursor: default;
+}
+
+.viz-mark {
+  transition: opacity 0.12s ease;
+}
+
+.viz-mark.dim {
+  opacity: 0.45;
+}
+
+.viz-tooltip {
+  position: absolute;
+  z-index: 10;
+  pointer-events: none;
+  min-width: 140px;
+  max-width: 240px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--surface-1);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow-2);
+  font-size: 12px;
+}
+
+.viz-tooltip-title {
+  color: var(--text-secondary);
+  font-size: 11px;
+  margin-bottom: 4px;
+}
+
+.viz-tooltip-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1.5;
+}
+
+.viz-tooltip-row strong {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+}
+
+.viz-tooltip-row span:last-child {
+  color: var(--text-secondary);
+}
+
+.viz-key {
+  width: 10px;
+  height: 2px;
+  border-radius: 1px;
+  flex-shrink: 0;
+}
+
+.viz-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  list-style: none;
+  padding: 0;
+  margin: 2px 0 6px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.viz-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.viz-legend-rect {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+.viz-legend-line {
+  width: 14px;
+  height: 2px;
+  border-radius: 1px;
+}
+
+.viz-scale {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+
+.viz-scale-bar {
+  height: 8px;
+  width: 140px;
+  border-radius: 4px;
+}
+
+.graph-node {
+  cursor: default;
+}
+
+.graph-node rect {
+  fill: var(--surface-1);
+  stroke: var(--border-strong);
+}
+
+.graph-node.approved rect,
+.graph-node.supported rect,
+.graph-node.adopted rect {
+  stroke: var(--good);
+}
+
+.graph-node.draft rect,
+.graph-node.proposed rect {
+  stroke-dasharray: 3 2;
+}
+
+.graph-node text {
+  font-size: 10.5px;
+  fill: var(--text-primary);
+}
+
+.graph-edge {
+  stroke: var(--axis);
+  fill: none;
+  stroke-width: 1;
+}
+
+@media print {
+  .viz-head .btn {
+    display: none;
+  }
+}
