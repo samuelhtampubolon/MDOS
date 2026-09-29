@@ -15,7 +15,7 @@ pull request checklist. This file only adds practical notes for Claude Code sess
 ## Commands
 
 ```bash
-cd backend && .venv/bin/python -m pytest -q          # backend tests (about 60, under a minute)
+cd backend && .venv/bin/python -m pytest -q          # backend tests (about 85, under a minute)
 cd backend && .venv/bin/ruff check mdos tests         # lint
 cd frontend && npm run typecheck && npm test && npm run build
 cd frontend && npx playwright test                    # E2E; starts the server itself on port 8765
@@ -28,6 +28,9 @@ cd backend && .venv/bin/python -m mdos.desktop --no-browser   # run the app loca
 * Tests use an isolated SQLite file per test; set `TEST_DATABASE_URL` to run them on PostgreSQL.
 * Agents run synchronously in tests (`EXECUTION_MODE=sync`) and in a background thread otherwise.
 * The demo (`POST /projects/demo`) builds the whole loop from `backend/mdos/demo_data`; it is labeled synthetic.
+* Sessions are cookies: scripts calling the API send `X-Requested-With: mdos` on every change. The desktop launcher
+  needs its per-launch key (`MDOS_LOCAL_KEY`, passed to `/auth/local-session`); the E2E config sets one for the run.
+* Read SECURITY.md section 5 before adding outbound calls, file deletions, subprocesses or dependencies.
 * `scripts/generate_sample_data.py` is seeded; regenerating rewrites the XLSX metadata, so restore that file with git
   if nothing else changed.
 * Claude calls use the model in `MDOS_LLM_MODEL` (default `claude-opus-5-5`) with server-side fallbacks enabled;

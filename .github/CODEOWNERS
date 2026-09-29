@@ -1,0 +1,12 @@
+# Every change needs a review from the owner. Security-sensitive paths are listed so the rule stays explicit
+# if more owners are added later.
+*                                   @samuelhtampubolon
+/backend/mdos/security.py           @samuelhtampubolon
+/backend/mdos/deps.py               @samuelhtampubolon
+/backend/mdos/api/auth.py           @samuelhtampubolon
+/backend/mdos/storage.py            @samuelhtampubolon
+/backend/mdos/desktop.py            @samuelhtampubolon
+/backend/requirements.txt           @samuelhtampubolon
+/.github/                           @samuelhtampubolon
+/Dockerfile                         @samuelhtampubolon
+/SECURITY.md                        @samuelhtampubolon

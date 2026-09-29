@@ -27,9 +27,10 @@
 
 | Suite | Count | Location |
 |---|---|---|
-| Backend tests | 62 | `backend/tests` (analytics 24, auth and tenancy 12, strategy 10, agents 7, journey 6, research flow 3) |
-| Frontend unit tests | 4 | `frontend/src/lib/format.test.ts` |
-| End-to-end tests | 9 | `frontend/e2e/closed-loop.spec.ts` |
+| Backend tests | 84 | `backend/tests` (analytics 24, security 22, auth and tenancy 12, strategy 10, agents 7, journey 6, research flow 3) |
+| Frontend unit tests | 7 | `frontend/src/lib/format.test.ts` (4), `frontend/src/styles/styles.test.ts` (3: no shadows, gradients, scale transforms or fixed radii) |
+| End-to-end tests | 13 | `frontend/e2e/closed-loop.spec.ts` (includes the desktop launch key, cookie and CSRF checks, the sandboxed export and phone-width layout) |
+| CI security job | 3 checks | secret scan (`scripts/check_secrets.py`), `pip-audit` on `backend/requirements.txt`, `npm audit` |
 
 ## Statistical oracles
 

@@ -1,0 +1,28 @@
+name: Idea or improvement
+description: Suggest a change that helps a marketing decision.
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: job
+    attributes:
+      label: The decision or task
+      description: "When I ..., I want to ..., so that ..."
+    validations:
+      required: true
+  - type: textarea
+    id: today
+    attributes:
+      label: How you handle it today
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would help
+    validations:
+      required: true
+  - type: checkboxes
+    id: rules
+    attributes:
+      label: Product rules
+      options:
+        - label: Numbers would still come from code, and people would still approve insights and decisions.
+          required: true

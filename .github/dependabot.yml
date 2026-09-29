@@ -1,7 +1,8 @@
-# Weekly update proposals. Security updates also arrive as soon as an advisory is published
-# (turn on "Dependabot alerts" and "Dependabot security updates" in the repository settings).
+# Update proposals. Security fixes also arrive as soon as an advisory is published when "Dependabot alerts" and
+# "Dependabot security updates" are on in the repository settings (they are not limited by the rules below).
 version: 2
 updates:
+  # Actions are pinned to commit hashes; Dependabot moves the hash and the version comment together.
   - package-ecosystem: github-actions
     directory: /
     schedule:
@@ -9,14 +10,26 @@ updates:
     groups:
       actions:
         patterns: ["*"]
+
+  # Minor and patch releases, grouped. Major versions (for example React 19) need a planned migration.
   - package-ecosystem: npm
     directory: /frontend
     schedule:
       interval: weekly
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     groups:
+      frontend-runtime:
+        dependency-type: production
       frontend-dev-tools:
         dependency-type: development
+
+  # backend/requirements.txt pins every package, including ones owned by another package (pydantic-core belongs to
+  # pydantic), so single-package bumps can break the set. It is regenerated as a whole with the command at the top of
+  # the file; CI audits it for known vulnerabilities, and security updates still arrive through the setting above.
   - package-ecosystem: pip
     directory: /backend
     schedule:
       interval: weekly
+    open-pull-requests-limit: 0

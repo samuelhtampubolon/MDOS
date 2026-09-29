@@ -5,6 +5,26 @@ versioning.
 
 ## [Unreleased]
 
+### Security
+
+- Browser sessions moved to an HttpOnly, SameSite=Strict cookie with a CSRF header check; sign out and sign out on
+  all devices; the desktop app needs a per-launch key and ends sessions when it closes.
+- Strict Content Security Policy, sandboxed HTML exports, COOP, CORP, Permissions-Policy, HSTS and `no-store`.
+- Personal identifiers masked before prompts reach Claude; request body limits; XLSX zip-bomb check; confirmed,
+  confined project deletion; sign-up open only for the first cloud account by default; login timing equalized.
+- Container published on 127.0.0.1, read-only root, no capabilities, proxy headers trusted only from
+  `FORWARDED_ALLOW_IPS`; interactive API docs off by default; `CORS_ORIGINS="*"` refused.
+- Supply chain: hash-pinned Python dependencies, npm without install scripts, actions pinned to commits,
+  Dependabot, `pip-audit`, `npm audit` and a secret scan in CI; vulnerable packages upgraded; Node.js 24 LTS.
+- New [SECURITY.md](SECURITY.md) and [docs/19-security-hardening-review.md](docs/19-security-hardening-review.md).
+
+### Changed
+
+- Interface redesigned as "Quiet Ledger" ([docs/18-interface-brief.md](docs/18-interface-brief.md)): IBM Plex
+  type, flat surfaces with one radius, a single accent job, a next-step-led research dashboard, projects-first Home,
+  designed loading, empty and error states, and layouts that fit phones.
+- README in a numbered, badge-led layout with screenshots; issue forms, a pull request template and CODEOWNERS.
+
 ## [0.1.0] - 2026-09-29
 
 First MVP: the Research Lab in full, with working slices of the Strategy Simulator and the Journey Designer connected

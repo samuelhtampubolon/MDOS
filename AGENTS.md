@@ -69,8 +69,12 @@ frontend/src/
 * No raw SQL from input; no secrets in code, logs or the frontend; `.env` stays untracked.
 * Uploads and exports go through the existing limits and `safe_cell` sanitizing.
 * Customer text sent to a model is wrapped with `wrap_untrusted`; model output is validated before use.
-* Local mode stays loopback-only; never relax the trusted-host check.
-* See docs/12-security-threat-model.md.
+* Local mode stays loopback-only; never relax the trusted-host check, the per-launch key or the CSRF header check.
+* Browser sessions stay in the HttpOnly cookie; never store tokens in `localStorage` or send them to page scripts.
+* Files go through `storage.py`; recursive deletes only for validated `<org uuid>/<project uuid>` folders.
+* No new outbound hosts, shell commands or dependencies without the steps in SECURITY.md section 5; run
+  `python scripts/check_secrets.py` before committing.
+* See docs/12-security-threat-model.md, SECURITY.md and docs/19-security-hardening-review.md.
 
 ## 6. Commands
 
