@@ -82,5 +82,5 @@ Experience, Share, Return and Recommend. Every stage topic below shares the same
 | integrations | Partial | CSV/XLSX in, XLSForm, Markdown, HTML, CSV out; Claude API | Exports open in KoboToolbox and spreadsheet tools | T exports. API connectors: Phase 2 |
 | billing | Phase 2 | Pricing hypotheses only | See [`15-pricing-gtm-hypotheses.md`](15-pricing-gtm-hypotheses.md) | Planned |
 | deployment | MVP | Desktop executable, Docker image, docker-compose, migrations | See [`13-deployment.md`](13-deployment.md) | CI Docker smoke test, desktop build smoke test |
-| testing | MVP | 61 backend tests (SQLite and PostgreSQL), frontend unit tests, 9 E2E tests, CI | See [`11-test-strategy.md`](11-test-strategy.md) | CI |
+| testing | MVP | 62 backend tests (SQLite and PostgreSQL), frontend unit tests, 9 E2E tests, CI | See [`11-test-strategy.md`](11-test-strategy.md) | CI |
 | documentation | MVP | README, docs 00 to 17, AGENTS.md, CLAUDE.md, CHANGELOG | Every module and decision documented | Review |

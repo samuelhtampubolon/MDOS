@@ -27,7 +27,7 @@
 
 | Suite | Count | Location |
 |---|---|---|
-| Backend tests | 61 | `backend/tests` (analytics 24, auth and tenancy 11, strategy 10, agents 7, journey 6, research flow 3) |
+| Backend tests | 62 | `backend/tests` (analytics 24, auth and tenancy 12, strategy 10, agents 7, journey 6, research flow 3) |
 | Frontend unit tests | 4 | `frontend/src/lib/format.test.ts` |
 | End-to-end tests | 9 | `frontend/e2e/closed-loop.spec.ts` |
 
