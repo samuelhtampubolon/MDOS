@@ -1,4 +1,4 @@
-# 16 · Section Catalog (54 topics)
+# 16. Section catalog (54 topics)
 
 The specification's `detailed_section_catalog` has 420 entries, which are 54 topics repeated with one sentence
 template ("define acceptance criteria, failure modes, data inputs, outputs, human approval requirements, tests and

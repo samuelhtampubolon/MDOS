@@ -81,6 +81,10 @@ No live secret was found in the working tree or in any commit, so nothing needs 
 | Desktop builds (Windows, macOS, Linux) | Built and smoke-tested with the launch key, the session cookie and the demo |
 | Docker image | Built and smoke-tested with a read-only root filesystem and no capabilities |
 
+All of these checks were run again before the 0.1.0 release, with the same results. That final pass also replaced
+two placeholder email domains with reserved example domains, and confirmed that every workflow action is pinned to
+a commit and every workflow token has only the permissions it needs.
+
 ## 4. Local traces removed
 
 * The temporary E2E data folders left by earlier runs in the system temp directory (`mdos-e2e-*`), after checking

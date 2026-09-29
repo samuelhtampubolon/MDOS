@@ -1,4 +1,4 @@
-# 10 · MVP Backlog and Status
+# 10. MVP backlog and status
 
 Status of the MVP scope in [`03-mvp-scope.md`](03-mvp-scope.md), the measured weight of each module, and the next
 backlog. "Verified" names the automated check that proves the item (backend tests `T`, end-to-end tests `E2E`).

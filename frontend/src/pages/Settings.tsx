@@ -6,6 +6,7 @@ import { useApi, useAudit, useProject, useProjectMutation, useProvider } from ".
 import { useAuth } from "../auth";
 import { AGENT_LABELS } from "../components/domain";
 import { Callout, Card, Icon, KV, PageHeader, useToast } from "../components/ui";
+import { COPYRIGHT, LICENSE_NAME } from "../lib/about";
 import { dateTime, sentence } from "../lib/format";
 
 type Theme = "system" | "light" | "dark";
@@ -60,6 +61,8 @@ function Workspace() {
         ["Signed in as", user ? `${user.name} (${user.email})` : ""],
         ["Organization", user?.organization ?? ""],
         ["Version", health?.version ?? ""],
+        ["Copyright", COPYRIGHT],
+        ["License", LICENSE_NAME],
       ]} />
       {mode === "local" && (
         <div style={{ marginTop: 10 }}>
@@ -192,7 +195,7 @@ function ProjectSettings({ pid }: { pid: string }) {
               <form className="row" onSubmit={(e) => { e.preventDefault(); addMember.mutate(undefined, {
                 onSuccess: () => { toast("Member added."); setMember({ email: "", role: "editor" }); }, onError: (er) => toast(errorMessage(er), "error"),
               }); }}>
-                <input className="input sm" type="email" required placeholder="colleague@company.com" aria-label="Member email" value={member.email}
+                <input className="input sm" type="email" required placeholder="colleague@example.com" aria-label="Member email" value={member.email}
                   onChange={(e) => setMember({ ...member, email: e.target.value })} />
                 <select className="select sm" aria-label="Role" value={member.role} onChange={(e) => setMember({ ...member, role: e.target.value })}>
                   <option value="viewer">Viewer</option><option value="editor">Editor</option><option value="owner">Owner</option>

@@ -1,4 +1,4 @@
-# 01 · Pre-Build Interview (12 Questions)
+# 01. Pre-build interview (12 questions)
 
 The specification requires 12 questions before coding. The founder vision notes (Graph1) already answer most of
 them. Each answer below states its source and confidence. **Rows marked "Confirm" are defaults chosen so the build

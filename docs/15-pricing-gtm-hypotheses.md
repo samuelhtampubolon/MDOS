@@ -1,4 +1,4 @@
-# 15 · Pricing and Go-to-Market Hypotheses
+# 15. Pricing and go-to-market hypotheses
 
 Everything here is a **hypothesis to test**, not a decision. Numbers are starting points for experiments, chosen from
 the interview answers (Q01 first segment, Q09 business model) and typical tool budgets in Indonesia. Please confirm or

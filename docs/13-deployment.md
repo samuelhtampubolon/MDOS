@@ -1,4 +1,4 @@
-# 13 · Deployment Architecture
+# 13. Deployment architecture
 
 One codebase ships two ways. The same FastAPI process serves the API and the built React app in both.
 

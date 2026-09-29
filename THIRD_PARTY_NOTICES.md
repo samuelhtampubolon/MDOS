@@ -1,6 +1,7 @@
 # Third-party notices
 
-Marketing Decision OS is released under the [MIT License](LICENSE). It is built on the open-source components below.
+Marketing Decision OS is Copyright © 2026 Samuel Hasudungan Tampubolon and released under the [MIT License](LICENSE).
+It is built on the open-source components below.
 Each component keeps its own license: the license texts ship inside the packages themselves (in the Docker image's
 Python environment, in the desktop bundle and in `frontend/node_modules`) and at the source links listed here.
 This list covers what the app ships; development and test tools (for example pytest, Ruff, Vite, Vitest and

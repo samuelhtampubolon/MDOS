@@ -1,4 +1,4 @@
-# 17 · Methods Reference
+# 17. Methods reference
 
 What each analysis answers, what it needs, which assumptions it checks and how results are worded. All statistics
 are computed in `backend/mdos/analytics` with numpy, scipy, statsmodels and scikit-learn, and validated against those

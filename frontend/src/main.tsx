@@ -1,3 +1,4 @@
+// MDOS, Marketing Decision OS. Copyright © 2026 Samuel Hasudungan Tampubolon. Released under the MIT License.
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";

@@ -1,4 +1,4 @@
-# 03 · MVP Scope and Deferred Scope
+# 03. MVP scope and deferred scope
 
 ## Scope principle
 

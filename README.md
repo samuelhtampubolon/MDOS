@@ -196,9 +196,11 @@ administration, troubleshooting and the owner's checklist.
 For the design, start with [docs/00-synthesis.md](docs/00-synthesis.md). Architecture: [docs/04-architecture.md](docs/04-architecture.md)
 and [docs/05-agent-architecture.md](docs/05-agent-architecture.md). Design system:
 [docs/09-design-system.md](docs/09-design-system.md). Rules for contributors and coding agents:
-[AGENTS.md](AGENTS.md).
+[AGENTS.md](AGENTS.md). Every document is listed in [docs/README.md](docs/README.md).
 
 ## 11. License
+
+Copyright © 2026 Samuel Hasudungan Tampubolon.
 
 MDOS is released under the [MIT License](LICENSE). The open-source components it ships, and their licenses, are
 listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

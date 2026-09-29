@@ -1,4 +1,4 @@
-# 14 · Observability Plan
+# 14. Observability plan
 
 Goal: know when MDOS is down or slow, why an agent or analysis failed, what the model did and cost, and whether
 people get value from the product.

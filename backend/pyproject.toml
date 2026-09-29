@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Marketing Decision OS: agentic marketing research, strategy simulation and customer journey design"
 readme = "README.md"
 license = "MIT"
+authors = [{ name = "Samuel Hasudungan Tampubolon" }]
 requires-python = ">=3.11"
 dependencies = [
     "fastapi>=0.115",

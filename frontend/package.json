@@ -2,6 +2,7 @@
   "name": "mdos-frontend",
   "private": true,
   "version": "0.1.0",
+  "author": "Samuel Hasudungan Tampubolon",
   "license": "MIT",
   "type": "module",
   "scripts": {

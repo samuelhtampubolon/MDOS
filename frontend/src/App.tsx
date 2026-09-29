@@ -5,6 +5,7 @@ import { useApprovals, useProject, useProjects } from "./api/hooks";
 import { AuthProvider, useAuth } from "./auth";
 import { ApiError, errorMessage } from "./api/client";
 import { Callout, Icon, Spinner } from "./components/ui";
+import { COPYRIGHT } from "./lib/about";
 import Agents from "./pages/Agents";
 import Approvals from "./pages/Approvals";
 import DataPage from "./pages/Data";
@@ -90,6 +91,7 @@ function Sidebar({ pid, open, onNavigate }: { pid: string | null; open: boolean;
         {mode === "cloud" && (
           <button className="btn ghost sm" style={{ marginTop: 6, paddingLeft: 0 }} onClick={logout}>Sign out {user?.name}</button>
         )}
+        <div className="legal">{COPYRIGHT}</div>
       </div>
     </nav>
   );

@@ -119,6 +119,10 @@
   border-top: 1px solid var(--border);
 }
 
+.sidebar-footer .legal {
+  margin-top: 6px;
+}
+
 .main {
   min-width: 0;
   display: flex;

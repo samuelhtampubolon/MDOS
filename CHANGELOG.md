@@ -5,40 +5,6 @@ versioning.
 
 ## [Unreleased]
 
-### Security
-
-- Browser sessions moved to an HttpOnly, SameSite=Strict cookie with a CSRF header check; sign out and sign out on
-  all devices; the desktop app needs a per-launch key and ends sessions when it closes.
-- Strict Content Security Policy, sandboxed HTML exports, COOP, CORP, Permissions-Policy, HSTS and `no-store`.
-- Personal identifiers masked before prompts reach Claude; request body limits; XLSX zip-bomb check; confirmed,
-  confined project deletion; sign-up open only for the first cloud account by default; login timing equalized.
-- Container published on 127.0.0.1, read-only root, no capabilities, proxy headers trusted only from
-  `FORWARDED_ALLOW_IPS`; interactive API docs off by default; `CORS_ORIGINS="*"` refused.
-- Supply chain: hash-pinned Python dependencies, npm without install scripts, actions pinned to commits,
-  Dependabot, `pip-audit`, `npm audit` and a secret scan in CI; vulnerable packages upgraded; Node.js 24 LTS.
-- New [SECURITY.md](SECURITY.md) and [docs/19-security-hardening-review.md](docs/19-security-hardening-review.md).
-- Second review: owner-only desktop data folder, stray `.env` files ignored by the desktop app, a browser-session
-  cookie on the desktop, no server header, masked CI keys, npm registry signature checks, explicit setup errors.
-- Cloud settings: `docker-compose.yml` now passes every documented setting to the app (`COOKIE_SECURE`, the limits
-  and the model options were ignored), and the deployment guide explains which proxy address the container sees;
-  `COOKIE_SECURE=true` is recommended behind TLS.
-
-### Added
-
-- MIT License and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md); the desktop bundle leaves out the PostgreSQL
-  driver.
-- User and operations manual in Word,
-  [docs/MDOS-User-and-Operations-Manual.docx](docs/MDOS-User-and-Operations-Manual.docx): installation, every module,
-  Claude drafting, security, administration, troubleshooting, the owner's checklist, a glossary and a settings
-  reference.
-
-### Changed
-
-- Interface redesigned as "Quiet Ledger" ([docs/18-interface-brief.md](docs/18-interface-brief.md)): IBM Plex
-  type, flat surfaces with one radius, a single accent job, a next-step-led research dashboard, projects-first Home,
-  designed loading, empty and error states, and layouts that fit phones.
-- README in a numbered, badge-led layout with screenshots; issue forms, a pull request template and CODEOWNERS.
-
 ## [0.1.0] - 2026-09-29
 
 First MVP: the Research Lab in full, with working slices of the Strategy Simulator and the Journey Designer connected
@@ -64,12 +30,35 @@ in a closed loop.
   allowlists, supervisor workflows with retry, cancel and rollback, and optional Claude drafting with offline
   fallback, untrusted-data wrapping and numeric grounding.
 - **Platform:** organizations, roles and tenant isolation; desktop mode (loopback only) and cloud mode (accounts);
-  audit log and approvals inbox; rate limits, upload limits, security headers and allowed hosts; Alembic migrations;
-  light and dark themes with an accessible, color-blind-safe chart palette.
+  audit log and approvals inbox; rate limits, upload limits, security headers and allowed hosts; Alembic migrations.
+- **Interface:** the "Quiet Ledger" design ([docs/18-interface-brief.md](docs/18-interface-brief.md)): IBM Plex type,
+  flat surfaces with one radius, a single accent job, a next-step-led research dashboard, a projects-first Home,
+  designed loading, empty and error states, layouts that fit phones, light and dark themes and an accessible,
+  color-blind-safe chart palette with a table view for every chart.
 - **Delivery:** desktop executable build (PyInstaller) for Windows, macOS and Linux; Docker image and docker-compose
   with PostgreSQL; CI with tests on SQLite and PostgreSQL, a migration drift check, Playwright end-to-end tests and a
   Docker smoke test.
 - **Demo:** one-click Lake Toba project on synthetic data that runs the whole loop through the agents.
-- **Docs:** synthesis, interview, assumptions, scope, architecture, agent architecture, design system, backlog, test
-  strategy, threat model, deployment, observability, pricing and go-to-market hypotheses, section catalog and methods
-  reference.
+- **Docs:** the [User and Operations Manual](docs/MDOS-User-and-Operations-Manual.docx) (Word) and a
+  [documentation index](docs/README.md) covering the synthesis, interview, assumptions, scope, architecture, agent
+  architecture, design system, backlog, test strategy, threat model, deployment, observability, pricing and
+  go-to-market hypotheses, section catalog, methods reference, interface brief and security review.
+- **Project:** MIT License, [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md), [SECURITY.md](SECURITY.md), issue forms,
+  a pull request template and CODEOWNERS.
+
+### Security
+
+- Browser sessions in an HttpOnly, SameSite=Strict cookie with a CSRF header check; sign out and sign out on all
+  devices; the desktop app needs a per-launch key and ends sessions when it closes.
+- Strict Content Security Policy, sandboxed HTML exports, COOP, CORP, Permissions-Policy, HSTS and `no-store`.
+- Personal identifiers masked before prompts reach Claude; request body limits; XLSX zip-bomb check; confirmed,
+  confined project deletion; sign-up open only for the first cloud account by default; login timing equalized.
+- Container published on 127.0.0.1 with a read-only root and no capabilities; proxy headers trusted only from
+  `FORWARDED_ALLOW_IPS`; every documented setting passed through `docker-compose.yml`; interactive API docs off by
+  default; `CORS_ORIGINS="*"` refused.
+- Desktop: owner-only data folder, stray `.env` files ignored, a browser-session cookie and no server header.
+- Supply chain: hash-pinned Python dependencies, npm without install scripts, actions pinned to commits,
+  Dependabot, `pip-audit`, `npm audit` with registry signature checks, and a secret scan in CI; the desktop bundle
+  leaves out the PostgreSQL driver.
+- The full review, with findings, fixes and proof, is in
+  [docs/19-security-hardening-review.md](docs/19-security-hardening-review.md).

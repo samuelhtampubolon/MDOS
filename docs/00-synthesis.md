@@ -1,4 +1,4 @@
-# 00 · Analysis and Synthesis of the Source Inputs
+# 00. Analysis and synthesis of the source inputs
 
 This document records how the three source inputs were analyzed, what is signal and what is noise,
 where they conflict, and how each conflict was resolved. Everything else in `docs/` builds on it.

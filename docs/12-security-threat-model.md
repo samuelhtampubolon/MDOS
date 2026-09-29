@@ -1,4 +1,4 @@
-# 12 · Security Threat Model
+# 12. Security threat model
 
 Scope: the MDOS web app in both deployment modes (desktop "local" mode and multi-tenant "cloud" mode), its API,
 file handling, agents and the optional Claude integration. Method: assets, trust boundaries, then STRIDE threats with

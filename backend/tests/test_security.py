@@ -161,10 +161,10 @@ def test_desktop_launcher_file_is_private_and_escaped(tmp_path):
 def test_personal_identifiers_are_masked():
     from mdos.privacy import mask_pii
 
-    text = ("Contact ana.putri@example.co.id or 0812-3456-7890, +62 812 3456 7890, 081234567890, "
+    text = ("Contact ana.putri@example.org or 0812-3456-7890, +62 812 3456 7890, 081234567890, "
             "+1 415 555 0100. NIK 3201234567890123.")
     masked, count = mask_pii(text)
-    assert "example.co.id" not in masked and "3456" not in masked and "0100" not in masked and "3201" not in masked
+    assert "example.org" not in masked and "3456" not in masked and "0100" not in masked and "3201" not in masked
     assert masked.count("[phone]") == 4 and "[email]" in masked and "[id number]" in masked and count == 6
     stats = ("Price Rp 150.000 (n = 385, p = 0.032) on 2026-08-15 at 08:30; effect +15.2 (95% CI 12.1 to 18.3), "
              "coefficient 0.85, 628 respondents, 1,250,000 visitors.")

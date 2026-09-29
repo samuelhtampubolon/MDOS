@@ -1,4 +1,4 @@
-# 05 · Agent Architecture and Responsibility Matrix
+# 05. Agent architecture and responsibility matrix
 
 ## 1. Principles
 

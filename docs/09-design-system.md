@@ -1,4 +1,4 @@
-# 09 · Design System
+# 09. Design system
 
 MDOS is a working tool for marketers and researchers who read numbers all day. The design system favors calm
 surfaces, legible data and explicit state over decoration. Everything below is implemented in
