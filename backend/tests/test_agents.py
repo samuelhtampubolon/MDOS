@@ -183,3 +183,23 @@ def test_llm_output_is_used_only_when_it_passes_guards(local_client, project, mo
     assert "model_generated" not in design["result"]["outputs"]["design"]
     assert any("causal" in u for u in design["result"]["uncertainties"])
     assert all("<untrusted_data>" in p for p in provider.prompts[:2])  # business question is delimited as data
+
+
+def test_demo_project_runs_closed_loop(local_client):
+    c = local_client
+    project = c.post("/api/v1/projects/demo").json()
+    assert project["is_demo"] is True
+    project = c.get(f"/api/v1/projects/{project['id']}").json()
+    assert project["brief"]["demo_status"] == "ready", project["brief"]
+    pid = project["id"]
+    runs = {r["workflow"]: r["status"] for r in c.get(f"/api/v1/projects/{pid}/workflows").json()}
+    assert runs == {"research_design": "succeeded", "research_analysis": "succeeded", "strategy_baseline": "succeeded",
+                    "journey_voc": "succeeded"}
+    evidence = c.get(f"/api/v1/projects/{pid}/evidence").json()
+    assert evidence and all(e["origin"] == "synthetic_demo" for e in evidence)
+    report = c.get(f"/api/v1/projects/{pid}/reports").json()[0]
+    md = c.get(f"/api/v1/projects/{pid}/reports/{report['id']}/export?format=md").text
+    assert "SYNTHETIC" in md
+    pending = {a["action"] for a in c.get(f"/api/v1/projects/{pid}/approvals").json()}
+    assert "adopt_design" not in pending and "apply_cleaning" not in pending
+    assert {"approve_insight", "approve_verdict", "approve_decision", "launch_experiment"} <= pending

@@ -88,6 +88,16 @@ def create_project(body: ProjectIn, user: User = Depends(get_current_user), db: 
     return project_out(project, "owner")
 
 
+@router.post("/demo", status_code=201)
+def create_demo(user: User = Depends(get_current_user), db: Session = Depends(get_db)) -> dict:
+    """Create the Lake Toba demo project (synthetic data) and run the closed loop through the agents."""
+    from ..services.demo import create_demo_project
+
+    project = create_demo_project(db, user.id, user.org_id)
+    db.refresh(project)
+    return project_out(project, "owner")
+
+
 @router.get("/{project_id}")
 def get_project(access: ProjectAccess = Depends(project_access)) -> dict:
     return project_out(access.project, access.role)

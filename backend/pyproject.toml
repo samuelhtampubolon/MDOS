@@ -41,7 +41,7 @@ build-backend = "setuptools.build_meta"
 include = ["mdos*"]
 
 [tool.setuptools.package-data]
-mdos = ["static/**/*", "migrations/**/*", "alembic.ini"]
+mdos = ["static/**/*", "migrations/**/*", "demo_data/*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

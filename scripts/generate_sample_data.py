@@ -18,6 +18,7 @@ import pandas as pd
 
 SEED = 20260928
 OUT = Path(__file__).resolve().parents[1] / "samples"
+DEMO_DATA = Path(__file__).resolve().parents[1] / "backend" / "mdos" / "demo_data"
 N_SURVEY = 320
 N_REVIEWS = 240
 
@@ -249,7 +250,11 @@ def main() -> None:
     survey.head(80).to_excel(OUT / "lake_toba_survey_sample.xlsx", index=False)
     reviews = generate_reviews(rng)
     reviews.to_csv(OUT / "lake_toba_reviews.csv", index=False)
-    print(f"survey: {survey.shape}, reviews: {reviews.shape} -> {OUT}")
+    # The desktop and cloud builds ship a copy inside the package for the one-click demo.
+    DEMO_DATA.mkdir(parents=True, exist_ok=True)
+    survey.to_csv(DEMO_DATA / "lake_toba_survey.csv", index=False, quoting=csv.QUOTE_MINIMAL)
+    reviews.to_csv(DEMO_DATA / "lake_toba_reviews.csv", index=False)
+    print(f"survey: {survey.shape}, reviews: {reviews.shape} -> {OUT} and {DEMO_DATA}")
 
 
 if __name__ == "__main__":
