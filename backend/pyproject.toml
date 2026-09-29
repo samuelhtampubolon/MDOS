@@ -21,7 +21,8 @@ dependencies = [
     "argon2-cffi>=23.1",
     "pyjwt>=2.8",
     "email-validator>=2.1",
-    "anthropic>=0.40",
+    "defusedxml>=0.7",
+    "anthropic>=1.9",
 ]
 
 [project.optional-dependencies]

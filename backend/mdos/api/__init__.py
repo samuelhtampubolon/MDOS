@@ -2,8 +2,8 @@
 
 from fastapi import APIRouter
 
-from . import auth, projects
+from . import analyses, approvals, auth, datasets, evidence, projects, reports, research, tools
 
 router = APIRouter()
-router.include_router(auth.router)
-router.include_router(projects.router)
+for module in (auth, projects, research, datasets, analyses, evidence, approvals, reports, tools):
+    router.include_router(module.router)

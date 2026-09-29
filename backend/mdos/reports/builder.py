@@ -1,0 +1,503 @@
+"""Build reports as structured blocks, then render them to Markdown or self-contained HTML.
+
+Citation policy (specification): cite source records, link evidence to claims, distinguish user data from
+external data, and label model-generated interpretation.
+"""
+
+from __future__ import annotations
+
+import html
+from datetime import UTC, datetime
+from typing import Any
+
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+from ..models import (
+    Analysis,
+    Dataset,
+    DatasetVersion,
+    Decision,
+    Evidence,
+    Experiment,
+    Hypothesis,
+    Insight,
+    Journey,
+    Project,
+    Recommendation,
+    ResearchPlan,
+    ResearchQuestion,
+    Scenario,
+    Segment,
+    Survey,
+    Variable,
+)
+
+ORIGIN_LABEL = {"user_data": "User data", "external": "External source", "model_generated": "Model-generated",
+                "experiment": "Experiment", "synthetic_demo": "Synthetic demo data"}
+STATUS_LABEL = {"untested": "Not yet tested", "proposed_supported": "Proposed: supported (awaiting approval)",
+                "proposed_not_supported": "Proposed: not supported (awaiting approval)",
+                "proposed_inconclusive": "Proposed: inconclusive (awaiting approval)", "supported": "Supported",
+                "not_supported": "Not supported", "inconclusive": "Inconclusive"}
+PRICE_METHODS = {"van_westendorp", "gabor_granger", "wtp"}
+TEXT_METHODS = {"text_themes", "sentiment"}
+
+
+def H(level: int, text: str) -> dict:
+    return {"type": "heading", "level": level, "text": text}
+
+
+def P(text: str, citations: list[str] | None = None, model_generated: bool = False) -> dict:
+    return {"type": "paragraph", "text": text, "citations": citations or [], "model_generated": model_generated}
+
+
+def L(items: list[dict | str]) -> dict:
+    return {"type": "list", "items": [i if isinstance(i, dict) else {"text": i, "citations": []} for i in items]}
+
+
+def T(columns: list[str], rows: list[list[Any]]) -> dict:
+    return {"type": "table", "columns": columns, "rows": [[("" if v is None else v) for v in r] for r in rows]}
+
+
+def C(text: str, tone: str = "info") -> dict:
+    return {"type": "callout", "tone": tone, "text": text}
+
+
+class Context:
+    def __init__(self, db: Session, project: Project):
+        pid = project.id
+        self.project = project
+        self.evidence = db.scalars(select(Evidence).where(Evidence.project_id == pid).order_by(Evidence.seq)).all()
+        self.ev_by_id = {e.id: e for e in self.evidence}
+        self.analyses = db.scalars(select(Analysis).where(Analysis.project_id == pid).order_by(Analysis.created_at)).all()
+        self.analysis_by_id = {a.id: a for a in self.analyses}
+        self.insights = db.scalars(select(Insight).where(Insight.project_id == pid).order_by(Insight.seq)).all()
+        self.recs = db.scalars(select(Recommendation).where(Recommendation.project_id == pid).order_by(Recommendation.seq)).all()
+        self.hypotheses = db.scalars(select(Hypothesis).where(Hypothesis.project_id == pid).order_by(Hypothesis.code)).all()
+        self.rqs = db.scalars(select(ResearchQuestion).where(ResearchQuestion.project_id == pid).order_by(ResearchQuestion.code)).all()
+        self.plans = {p.kind: p.content for p in db.scalars(select(ResearchPlan).where(ResearchPlan.project_id == pid)).all()}
+        self.datasets = db.scalars(select(Dataset).where(Dataset.project_id == pid)).all()
+        self.versions = db.scalars(select(DatasetVersion).where(DatasetVersion.project_id == pid).order_by(DatasetVersion.version)).all()
+        self.surveys = db.scalars(select(Survey).where(Survey.project_id == pid)).all()
+        self.variables = db.scalars(select(Variable).where(Variable.project_id == pid).order_by(Variable.name)).all()
+        self.segments = db.scalars(select(Segment).where(Segment.project_id == pid).order_by(Segment.share.desc())).all()
+        self.scenarios = db.scalars(select(Scenario).where(Scenario.project_id == pid).order_by(Scenario.created_at)).all()
+        self.decisions = db.scalars(select(Decision).where(Decision.project_id == pid).order_by(Decision.created_at)).all()
+        self.experiments = db.scalars(select(Experiment).where(Experiment.project_id == pid).order_by(Experiment.created_at)).all()
+        self.journeys = db.scalars(select(Journey).where(Journey.project_id == pid)).all()
+        self.cited: list[str] = []
+
+    def codes(self, evidence: list[Evidence] | list[str]) -> list[str]:
+        out = []
+        for e in evidence:
+            ev = self.ev_by_id.get(e) if isinstance(e, str) else e
+            if ev:
+                out.append(ev.code)
+                if ev.id not in self.cited:
+                    self.cited.append(ev.id)
+        return out
+
+    @property
+    def synthetic(self) -> bool:
+        return any(d.origin == "synthetic_demo" for d in self.datasets)
+
+
+def _header(ctx: Context, title: str) -> list[dict]:
+    blocks = []
+    if ctx.synthetic:
+        blocks.append(C("This report uses SYNTHETIC demonstration data generated by MDOS. It illustrates the workflow and "
+                        "must not be used for real decisions.", "warning"))
+    return blocks
+
+
+def _insight_items(ctx: Context, only_approved: bool) -> list[dict]:
+    items = []
+    for i in ctx.insights:
+        if i.status == "rejected" or (only_approved and i.status != "approved"):
+            continue
+        suffix = "" if i.status == "approved" else " (draft, awaiting approval)"
+        label = " [model-generated interpretation]" if i.is_model_generated else ""
+        items.append({"text": f"**{i.title}.** {i.statement}{suffix}{label}", "citations": ctx.codes(i.evidence)})
+    return items
+
+
+def _rec_items(ctx: Context) -> list[dict]:
+    items = []
+    for r in ctx.recs:
+        if r.status == "rejected":
+            continue
+        suffix = "" if r.status == "approved" else " (draft, awaiting approval)"
+        label = " [model-generated]" if r.is_model_generated else ""
+        items.append({"text": f"**{r.code} ({r.priority} priority).** {r.statement}{suffix}{label}"
+                              + (f" Rationale: {r.rationale}" if r.rationale else ""), "citations": ctx.codes(r.evidence)})
+    return items
+
+
+def _limitations(ctx: Context) -> list[str]:
+    seen: list[str] = []
+    base = ["The sample was collected with non-probability (quota) sampling; results describe the sampled groups."]
+    if any(a.method in PRICE_METHODS for a in ctx.analyses):
+        base.append("Willingness to pay was stated, not observed; stated answers usually overstate real purchasing. "
+                    "Validate the price with a behavioral experiment.")
+    if ctx.synthetic:
+        base.append("All data in this report are synthetic and were generated for demonstration.")
+    for a in ctx.analyses:
+        for lim in a.limitations or []:
+            if lim not in seen and lim not in base:
+                seen.append(lim)
+    return base + seen
+
+
+def build_research_report(db: Session, project: Project) -> dict[str, Any]:
+    ctx = Context(db, project)
+    blocks: list[dict] = _header(ctx, "Research report")
+
+    blocks.append(H(2, "Executive summary"))
+    blocks.append(P(f"Business question: {project.business_question}"))
+    if project.decision_to_inform:
+        blocks.append(P(f"Decision to inform: {project.decision_to_inform}"))
+    approved = _insight_items(ctx, only_approved=True)
+    if approved:
+        blocks.append(L(approved))
+    else:
+        drafts = _insight_items(ctx, only_approved=False)
+        if drafts:
+            blocks.append(C("No insight has been approved yet. The points below are drafts pending review.", "warning"))
+            blocks.append(L(drafts))
+        else:
+            blocks.append(C("No insights have been recorded yet.", "info"))
+
+    blocks.append(H(2, "Research design"))
+    framing = ctx.plans.get("framing") or {}
+    if framing.get("objectives"):
+        blocks.append(H(3, "Objectives"))
+        blocks.append(L(framing["objectives"]))
+    if ctx.rqs:
+        blocks.append(H(3, "Research questions"))
+        blocks.append(L([f"**{q.code}.** {q.text}" for q in ctx.rqs]))
+    if ctx.hypotheses:
+        blocks.append(H(3, "Hypotheses"))
+        blocks.append(T(["Code", "Hypothesis", "Status"],
+                        [[h.code, h.statement, STATUS_LABEL.get(h.status, h.status)] for h in ctx.hypotheses]))
+    design = ctx.plans.get("design") or {}
+    if design.get("method"):
+        blocks.append(H(3, "Method"))
+        blocks.append(P(design["method"]))
+    sampling = ctx.plans.get("sampling") or {}
+    if sampling:
+        blocks.append(P(f"Sampling: {sampling.get('method', '')} Target population: {sampling.get('target_population', '')}."))
+    if ctx.datasets:
+        rows = []
+        for d in ctx.datasets:
+            versions = [v for v in ctx.versions if v.dataset_id == d.id]
+            current = next((v for v in versions if v.id == d.current_version_id), versions[-1] if versions else None)
+            rows.append([d.name, ORIGIN_LABEL.get(d.origin, d.origin), versions[0].n_rows if versions else "",
+                         current.n_rows if current else "", f"v{current.version}" if current else ""])
+        blocks.append(H(3, "Data"))
+        blocks.append(T(["Dataset", "Origin", "Rows imported", "Rows analyzed", "Version"], rows))
+
+    blocks.append(H(2, "Findings"))
+    if ctx.hypotheses:
+        blocks.append(H(3, "Hypothesis tests"))
+        items = []
+        for h in ctx.hypotheses:
+            cites = ctx.codes(h.verdict_evidence or [])
+            text = f"**{h.code}: {STATUS_LABEL.get(h.status, h.status)}.** {h.statement}"
+            if h.verdict_rationale:
+                text += f" {h.verdict_rationale}"
+            items.append({"text": text, "citations": cites})
+        blocks.append(L(items))
+    price_ev = [e for e in ctx.evidence if (ctx.analysis_by_id.get(e.analysis_id) and
+                                            ctx.analysis_by_id[e.analysis_id].method in PRICE_METHODS)]
+    if price_ev:
+        blocks.append(H(3, "Price research"))
+        blocks.append(L([{"text": e.statement, "citations": ctx.codes([e])} for e in price_ev]))
+    if ctx.segments:
+        blocks.append(H(3, "Segments and personas"))
+        for s in ctx.segments:
+            persona = s.persona or {}
+            parts = [f"**{s.name}** ({s.share:.0%} of the sample)."]
+            if persona.get("values"):
+                parts.append(f"Scores high on: {', '.join(persona['values'])}.")
+            if persona.get("concerns"):
+                parts.append(f"Scores low on: {', '.join(persona['concerns'])}.")
+            if persona.get("who"):
+                parts.append(f"Profile: {'; '.join(persona['who'])}.")
+            if persona.get("quote"):
+                parts.append(f"In their words: \"{persona['quote']}\"")
+            seg_ev = [e for e in ctx.evidence if e.analysis_id == s.analysis_id]
+            blocks.append(P(" ".join(parts), ctx.codes(seg_ev)))
+    text_ev = [e for e in ctx.evidence if (ctx.analysis_by_id.get(e.analysis_id) and
+                                           ctx.analysis_by_id[e.analysis_id].method in TEXT_METHODS)]
+    if text_ev:
+        blocks.append(H(3, "Voice of the customer"))
+        blocks.append(L([{"text": e.statement, "citations": ctx.codes([e])} for e in text_ev]))
+    shown = set(ctx.cited)
+    other = [e for e in ctx.evidence if e.id not in shown and e.id not in {x.id for x in price_ev + text_ev}]
+    if other:
+        blocks.append(H(3, "Other evidence"))
+        blocks.append(L([{"text": e.statement, "citations": ctx.codes([e])} for e in other]))
+
+    blocks.append(H(2, "Recommendations"))
+    recs = _rec_items(ctx)
+    blocks.append(L(recs) if recs else C("No recommendations have been recorded yet.", "info"))
+
+    blocks.append(H(2, "Limitations"))
+    blocks.append(L(_limitations(ctx)))
+
+    blocks += methods_appendix_blocks(ctx)
+    blocks += data_appendix_blocks(ctx)
+    blocks += evidence_register_blocks(ctx)
+    return _document(f"Research report: {project.name}", project, blocks, ctx)
+
+
+def methods_appendix_blocks(ctx: Context) -> list[dict]:
+    if not ctx.analyses:
+        return []
+    blocks = [H(2, "Methods appendix")]
+    for a in ctx.analyses:
+        version = next((v for v in ctx.versions if v.id == a.dataset_version_id), None)
+        blocks.append(H(3, a.title or a.method))
+        blocks.append(P(f"Method: {a.method}. n = {a.n}. Dataset version: {f'v{version.version}' if version else 'n/a'}. "
+                        f"Parameters: {', '.join(f'{k}={v}' for k, v in (a.params or {}).items() if v not in (None, [], ''))}."))
+        if a.assumptions:
+            blocks.append(T(["Check", "Status", "Detail"], [[c["name"], c["status"], c["detail"]] for c in a.assumptions]))
+    return blocks
+
+
+def data_appendix_blocks(ctx: Context) -> list[dict]:
+    blocks = [H(2, "Data appendix")]
+    if ctx.versions:
+        rows = []
+        for v in ctx.versions:
+            ops = "; ".join(f"{o.get('op')}" + (f" ({o.get('reason')})" if o.get("reason") else "") for o in v.operations or [])
+            rows.append([f"v{v.version}", v.n_rows, v.n_cols, ops, v.checksum[:12]])
+        blocks.append(H(3, "Dataset lineage"))
+        blocks.append(T(["Version", "Rows", "Columns", "Operations", "Checksum"], rows))
+    if ctx.variables:
+        blocks.append(H(3, "Variable dictionary"))
+        blocks.append(T(["Variable", "Label", "Type", "Role"],
+                        [[v.name, (v.label or "")[:90], v.var_type, v.role] for v in ctx.variables]))
+    return blocks if len(blocks) > 1 else []
+
+
+def evidence_register_blocks(ctx: Context) -> list[dict]:
+    if not ctx.evidence:
+        return []
+    items = []
+    for e in ctx.evidence:
+        analysis = ctx.analysis_by_id.get(e.analysis_id)
+        source = f"{analysis.method}" if analysis else (e.source_ref or {}).get("citation", e.kind)
+        items.append({"code": e.code, "title": e.title, "statement": e.statement, "origin": ORIGIN_LABEL.get(e.origin, e.origin),
+                      "design": e.design, "strength": e.strength, "source": source, "n": e.n})
+    return [H(2, "Evidence register"), {"type": "evidence_register", "items": items}]
+
+
+def build_executive_summary(db: Session, project: Project) -> dict[str, Any]:
+    ctx = Context(db, project)
+    blocks = _header(ctx, "Executive summary")
+    blocks.append(P(f"Business question: {project.business_question}"))
+    if project.decision_to_inform:
+        blocks.append(P(f"Decision to inform: {project.decision_to_inform}"))
+    blocks.append(H(2, "Key findings"))
+    items = _insight_items(ctx, only_approved=True) or _insight_items(ctx, only_approved=False)
+    blocks.append(L(items) if items else C("No insights recorded yet.", "info"))
+    blocks.append(H(2, "Recommendations"))
+    recs = _rec_items(ctx)
+    blocks.append(L(recs) if recs else C("No recommendations recorded yet.", "info"))
+    blocks.append(H(2, "Main limitations"))
+    blocks.append(L(_limitations(ctx)[:4]))
+    blocks += evidence_register_blocks(ctx)
+    return _document(f"Executive summary: {project.name}", project, blocks, ctx)
+
+
+def build_decision_memo(db: Session, project: Project) -> dict[str, Any]:
+    ctx = Context(db, project)
+    blocks = _header(ctx, "Decision memo")
+    blocks.append(H(2, "Decision"))
+    blocks.append(P(project.decision_to_inform or project.business_question))
+    if ctx.scenarios:
+        blocks.append(H(2, "Options considered"))
+        rows = []
+        for s in ctx.scenarios:
+            k = (s.results or {}).get("kpis", {})
+            rows.append([s.name, s.kind, _money(k.get("revenue"), project.currency), _money(k.get("profit"), project.currency),
+                         f"{k['romi']:.0%}" if isinstance(k.get("romi"), int | float) else "", k.get("customers", "")])
+        blocks.append(T(["Scenario", "Type", "Revenue", "Profit", "ROMI", "Customers"], rows))
+    decided = [d for d in ctx.decisions if d.status == "approved"]
+    proposed = [d for d in ctx.decisions if d.status == "proposed"]
+    blocks.append(H(2, "Recommendation"))
+    if decided or proposed:
+        for d in decided + proposed:
+            status = "Approved" if d.status == "approved" else "Proposed, awaiting approval"
+            blocks.append(P(f"**{d.title}** ({status}). {d.decision} {d.rationale}", ctx.codes(d.evidence_ids or [])))
+    else:
+        blocks.append(C("No decision has been proposed yet. Use the Strategy module's decision log.", "info"))
+    blocks.append(H(2, "Supporting evidence"))
+    items = _insight_items(ctx, only_approved=False)
+    blocks.append(L(items) if items else C("No insights recorded yet.", "info"))
+    risky = []
+    for s in ctx.scenarios:
+        for a in (s.model or {}).get("assumptions", []):
+            if a.get("confidence") == "low":
+                risky.append(f"{s.name}: {a.get('label', a.get('key'))} is a low-confidence assumption ({a.get('source', 'guess')}).")
+    blocks.append(H(2, "Risks and open assumptions"))
+    blocks.append(L(risky[:8] or ["No low-confidence assumptions recorded."]))
+    if ctx.experiments:
+        blocks.append(H(2, "Next steps: experiments"))
+        blocks.append(L([f"{x.name}: {x.hypothesis} (status: {x.status}, {x.sample_size_per_arm} per arm)" for x in ctx.experiments]))
+    blocks += evidence_register_blocks(ctx)
+    return _document(f"Decision memo: {project.name}", project, blocks, ctx)
+
+
+def build_methods_appendix(db: Session, project: Project) -> dict[str, Any]:
+    ctx = Context(db, project)
+    blocks = _header(ctx, "Methods appendix") + methods_appendix_blocks(ctx) + data_appendix_blocks(ctx)
+    return _document(f"Methods appendix: {project.name}", project, blocks, ctx)
+
+
+def build_experiment_brief(db: Session, project: Project, experiment: Experiment) -> dict[str, Any]:
+    ctx = Context(db, project)
+    blocks = _header(ctx, "Experiment brief")
+    blocks += [
+        H(2, "Hypothesis"), P(experiment.hypothesis),
+        H(2, "Design"),
+        T(["Item", "Value"], [
+            ["Primary metric", experiment.primary_metric],
+            ["Baseline rate", f"{experiment.baseline_rate:.1%}"],
+            ["Minimum detectable effect (relative)", f"{experiment.mde:.0%}"],
+            ["Significance level", experiment.alpha], ["Power", experiment.power],
+            ["Sample size per arm", experiment.sample_size_per_arm],
+            ["Expected daily traffic", experiment.expected_daily_traffic or "not set"],
+            ["Estimated duration (days)", experiment.duration_days or "not set"],
+        ]),
+        H(2, "Variants"), L([f"**{v.get('name')}**: {v.get('description', '')}" for v in experiment.variants or []]),
+        H(2, "Decision rule"),
+        P("Ship the variant if the two-sided test is significant at the chosen level and the lower bound of the confidence "
+          "interval for the lift is above zero; otherwise keep the control and record the result as evidence."),
+    ]
+    if experiment.results:
+        r = experiment.results
+        blocks += [H(2, "Results"), P(r.get("summary", ""), ctx.codes([experiment.evidence_id] if experiment.evidence_id else []))]
+    return _document(f"Experiment brief: {experiment.name}", project, blocks, ctx)
+
+
+def _money(value: Any, currency: str) -> str:
+    if not isinstance(value, int | float):
+        return ""
+    if currency == "IDR":
+        return "Rp " + f"{value:,.0f}".replace(",", ".")
+    return f"{currency} {value:,.0f}"
+
+
+def _document(title: str, project: Project, blocks: list[dict], ctx: Context) -> dict[str, Any]:
+    return {"title": title, "subtitle": project.business_question, "generated_at": datetime.now(UTC).isoformat(),
+            "project": project.name, "synthetic": ctx.synthetic, "blocks": blocks,
+            "evidence_ids": list(dict.fromkeys(ctx.cited + [e.id for e in ctx.evidence]))}
+
+
+BUILDERS = {
+    "research_report": build_research_report,
+    "executive_summary": build_executive_summary,
+    "decision_memo": build_decision_memo,
+    "methods_appendix": build_methods_appendix,
+}
+
+
+# ----------------------------------------------------------------------------------------------
+# Rendering
+# ----------------------------------------------------------------------------------------------
+
+
+def _cite_md(codes: list[str]) -> str:
+    return f" [{', '.join(codes)}]" if codes else ""
+
+
+def to_markdown(doc: dict[str, Any]) -> str:
+    out = [f"# {doc['title']}", "", f"_{doc.get('subtitle', '')}_", "",
+           f"Generated {doc.get('generated_at', '')[:16].replace('T', ' ')} UTC by Marketing Decision OS.", ""]
+    for b in doc["blocks"]:
+        t = b["type"]
+        if t == "heading":
+            out += ["#" * b["level"] + " " + b["text"], ""]
+        elif t == "paragraph":
+            label = " _(model-generated interpretation)_" if b.get("model_generated") else ""
+            out += [b["text"] + _cite_md(b.get("citations", [])) + label, ""]
+        elif t == "list":
+            out += [f"- {i['text']}{_cite_md(i.get('citations', []))}" for i in b["items"]] + [""]
+        elif t == "table":
+            out.append("| " + " | ".join(str(c) for c in b["columns"]) + " |")
+            out.append("|" + "---|" * len(b["columns"]))
+            for row in b["rows"]:
+                out.append("| " + " | ".join(str(v).replace("|", "/").replace("\n", " ") for v in row) + " |")
+            out.append("")
+        elif t == "callout":
+            out += [f"> **{'Warning' if b['tone'] == 'warning' else 'Note'}:** {b['text']}", ""]
+        elif t == "evidence_register":
+            for i in b["items"]:
+                out.append(f"- **{i['code']}** {i['title']}: {i['statement']} _(origin: {i['origin']}; design: {i['design']}; "
+                           f"strength: {i['strength']}; source: {i['source']})_")
+            out.append("")
+    return "\n".join(out)
+
+
+def _inline(text: str) -> str:
+    """Escape HTML, then support **bold** only."""
+    escaped = html.escape(text)
+    parts = escaped.split("**")
+    return "".join(f"<strong>{p}</strong>" if i % 2 else p for i, p in enumerate(parts))
+
+
+def _cite_html(codes: list[str]) -> str:
+    if not codes:
+        return ""
+    links = ", ".join(f'<a href="#{html.escape(c)}">{html.escape(c)}</a>' for c in codes)
+    return f' <span class="cite">[{links}]</span>'
+
+
+HTML_STYLE = """
+:root { --ink:#16202c; --muted:#5b6776; --line:#d9dee5; --accent:#1f5f8b; --warn:#8a5a00; --warn-bg:#fff6e0; --note-bg:#eef4fa; }
+* { box-sizing: border-box; }
+body { font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--ink); background: #fff;
+       max-width: 860px; margin: 40px auto; padding: 0 24px; line-height: 1.55; font-size: 15px; }
+h1 { font-size: 28px; margin-bottom: 4px; } h2 { font-size: 20px; margin-top: 36px; border-bottom: 1px solid var(--line); padding-bottom: 6px; }
+h3 { font-size: 16px; margin-top: 24px; } .subtitle { color: var(--muted); font-style: italic; } .meta { color: var(--muted); font-size: 13px; }
+table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 13px; } th, td { border: 1px solid var(--line); padding: 6px 8px; text-align: left; vertical-align: top; }
+th { background: #f5f7fa; } .callout { padding: 10px 14px; border-radius: 6px; margin: 12px 0; } .callout.warning { background: var(--warn-bg); color: var(--warn); }
+.callout.info { background: var(--note-bg); } .cite { color: var(--accent); font-size: 12px; } .cite a { color: inherit; }
+.model { color: var(--muted); font-size: 12px; font-style: italic; } .register li { margin-bottom: 8px; } .register .src { color: var(--muted); font-size: 12px; }
+@media print { body { margin: 0; max-width: none; } a { color: inherit; text-decoration: none; } h2 { page-break-after: avoid; } }
+"""
+
+
+def to_html(doc: dict[str, Any]) -> str:
+    parts = [f"<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
+             f"<title>{html.escape(doc['title'])}</title><style>{HTML_STYLE}</style></head><body>",
+             f"<h1>{html.escape(doc['title'])}</h1><p class=\"subtitle\">{html.escape(doc.get('subtitle', ''))}</p>",
+             f"<p class=\"meta\">Generated {html.escape(doc.get('generated_at', '')[:16].replace('T', ' '))} UTC by Marketing Decision OS</p>"]
+    for b in doc["blocks"]:
+        t = b["type"]
+        if t == "heading":
+            level = min(max(int(b["level"]), 2), 4)
+            parts.append(f"<h{level}>{html.escape(b['text'])}</h{level}>")
+        elif t == "paragraph":
+            label = ' <span class="model">(model-generated interpretation)</span>' if b.get("model_generated") else ""
+            parts.append(f"<p>{_inline(b['text'])}{_cite_html(b.get('citations', []))}{label}</p>")
+        elif t == "list":
+            items = "".join(f"<li>{_inline(i['text'])}{_cite_html(i.get('citations', []))}</li>" for i in b["items"])
+            parts.append(f"<ul>{items}</ul>")
+        elif t == "table":
+            head = "".join(f"<th>{html.escape(str(c))}</th>" for c in b["columns"])
+            rows = "".join("<tr>" + "".join(f"<td>{html.escape(str(v))}</td>" for v in r) + "</tr>" for r in b["rows"])
+            parts.append(f"<table><thead><tr>{head}</tr></thead><tbody>{rows}</tbody></table>")
+        elif t == "callout":
+            parts.append(f"<div class=\"callout {html.escape(b['tone'])}\">{_inline(b['text'])}</div>")
+        elif t == "evidence_register":
+            items = "".join(
+                f"<li id=\"{html.escape(i['code'])}\"><strong>{html.escape(i['code'])}</strong> {html.escape(i['title'])}: "
+                f"{html.escape(i['statement'])}<br><span class=\"src\">Origin: {html.escape(i['origin'])} · Design: "
+                f"{html.escape(str(i['design']))} · Strength: {html.escape(str(i['strength']))} · Source: {html.escape(str(i['source']))}</span></li>"
+                for i in b["items"])
+            parts.append(f"<ul class=\"register\">{items}</ul>")
+    parts.append("</body></html>")
+    return "".join(parts)
