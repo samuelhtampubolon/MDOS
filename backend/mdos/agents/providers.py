@@ -143,5 +143,5 @@ def provider_status(settings: Settings | None = None) -> dict[str, Any]:
         "effort": settings.mdos_llm_effort if settings.llm_enabled else None,
         "fallbacks": settings.mdos_llm_fallbacks if settings.llm_enabled else None,
         "note": ("Generative steps use Claude; statistics are always computed by code." if settings.llm_enabled else
-                 "Offline mode: agents use deterministic generators. Set ANTHROPIC_API_KEY to enable Claude drafting."),
+                 "Agents use deterministic generators. Set ANTHROPIC_API_KEY to turn on Claude drafting."),
     }

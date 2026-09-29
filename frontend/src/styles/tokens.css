@@ -1,10 +1,27 @@
-/* Design tokens. Components use these roles only; to rebrand, change values here.
-   Chart colors follow the validated reference palette (docs/09-design-system.md). */
+/* Design tokens ("Quiet Ledger", docs/18-interface-brief.md). Components use these roles only; to rebrand, change
+   values here. Depth comes from borders and surface steps, never from shadows or gradients. The accent has three
+   jobs: the primary action, the current selection and the focus ring. Chart colors follow the validated palette
+   (docs/09-design-system.md). */
 
 :root {
   color-scheme: light;
-  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font-sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --weight-regular: 400;
+  --weight-strong: 600;
+  /* Type scale, about 1.2 */
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-base: 14px;
+  --text-md: 16px;
+  --text-lg: 20px;
+  --text-xl: 24px;
+  --text-2xl: 28px;
+  --measure: 72ch;
+  /* Motion: one hover and focus transition, one entrance */
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+  --dur-fast: 120ms;
+  --dur-enter: 160ms;
 
   --page: #f9f9f7;
   --surface-1: #fcfcfb;
@@ -64,11 +81,9 @@
   --div-pos: #2a78d6;
   --deemph: #c3c2b7;
 
-  --radius-sm: 6px;
-  --radius: 10px;
-  --radius-lg: 14px;
-  --shadow-1: 0 1px 2px rgba(11, 11, 11, 0.06), 0 1px 1px rgba(11, 11, 11, 0.03);
-  --shadow-2: 0 10px 30px rgba(11, 11, 11, 0.12);
+  --radius: 8px; /* every control and surface */
+  --radius-pill: 999px; /* status pills and counts only */
+  --scrim: rgba(11, 11, 11, 0.4);
   --sidebar: 232px;
 }
 
@@ -122,8 +137,7 @@
     --div-pos-soft: #1c3558;
     --div-pos: #3987e5;
     --deemph: #4a4a46;
-    --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
-    --shadow-2: 0 10px 30px rgba(0, 0, 0, 0.5);
+    --scrim: rgba(0, 0, 0, 0.6);
   }
 }
 
@@ -176,6 +190,5 @@
   --div-pos-soft: #1c3558;
   --div-pos: #3987e5;
   --deemph: #4a4a46;
-  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-2: 0 10px 30px rgba(0, 0, 0, 0.5);
+  --scrim: rgba(0, 0, 0, 0.6);
 }

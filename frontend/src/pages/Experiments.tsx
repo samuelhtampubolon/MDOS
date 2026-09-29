@@ -47,7 +47,7 @@ function ExperimentCard({ pid, x, onEvidence }: { pid: string; x: Experiment; on
       </>}>
       <div className="stack">
         <div><span className="small muted">Hypothesis: </span>{x.hypothesis}</div>
-        <div className="grid grid-4" style={{ gap: 0 }}>
+        <div className="stats inline">
           <Stat label="Primary metric" value={<span style={{ fontSize: 15 }}>{x.primary_metric}</span>} delta={`baseline ${pct(x.baseline_rate, 1)}`} />
           <Stat label="Smallest effect to detect" value={`${pct(x.mde)} relative`} delta={`${pct(x.baseline_rate, 1)} to ${pct(x.baseline_rate * (1 + x.mde), 1)}`} />
           <Stat label="Sample per variant" value={num(x.sample_size_per_arm)} delta={`alpha ${x.alpha}, power ${pct(x.power)}`} />

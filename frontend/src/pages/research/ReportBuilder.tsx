@@ -27,7 +27,7 @@ export default function ReportBuilder({ pid, kinds = ["research_report", "execut
   const [chosen, setChosen] = useState<string | undefined>();
   const selected = chosen ?? reports?.[0]?.id;
   return (
-    <div className="grid" style={{ gridTemplateColumns: "minmax(250px, 320px) minmax(0, 1fr)", alignItems: "start" }}>
+    <div className="grid grid-sidebar">
       <div className="stack">
         <Generate pid={pid} kinds={kinds} onCreated={setChosen} />
         <Card title="Reports">
@@ -101,8 +101,8 @@ function ReportView({ pid, rid, onDeleted }: { pid: string; rid: string; onDelet
   const cite = (list?: string[]) => list && list.length > 0 && (
     <span className="row" style={{ display: "inline-flex", gap: 3, marginLeft: 6 }}>
       {list.map((c) => codes.get(c)
-        ? <button key={c} className="chip" style={{ fontSize: 11 }} onClick={() => setEvidenceId(codes.get(c) as string)}>{c}</button>
-        : <span key={c} className="chip" style={{ fontSize: 11 }}>{c}</span>)}
+        ? <button key={c} className="chip code" onClick={() => setEvidenceId(codes.get(c) as string)}>{c}</button>
+        : <span key={c} className="chip code">{c}</span>)}
     </span>
   );
   const doc = report.document;
@@ -158,7 +158,7 @@ function Block({ block: b, cite }: { block: ReportBlock; cite: (list?: string[])
             <tbody>
               {(b.items ?? []).map((it) => (
                 <tr key={it.code}>
-                  <td><span className="chip">{it.code}</span></td>
+                  <td><span className="chip code">{it.code}</span></td>
                   <td><div style={{ fontWeight: 600 }}>{it.title}</div><div className="small secondary">{it.statement}</div></td>
                   <td className="small">{sentence(it.design ?? "")}</td>
                   <td><span className={`chip strength-${it.strength}`}>{it.strength}</span></td>

@@ -61,61 +61,79 @@ function Dashboard({ pid }: { pid: string }) {
   const surveyDataset = (datasets ?? []).find((d) => d.kind === "survey");
   const hasDesign = (research?.hypotheses.length ?? 0) > 0;
   const nextStep = !hasDesign
-    ? { text: "Generate a research design from your business question.", tab: "brief" }
+    ? { text: "Generate a research design from your business question.", tab: "brief", cta: "Open the project brief" }
     : !surveyDataset
-      ? { text: "Export the questionnaire, run fieldwork, then upload the responses.", tab: "questionnaire" }
+      ? { text: "Export the questionnaire, run fieldwork, then upload the responses.", tab: "questionnaire", cta: "Open the questionnaire" }
       : !(evidence?.length)
-        ? { text: "Run the analysis workflow on your survey data.", tab: "data" }
+        ? { text: "Run the analysis workflow on your survey data.", tab: "data", cta: "Open the data workspace" }
         : (approvals?.length ?? 0) > 0
-          ? { text: `Review ${approvals?.length} pending approval(s): insights, verdicts and the report stay drafts until you decide.`, tab: "insights" }
-          : { text: "Generate the research report and carry the evidence into the Strategy Simulator.", tab: "report" };
+          ? { text: `Review ${approvals?.length} pending approval${approvals?.length === 1 ? "" : "s"}: insights, verdicts and the report stay drafts until you decide.`, tab: "insights", cta: "Review insights" }
+          : { text: "Generate the research report and carry the evidence into the Strategy Simulator.", tab: "report", cta: "Open the report builder" };
+  const counted = progress.filter((s) => s.status !== "deferred");
+  const nextIndex = progress.findIndex((s) => s.status !== "done" && s.status !== "deferred");
   return (
-    <div className="stack">
-      <Callout icon="flag"><strong>Next step:</strong> {nextStep.text}{" "}
-        <button className="btn sm" style={{ marginLeft: 8 }} onClick={() => navigate(`/p/${pid}/research/${nextStep.tab}`)}>Go<Icon name="arrowRight" size={12} /></button>
-      </Callout>
-      <div className="card">
-        <div className="grid grid-4" style={{ gap: 0 }}>
-          <Stat label="Workflow steps done" value={`${done} of ${progress.filter((s) => s.status !== "deferred").length}`} />
-          <Stat label="Hypotheses" value={research?.hypotheses.length ?? 0}
-            delta={`${research?.hypotheses.filter((h) => ["supported", "not_supported", "inconclusive"].includes(h.status)).length ?? 0} with approved verdicts`} />
-          <Stat label="Evidence records" value={evidence?.length ?? 0} delta={`${insights?.length ?? 0} insights drafted or approved`} />
-          <Stat label="Pending approvals" value={approvals?.length ?? 0} delta="Human gates" />
-        </div>
+    <div className="stack" style={{ gap: 24 }}>
+      <div className="next-step">
+        <Icon name="flag" />
+        <div className="next-step-text"><strong>Next step:</strong> {nextStep.text}</div>
+        <button className="btn primary" onClick={() => navigate(`/p/${pid}/research/${nextStep.tab}`)}>{nextStep.cta}<Icon name="arrowRight" size={14} /></button>
       </div>
-      <Card title="Research workflow" subtitle="The 23 steps from the specification. Presentation export is deferred to Phase 2.">
-        <div className="progress-steps">
-          {progress.map((s) => (
-            <div key={s.step} className={`progress-step ${s.status}`} title={s.status}>
-              {s.status === "done" ? <Icon name="check" size={14} /> : <span className="num muted" style={{ width: 14 }}>{s.step}</span>}
-              {s.name}
-            </div>
-          ))}
-        </div>
-      </Card>
-      <div className="grid grid-2">
-        <Card title="Agent workflows" subtitle="Graph1 pipeline: Research, Questionnaire, Sampling, Fieldwork, Cleaning, Statistics, Insight, Report."
-          actions={<>
-            <StartWorkflow pid={pid} workflow="research_design" label="Run design agents" primary={!hasDesign} />
-            <StartWorkflow pid={pid} workflow="research_analysis" label="Run analysis agents" primary={hasDesign && Boolean(surveyDataset)}
+      <div className="stats">
+        <Stat label="Workflow steps done" value={`${done} of ${counted.length}`} />
+        <Stat label="Hypotheses" value={research?.hypotheses.length ?? 0}
+          delta={`${research?.hypotheses.filter((h) => ["supported", "not_supported", "inconclusive"].includes(h.status)).length ?? 0} with approved verdicts`} />
+        <Stat label="Evidence records" value={evidence?.length ?? 0} delta={`${insights?.length ?? 0} insights drafted or approved`} />
+        <Stat label="Pending approvals" value={approvals?.length ?? 0} delta="Waiting for a person" />
+      </div>
+      <div className="grid grid-2 align-start">
+        <section aria-labelledby="workflow-title">
+          <div className="section-title">
+            <h2 id="workflow-title">Research workflow</h2>
+            <p>{done} of {counted.length} steps</p>
+          </div>
+          <div className="progress-bar" aria-hidden style={{ marginBottom: 12 }}>
+            <span style={{ width: `${counted.length ? (done / counted.length) * 100 : 0}%` }} />
+          </div>
+          <ol className="progress-steps" aria-label="Research workflow steps">
+            {progress.map((s, i) => (
+              <li key={s.step} className={`progress-step ${s.status} ${i === nextIndex ? "next" : ""}`}
+                title={s.status === "deferred" ? "Planned for a later version" : undefined}>
+                {s.status === "done" ? <Icon name="check" size={14} /> : <span className="num muted" style={{ width: 14, textAlign: "right" }}>{s.step}</span>}
+                <span>{s.name}{i === nextIndex && <span className="visually-hidden"> (next)</span>}</span>
+              </li>
+            ))}
+          </ol>
+        </section>
+        <section aria-labelledby="agents-title" className="stack-sm">
+          <div className="section-title" style={{ marginBottom: 0 }}>
+            <h2 id="agents-title">Agent workflows</h2>
+          </div>
+          <p className="small secondary measure">Research, questionnaire, sampling, fieldwork, cleaning, statistics, insight and report agents. They draft; you approve.</p>
+          <div className="actions" style={{ margin: "4px 0 8px" }}>
+            {/* The next-step button above is the page's one primary action. */}
+            <StartWorkflow pid={pid} workflow="research_design" label="Run design agents" primary={false} />
+            <StartWorkflow pid={pid} workflow="research_analysis" label="Run analysis agents" primary={false}
               disabled={!hasDesign || !surveyDataset} inputs={surveyDataset ? { dataset_id: surveyDataset.id } : {}} />
-          </>}>
+          </div>
           {research_runs.length ? (
             <div className="stack">
               {research_runs.slice(0, 2).map((w) => <WorkflowPanel key={w.id} pid={pid} runId={w.id} onOpenRun={setRunId} />)}
             </div>
-          ) : <span className="muted">No agent runs yet.</span>}
-        </Card>
-        <Card title="How the lab keeps research defensible">
-          <ul className="small secondary" style={{ margin: 0, paddingLeft: 18, lineHeight: 1.7 }}>
-            <li>Every statistic comes from code and reports its assumption checks, sample size and limitations.</li>
-            <li>Insights and recommendations must cite evidence; causal wording is blocked unless evidence comes from an experiment.</li>
-            <li>Segmentation needs a stated objective and variable rationale.</li>
-            <li>Agents propose hypothesis verdicts; only a person can approve them.</li>
-            <li>Every cleaning step creates a new dataset version with a checksum and an operations log.</li>
-          </ul>
-        </Card>
+          ) : (
+            <p className="small muted">No agent runs yet. {hasDesign ? "Upload survey responses to run the analysis agents." : "Run the design agents to draft hypotheses, a questionnaire and a sampling plan."}</p>
+          )}
+        </section>
       </div>
+      <details className="disclosure">
+        <summary><Icon name="chevronDown" size={12} />How MDOS keeps research defensible</summary>
+        <ul className="small secondary measure" style={{ margin: 0, paddingLeft: 18, lineHeight: 1.7 }}>
+          <li>Every statistic comes from code and reports its assumption checks, sample size and limitations.</li>
+          <li>Insights and recommendations must cite evidence; causal wording is blocked unless evidence comes from an experiment.</li>
+          <li>Segmentation needs a stated objective and variable rationale.</li>
+          <li>Agents propose hypothesis verdicts; only a person can approve them.</li>
+          <li>Every cleaning step creates a new dataset version with a checksum and an operations log.</li>
+        </ul>
+      </details>
       <AgentRunModal pid={pid} runId={runId} onClose={() => setRunId(null)} />
     </div>
   );

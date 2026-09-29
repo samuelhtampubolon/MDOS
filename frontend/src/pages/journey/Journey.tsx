@@ -130,27 +130,41 @@ function JourneyMap({ journey, currency }: { journey: JourneyT; currency: string
   const heat = journey.voc.heatmap;
   return (
     <div className="stack">
-      {journey.voc.summary ? <Callout icon="sparkles">{journey.voc.summary}</Callout> : (
+      {journey.voc.summary ? <Callout>{journey.voc.summary}</Callout> : (
         <Callout tone="warning">No voice-of-customer data yet. Run the analysis on reviews in the <strong>Stages and settings</strong> tab to fill in emotions and friction.</Callout>
       )}
-      <div className="card">
-        <div className="grid grid-4" style={{ gap: 0 }}>
+      <div>
+        <div className="stats">
           <Stat label="People entering per month" value={compact(sim.entrants)} hint={String(journey.settings.entrants_source ?? "")} />
           <Stat label="Customers per month" value={num(sim.total_customers)} delta={`${num(sim.wom_customers)} from word of mouth`} />
           <Stat label="Journey conversion" value={pct(sim.customers / (sim.entrants || 1), 2)} />
           <Stat label="Revenue per month" value={money(sim.revenue, currency, { compact: true })} delta={`at ${money(journey.settings.price ?? null, currency)} per customer`} />
         </div>
       </div>
-      <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 6 }} aria-label="Journey stages">
-        {journey.stages.map((s) => <StageColumn key={s.key} stage={s} touchpoints={journey.touchpoints.filter((t) => t.stage_key === s.key)} />)}
-      </div>
-      <div className="grid grid-2">
+      <section aria-labelledby="stages-title">
+        <div className="section-title">
+          <h2 id="stages-title">Journey stages</h2>
+          {journey.stages.length > 4 && <p>{journey.stages.length} stages. Scroll sideways to see them all.</p>}
+        </div>
+        <div className="scroller" role="region" aria-labelledby="stages-title" tabIndex={0}>
+          {journey.stages.map((s) => <StageColumn key={s.key} stage={s} touchpoints={journey.touchpoints.filter((t) => t.stage_key === s.key)} />)}
+        </div>
+      </section>
+      <div className="grid grid-2 align-start">
         <Card><EmotionCurve title="Emotion along the journey" subtitle="Mean sentiment of review sentences mapped to each stage (−1 to +1)"
           data={journey.stages.map((s) => ({ label: s.name, value: s.emotion, n: s.mentions }))} /></Card>
-        {heat && heat.themes.length > 0 ? (
-          <Card><Heatmap title="Where friction concentrates" subtitle="Reviews with a negative mention, by stage and theme" rows={heat.stages} cols={heat.themes}
-            data={heat.counts} fmt="number" /></Card>
-        ) : <Card title="Where friction concentrates"><span className="muted small">No negative themes found yet.</span></Card>}
+        {heat && heat.themes.length > 0 ? (() => {
+          // Stages without any negative mention become a note instead of empty rows.
+          const keep = heat.stages.map((_, i) => heat.counts[i].some((v) => (v ?? 0) > 0));
+          const quiet = heat.stages.filter((_, i) => !keep[i]);
+          return (
+            <Card>
+              <Heatmap title="Where friction concentrates" subtitle="Reviews with a negative mention, by stage and theme"
+                rows={heat.stages.filter((_, i) => keep[i])} cols={heat.themes} data={heat.counts.filter((_, i) => keep[i])} fmt="number" />
+              {quiet.length > 0 && <p className="small muted" style={{ marginTop: 8 }}>No negative mentions in: {quiet.join(", ")}.</p>}
+            </Card>
+          );
+        })() : <Card title="Where friction concentrates"><span className="muted small">No negative themes found yet.</span></Card>}
       </div>
       <Card title="Simulated funnel" subtitle="People continuing at each stage with the current continue rates">
         <div className="flow">

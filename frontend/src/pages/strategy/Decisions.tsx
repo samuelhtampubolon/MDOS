@@ -33,7 +33,7 @@ function DecisionCard({ pid, d, scenarios, currency, onEvidence }: { pid: string
     <Card title={d.title} subtitle={`${createdBy.startsWith("agent:") ? `Proposed by the ${AGENT_LABELS[createdBy.slice(6)] ?? "strategy"} agent` : "Logged by a person"} · ${dateTime(d.created_at)}`}
       actions={<StatusBadge status={d.status === "proposed" ? "pending" : d.status} label={d.status === "proposed" ? "Proposed" : undefined} />}>
       <div className="stack-sm">
-        <p style={{ margin: 0, fontWeight: 500 }}>{d.decision}</p>
+        <p className="measure" style={{ margin: 0 }}>{d.decision}</p>
         {d.rationale && <div className="small secondary">{d.rationale}</div>}
         {scenario && (
           <div className="small">Scenario: <strong>{scenario.name}</strong> · simulated profit {money(scenario.results.kpis.profit, currency)} per month
@@ -43,7 +43,7 @@ function DecisionCard({ pid, d, scenarios, currency, onEvidence }: { pid: string
           <span className="small muted">Evidence</span>
           {d.evidence_ids.length ? d.evidence_ids.map((id) => {
             const e = byId.get(id);
-            return <button key={id} className={`chip strength-${e?.strength ?? ""}`} title={e?.title} onClick={() => onEvidence(id)}>{e?.code ?? "view"}</button>;
+            return <button key={id} className={`chip code strength-${e?.strength ?? ""}`} title={e?.title} onClick={() => onEvidence(id)}>{e?.code ?? "view"}</button>;
           }) : <span className="small muted">None linked</span>}
         </div>
         {d.status === "proposed" && (

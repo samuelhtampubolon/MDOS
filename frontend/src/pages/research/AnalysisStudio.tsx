@@ -121,7 +121,7 @@ export default function AnalysisStudio({ pid }: { pid: string }) {
   return (
     <div className="stack">
       <RunPanel pid={pid} onRan={setViewId} />
-      <div className="grid" style={{ gridTemplateColumns: "minmax(240px, 320px) minmax(0, 1fr)", alignItems: "start" }}>
+      <div className="grid grid-sidebar">
         <Card title="History" subtitle="Every analysis is stored with its parameters and data version.">
           {!analyses?.length ? <span className="muted small">No analyses yet.</span> : (
             <div className="stack-sm" style={{ maxHeight: 900, overflowY: "auto" }}>

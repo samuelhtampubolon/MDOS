@@ -13,7 +13,7 @@
 
 .viz-title {
   font-size: 13px;
-  font-weight: 650;
+  font-weight: var(--weight-strong);
 }
 
 .viz-sub {
@@ -84,10 +84,9 @@
   min-width: 140px;
   max-width: 240px;
   padding: 8px 10px;
-  border-radius: 8px;
+  border-radius: var(--radius);
   background: var(--surface-1);
   border: 1px solid var(--border-strong);
-  box-shadow: var(--shadow-2);
   font-size: 12px;
 }
 
@@ -158,10 +157,16 @@
   margin-top: 6px;
 }
 
-.viz-scale-bar {
-  height: 8px;
-  width: 140px;
-  border-radius: 4px;
+.viz-scale-steps {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.viz-scale-steps > span {
+  width: 18px;
+  height: 10px;
+  border-radius: 2px;
+  border: 1px solid var(--border);
 }
 
 .graph-node {

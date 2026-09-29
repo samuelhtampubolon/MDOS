@@ -25,7 +25,7 @@ export function PainPoints({ pid, journey }: { pid: string; journey: Journey }) 
         actions={<button className="btn primary" disabled={propose.isPending || !journey.pain_points.length} onClick={() => propose.mutate(undefined, {
           onSuccess: (list) => toast(list.length ? `${list.length} intervention idea(s) added.` : "Every open pain point already has an intervention."),
           onError: (e) => toast(errorMessage(e), "error"),
-        })}><Icon name="sparkles" size={14} />Propose interventions</button>}>
+        })}><Icon name="play" size={14} />Propose interventions</button>}>
         {!journey.pain_points.length ? <Empty title="No pain points yet">Analyze reviews to find friction, or add one below from your own observations.</Empty> : (
           <div className="stack-sm">
             {journey.pain_points.map((p, i) => (
@@ -53,7 +53,7 @@ function PainPointRow({ pid, journey, p, rank, stage, codes, onEvidence }: {
         <div className="row" style={{ gap: 8 }}>
           <strong>{p.theme || p.title}</strong>
           <Badge>{stage}</Badge>
-          {p.evidence_ids.map((id) => <button key={id} className="chip" onClick={() => onEvidence(id)}>{codes.get(id) ?? "evidence"}</button>)}
+          {p.evidence_ids.map((id) => <button key={id} className="chip code" onClick={() => onEvidence(id)}>{codes.get(id) ?? "evidence"}</button>)}
         </div>
         <div className="small muted">
           {p.mentions} mentions ({pct(p.frequency, 1)} of texts) · severity {pct(p.severity)} · reach {pct(p.reach)} · priority score {num(p.score, 1)}

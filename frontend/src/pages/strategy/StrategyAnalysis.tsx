@@ -92,7 +92,7 @@ export function RiskView({ pid, scenarios, currency }: { pid: string; scenarios:
         </select>}>
         {!mc ? <Spinner label="Simulating" /> : (
           <div className="stack">
-            <div className="grid grid-4" style={{ gap: 0 }}>
+            <div className="stats inline">
               <Stat label="Chance of a profit" value={pct(mc.probability_profit_positive)} delta={`${num(mc.runs)} runs, seed ${mc.seed}`} />
               <Stat label="Typical profit (median)" value={money(mc.profit.p50, currency, { compact: true })} />
               <Stat label="Bad case (10th percentile)" value={money(mc.profit.p10, currency, { compact: true })} deltaTone={mc.profit.p10 < 0 ? "down" : undefined}
@@ -124,8 +124,8 @@ export function PriceView({ pid, baseline, currency }: { pid: string; baseline: 
   const research = data.research;
   return (
     <div className="stack">
-      <div className="card">
-        <div className="grid grid-4" style={{ gap: 0 }}>
+      <div>
+        <div className="stats">
           <Stat label="Current price" value={money(data.current_price, currency)} />
           <Stat label="Profit-maximizing price" value={money(data.profit_max_price, currency)} hint="Within the tested price range" />
           <Stat label="Revenue-maximizing price" value={money(data.revenue_max_price, currency)} />
@@ -182,7 +182,7 @@ export function MediaMix({ pid, baseline, currency }: { pid: string; baseline: S
               <input className="input" type="number" value={budget} onChange={(e) => setBudget(e.target.value)} /></label>
             <button className="btn primary" style={{ alignSelf: "end" }} disabled={optimize.isPending} onClick={() => optimize.mutate(undefined, {
               onSuccess: setResult, onError: (e) => toast(errorMessage(e), "error"),
-            })}><Icon name="sparkles" size={14} />Optimize</button>
+            })}><Icon name="play" size={14} />Optimize</button>
           </div>
           {result && (
             <div className="stack-sm">

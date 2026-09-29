@@ -136,20 +136,20 @@ function ScenarioDetail({ pid, scenario, baseline, currency }: { pid: string; sc
         </>}>
         <div className="stack">
           <FlowStrip scenario={scenario} baseline={baseline} currency={currency} />
-          <div className="grid grid-4" style={{ gap: 0 }}>
-            <Stat label="Customers per month" value={num(k.customers)} delta={cmp ? signedPct(cmp.customers?.pct, 1) : `${num(k.referrals)} from word of mouth`} />
-            <Stat label="Profit per month" value={money(k.profit, currency, { compact: true })} delta={cmp ? `${cmp.profit.delta >= 0 ? "+" : ""}${money(cmp.profit.delta, currency, { compact: true })} vs baseline` : `Break-even at ${num(k.break_even_customers)} customers`}
-              deltaTone={cmp ? (cmp.profit.delta >= 0 ? "up" : "down") : undefined} />
-            <Stat label="Return on marketing" value={k.romi !== null ? `${num(k.romi, 2)}x` : "n/a"} delta={`CAC ${money(k.cac, currency, { compact: true })}`} />
-            <Stat label="Customer lifetime value" value={money(k.clv, currency, { compact: true })} delta={k.clv_to_cac !== null ? `${num(k.clv_to_cac, 1)}x CAC` : undefined} />
-          </div>
-          <div className="small muted">
-            Price {money(k.price, currency)} · break-even price {money(scenario.results.break_even_price, currency)} · market penetration {pct(k.market_penetration, 2)}
+          {/* Customers and profit are in the flow above; these are the numbers it does not show. */}
+          <div className="stats inline">
+            <Stat label="Return on marketing" value={k.romi !== null ? `${num(k.romi, 2)}x` : "n/a"}
+              delta={cmp?.romi?.pct != null ? `${signedPct(cmp.romi.pct, 1)} vs baseline` : "Revenue per unit of media spend"} />
+            <Stat label="Cost per customer" value={money(k.cac, currency, { compact: true })}
+              delta={cmp?.cac?.pct != null ? `${signedPct(cmp.cac.pct, 1)} vs baseline` : "Media spend per new customer"} />
+            <Stat label="Customer lifetime value" value={money(k.clv, currency, { compact: true })} delta={k.clv_to_cac !== null ? `${num(k.clv_to_cac, 1)}x the cost per customer` : undefined} />
+            <Stat label="Break-even price" value={money(scenario.results.break_even_price, currency, { compact: true })}
+              delta={`Price ${money(k.price, currency)} · penetration ${pct(k.market_penetration, 2)}`} />
           </div>
         </div>
       </Card>
       {isScenario && scenario.results.waterfall && (
-        <div className="grid grid-2">
+        <div className="grid grid-2 align-start">
           <Card><Waterfall title="Profit bridge from the baseline" subtitle="Each lever applied in order" steps={scenario.results.waterfall} currency={currency} /></Card>
           <Card title="Scenario versus baseline">
             <div className="table-wrap">

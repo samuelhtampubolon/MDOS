@@ -215,7 +215,7 @@ function QualityPanel({ pid, dataset, version, isCurrent }: { pid: string; datas
         })}>Propose cleaning plan</button>
       ) : undefined}>
       <div className="stack">
-        <div className="grid grid-4" style={{ gap: 0 }}>
+        <div className="stats inline">
           <Stat label="Quality score" value={version.quality.quality_score !== undefined ? `${num(version.quality.quality_score)} / 100` : "n/a"} />
           <Stat label="Flagged respondents" value={num(version.quality.flagged_respondents ?? 0)}
             delta={typeof version.quality.flagged_share === "number" ? `${pct(version.quality.flagged_share, 1)} of rows` : undefined} />

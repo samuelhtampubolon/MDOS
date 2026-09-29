@@ -27,12 +27,21 @@ Components use semantic roles only; rebranding means changing values in `tokens.
 | `--surface-1` | `#fcfcfb` | `#1a1a19` | Cards, chart surface |
 | `--surface-2` / `-3` | `#f3f2ee` / `#ebe9e3` | `#222220` / `#2c2c2a` | Inset areas, table headers, empty heatmap cells |
 | `--text-primary` / `-secondary` / `-muted` | `#0b0b0b` / `#52514e` / `#6b6a65` | `#ffffff` and lighter grays | Body, supporting text, captions |
-| `--accent` | `#1c5cab` | `#256abf` | Primary buttons, links, focus |
+| `--accent` | `#1c5cab` | `#256abf` | Three jobs only: the primary action, the current selection, the focus ring (plus links) |
 | `--good`, `--warning`, `--serious`, `--critical` | green, amber, orange, red with `-text` and `-soft` variants | tuned for dark | Status only, never data series |
-| `--radius-sm` / `--radius` / `--radius-lg` | 6 / 10 / 14 px | same | Inputs, cards, dialogs |
+| `--radius` / `--radius-pill` | 8 px / 999 px | same | Every control and surface / status pills and counts only |
+| `--text-xs` to `--text-2xl` | 12, 13, 14, 16, 20, 24, 28 px | same | Type scale of about 1.2; body is 14 px |
+| `--weight-regular` / `--weight-strong` | 400 / 600 | same | The only two weights on screen |
+| `--dur-fast` / `--dur-enter` | 120 / 160 ms | same | Hover and focus color changes / toast and menu entrance |
 
-Typography uses the system font stack (`system-ui`, Segoe UI, Roboto, Helvetica Neue) for fast loading in the
-desktop build and good Indonesian diacritic support; numbers use tabular figures in tables (`.num`).
+Typography uses IBM Plex Sans for the interface and IBM Plex Mono for evidence codes, IDs and code. Both are bundled
+with the app (`@fontsource`, OFL licence), so they work offline and under the Content Security Policy, and both cover
+Indonesian text. Numbers use tabular figures in tables and key numbers.
+
+Depth comes from a 1 px border and a surface step, never from shadows or gradients; hover states change color only
+and nothing scales. `src/styles/styles.test.ts` fails the build if a shadow, gradient, scale transform or fixed
+surface radius appears. The reasoning, the five directions considered and the critique log are in
+[18-interface-brief.md](18-interface-brief.md).
 
 Dark mode is a separate, selected set of values (not an automatic inversion). The theme follows the device by
 default and can be set to light or dark in Settings or the top bar.

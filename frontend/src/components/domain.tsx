@@ -108,13 +108,15 @@ export function WorkflowPanel({ pid, runId, onOpenRun }: { pid: string; runId: s
             <button className="btn sm ghost" onClick={() => act("cancel")}>Cancel</button>
           )}
           {["succeeded", "awaiting_approval", "failed"].includes(wf.status) && (
-            <button className="btn sm danger" onClick={() => window.confirm("Remove the drafts this workflow created? Approved items are kept.") && act("rollback")}>
+            <button className="btn sm ghost danger" onClick={() => window.confirm("Remove the drafts this workflow created? Approved items are kept.") && act("rollback")}>
               <Icon name="undo" size={14} />Roll back drafts
             </button>
           )}
         </div>
       </div>
       {wf.error && <Callout tone="critical">{wf.error}</Callout>}
+      <details className="disclosure" open={wf.status !== "succeeded"}>
+        <summary><Icon name="chevronDown" size={12} />{(wf.step_runs ?? []).length} agent steps</summary>
       <div className="timeline">
         {(wf.step_runs ?? []).map((s) => (
           <div key={s.index} className="timeline-step">
@@ -125,13 +127,13 @@ export function WorkflowPanel({ pid, runId, onOpenRun }: { pid: string; runId: s
             <div>
               <div className="row" style={{ gap: 8 }}>
                 {s.agent_run_id ? (
-                  <button className="btn ghost sm" style={{ padding: 0, height: "auto", fontWeight: 650 }} onClick={() => onOpenRun(s.agent_run_id as string)}>
+                  <button className="btn ghost sm" style={{ padding: 0, height: "auto" }} onClick={() => onOpenRun(s.agent_run_id as string)}>
                     {AGENT_LABELS[s.agent] ?? s.agent}
                   </button>
                 ) : (
                   <span style={{ fontWeight: 600, color: "var(--text-muted)" }}>{AGENT_LABELS[s.agent] ?? s.agent}</span>
                 )}
-                {s.status !== "pending" && s.status !== "skipped" && <StatusBadge status={s.status} />}
+                {!["pending", "skipped", "succeeded"].includes(s.status) && <StatusBadge status={s.status} />}
               </div>
               {s.summary[0] && <div className="small secondary">{s.summary[0]}</div>}
               {s.error && <div className="small" style={{ color: "var(--critical-text)" }}>{s.error}</div>}
@@ -139,6 +141,7 @@ export function WorkflowPanel({ pid, runId, onOpenRun }: { pid: string; runId: s
           </div>
         ))}
       </div>
+      </details>
       {wf.package_preview && (
         <details className="disclosure" open={wf.status === "awaiting_approval"}>
           <summary><Icon name="chevronDown" size={12} />Design package preview</summary>
@@ -238,7 +241,7 @@ export function StartWorkflow({ pid, workflow, inputs, label, primary = true, di
         },
         onError: (e) => toast(errorMessage(e), "error"),
       })}>
-      <Icon name="sparkles" size={14} />
+      <Icon name="play" size={14} />
       {start.isPending ? "Running agents" : label}
     </button>
   );

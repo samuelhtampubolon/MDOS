@@ -3,6 +3,7 @@ import { Link, Navigate, NavLink, Route, Routes, useLocation, useNavigate, usePa
 import { useQueryClient } from "@tanstack/react-query";
 import { useApprovals, useProject, useProjects } from "./api/hooks";
 import { AuthProvider, useAuth } from "./auth";
+import { ApiError, errorMessage } from "./api/client";
 import { Callout, Icon, Spinner } from "./components/ui";
 import Agents from "./pages/Agents";
 import Approvals from "./pages/Approvals";
@@ -50,11 +51,11 @@ function Sidebar({ pid, open, onNavigate }: { pid: string | null; open: boolean;
   const pending = approvals?.length ?? 0;
   return (
     <nav className={`sidebar ${open ? "open" : ""}`} aria-label="Main navigation" onClick={onNavigate}>
-      <Link to="/" className="brand">
-        <span className="brand-mark"><Icon name="journey" size={18} /></span>
+      <Link to="/" className="brand" aria-label="Marketing Decision OS home">
+        <span className="brand-mark"><Icon name="journey" size={16} /></span>
         <span>
-          <div className="brand-name">Marketing Decision OS</div>
-          <div className="brand-sub">Research · Strategy · Journey</div>
+          <div className="brand-name">MDOS</div>
+          <div className="brand-sub">Marketing Decision OS</div>
         </span>
       </Link>
       <NavLink to="/" end className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
@@ -82,7 +83,10 @@ function Sidebar({ pid, open, onNavigate }: { pid: string | null; open: boolean;
         <Icon name="settings" />Settings
       </NavLink>
       <div className="sidebar-footer">
-        <div>{mode === "local" ? "Desktop mode (this computer)" : user?.organization}</div>
+        <div className="row" style={{ gap: 6 }}>
+          {mode === "local" && <Icon name="lock" size={12} />}
+          {mode === "local" ? "Desktop: this computer only" : user?.organization}
+        </div>
         {mode === "cloud" && (
           <button className="btn ghost sm" style={{ marginTop: 6, paddingLeft: 0 }} onClick={logout}>Sign out {user?.name}</button>
         )}
@@ -97,12 +101,13 @@ function ProjectSwitcher({ pid }: { pid: string | null }) {
   const location = useLocation();
   if (!projects?.length) return null;
   const module = location.pathname.split("/")[3] || "research";
+  const known = !!pid && projects.some((p) => p.id === pid);
   return (
-    <label className="row" style={{ gap: 6 }}>
+    <label className="switcher">
       <span className="visually-hidden">Current project</span>
-      <select className="select sm" style={{ maxWidth: 360 }} value={pid ?? ""}
+      <select className="select sm" value={known ? pid! : ""}
         onChange={(e) => e.target.value && navigate(`/p/${e.target.value}/${module}`)}>
-        {!pid && <option value="">Choose a project</option>}
+        {!known && <option value="">Choose a project</option>}
         {projects.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
       </select>
     </label>
@@ -141,6 +146,7 @@ function Shell({ children }: { children: ReactNode }) {
   return (
     <div className="shell">
       <Sidebar pid={pid} open={open} onNavigate={() => setOpen(false)} />
+      {open && <div className="scrim" aria-hidden onClick={() => setOpen(false)} />}
       <div className="main">
         <header className="topbar">
           <button className="btn ghost icon menu-button" aria-label="Open menu" onClick={() => setOpen(true)}><Icon name="menu" /></button>
@@ -150,6 +156,18 @@ function Shell({ children }: { children: ReactNode }) {
         </header>
         <main className="content" id="main">{children}</main>
       </div>
+    </div>
+  );
+}
+
+/** Placeholder shaped like a module page while the project loads. */
+function PageSkeleton() {
+  return (
+    <div aria-busy="true" aria-label="Loading the project">
+      <span className="skeleton skeleton-line" style={{ width: 120 }} />
+      <span className="skeleton" style={{ height: 28, width: "45%", margin: "8px 0 24px" }} />
+      <span className="skeleton" style={{ height: 88, marginBottom: 24 }} />
+      <span className="skeleton" style={{ height: 240 }} />
     </div>
   );
 }
@@ -167,8 +185,20 @@ function ProjectRoute({ children }: { children: (pid: string) => ReactNode }) {
       void qc.invalidateQueries({ queryKey: [pid] });
     }
   }, [demoStatus, wasBuilding, pid, qc]);
-  if (isLoading) return <Spinner />;
-  if (error || !project) return <Callout tone="critical">This project was not found or you do not have access to it.</Callout>;
+  if (isLoading) return <PageSkeleton />;
+  if (error || !project) {
+    const missing = error instanceof ApiError && (error.status === 404 || error.status === 403);
+    return (
+      <div className="empty">
+        <h3>{missing ? "We can't find this project" : "This project could not be loaded"}</h3>
+        <p>{missing ? "It may have been deleted, or the link belongs to another workspace." : errorMessage(error)}</p>
+        <div className="row" style={{ marginTop: 16 }}>
+          <Link to="/" className="btn primary">Go to your projects</Link>
+          {!missing && <button className="btn" onClick={() => window.location.reload()}><Icon name="refresh" size={14} />Try again</button>}
+        </div>
+      </div>
+    );
+  }
   return (
     <>
       {project.brief?.demo_status === "building" && (
@@ -190,7 +220,19 @@ function ProjectRoute({ children }: { children: (pid: string) => ReactNode }) {
 function Routed() {
   const auth = useAuth();
   if (auth.status === "loading") return <div className="content"><Spinner label="Starting Marketing Decision OS" /></div>;
-  if (auth.status === "error") return <div className="content"><Callout tone="critical">Could not reach the MDOS server: {auth.error}</Callout></div>;
+  if (auth.status === "error") {
+    return (
+      <div className="content">
+        <div className="empty">
+          <h3>MDOS is not responding</h3>
+          <p>The app could not reach its server ({auth.error}). If you use the desktop app, check that the MDOS window is still open.</p>
+          <div style={{ marginTop: 16 }}>
+            <button className="btn primary" onClick={() => window.location.reload()}><Icon name="refresh" size={14} />Try again</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
   if (auth.status === "signed_out") return <Login />;
   if (auth.status === "locked") return <Locked />;
   return (

@@ -24,14 +24,14 @@ export function Heatmap({ title, subtitle, rows, cols, data, diverging = false, 
   const colHead = Math.min(150, Math.max(36, ...cols.map((c) => textWidth(c.slice(0, 26)) * 0.72 + 12)));
   const cell = Math.max(18, Math.min(44, (width - labelW - 8) / Math.max(cols.length, 1)));
   const height = colHead + rows.length * cell + 4;
+  // One ramp for cells and legend: t runs from 0 (low end) to 1 (high end).
+  const ramp = (t: number) => diverging
+    ? (t < 0.5 ? mix("var(--div-mid)", "var(--div-neg)", (0.5 - t) * 2) : mix("var(--div-mid)", "var(--div-pos)", (t - 0.5) * 2))
+    : mix("var(--surface-1)", "var(--seq-600)", t);
   const color = (v: number | null) => {
     if (v === null || !Number.isFinite(v)) return "var(--surface-2)";
-    if (diverging) {
-      const t = (v - lo) / (hi - lo);
-      return t < 0.5 ? mix("var(--div-mid)", "var(--div-neg)", (0.5 - t) * 2) : mix("var(--div-mid)", "var(--div-pos)", (t - 0.5) * 2);
-    }
-    if (v === 0 && fmt === "number") return "var(--surface-2)";
-    return mix("var(--surface-1)", "var(--seq-600)", (v - lo) / (hi - lo || 1));
+    if (!diverging && v === 0 && fmt === "number") return "var(--surface-2)";
+    return ramp((v - lo) / (hi - lo || 1));
   };
   const textOn = (v: number | null) => {
     if (v === null) return "var(--text-muted)";
@@ -71,9 +71,9 @@ export function Heatmap({ title, subtitle, rows, cols, data, diverging = false, 
         </svg>
         <div className="viz-scale">
           <span>{fmtValue(lo, fmt)}</span>
-          <span className="viz-scale-bar" style={{ background: diverging
-            ? "linear-gradient(90deg, var(--div-neg), var(--div-mid), var(--div-pos))"
-            : "linear-gradient(90deg, var(--surface-2), var(--seq-600))" }} />
+          <span className="viz-scale-steps" aria-hidden>
+            {[0, 1 / 6, 2 / 6, 3 / 6, 4 / 6, 5 / 6, 1].map((t) => <span key={t} style={{ background: ramp(t) }} />)}
+          </span>
           <span>{fmtValue(hi, fmt)}</span>
         </div>
       </ChartFrame>

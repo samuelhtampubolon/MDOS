@@ -153,6 +153,16 @@ test.describe.serial("closed loop on the demo project", () => {
     expect(csp).toContain("default-src 'none'");
   });
 
+  test("on a phone, pages fit the screen", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    for (const route of ["research", "research/analysis", "strategy", "journey", "data", "agents", "reports", "settings"]) {
+      await page.goto(`/p/${pid}/${route}`);
+      await page.waitForLoadState("networkidle");
+      const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+      expect(overflow, `${route} is wider than the screen`).toBeLessThanOrEqual(0);
+    }
+  });
+
   test("approvals page decides pending requests", async ({ page }) => {
     await page.goto(`/p/${pid}/approvals`);
     await expect(page.getByRole("tab", { name: /Waiting \(\d+\)/ })).toBeVisible();

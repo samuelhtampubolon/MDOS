@@ -32,7 +32,7 @@ export default function Agents({ pid }: { pid: string }) {
       <PageHeader eyebrow="Agents" title="The agent team"
         description="Agents orchestrate the work and draft wording. Statistics come from code, every run returns the same output contract, and each agent can only use its allowed tools." />
       {provider && (
-        <Callout tone={provider.mode === "claude" ? "good" : "info"} icon="sparkles">
+        <Callout tone={provider.mode === "claude" ? "good" : "info"} icon={provider.mode === "claude" ? "check" : "info"}>
           <strong>{provider.mode === "claude" ? `Claude is drafting wording (${provider.model}, ${provider.effort} effort).` : "Offline mode."}</strong> {provider.note}
           {provider.mode !== "claude" && <> To enable Claude, set <code>ANTHROPIC_API_KEY</code> in the server environment and restart. Numbers never depend on the model.</>}
         </Callout>
@@ -66,7 +66,7 @@ export default function Agents({ pid }: { pid: string }) {
                     <td style={{ fontWeight: 600, whiteSpace: "nowrap" }}>{a.name}{a.requires_approval && <div><Badge tone="warning"><Icon name="approvals" size={12} />Approval gate</Badge></div>}</td>
                     <td>{sentence(a.module)}</td>
                     <td className="small secondary">{a.description}</td>
-                    <td><div className="row" style={{ gap: 3 }}>{a.tools.map((t) => <code key={t} className="chip" style={{ fontSize: 11 }}>{t}</code>)}</div></td>
+                    <td><div className="row" style={{ gap: 3 }}>{a.tools.map((t) => <code key={t} className="chip code">{t}</code>)}</div></td>
                     <td className="small">{a.covers.join(", ")}</td>
                   </tr>
                 ))}
@@ -107,7 +107,7 @@ function WorkflowHistory({ pid, onOpenRun }: { pid: string; onOpenRun: (id: stri
   if (!workflows?.length) return <Card title="History"><span className="muted small">No workflows have run yet.</span></Card>;
   const shown = open ?? workflows[0].id;
   return (
-    <div className="grid" style={{ gridTemplateColumns: "minmax(240px, 320px) minmax(0, 1fr)", alignItems: "start" }}>
+    <div className="grid grid-sidebar">
       <Card title="History">
         <div className="stack-sm">
           {workflows.map((w) => (

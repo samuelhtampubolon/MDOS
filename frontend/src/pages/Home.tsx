@@ -4,7 +4,7 @@ import { api, errorMessage } from "../api/client";
 import { useProjects, useProvider } from "../api/hooks";
 import type { Project } from "../api/types";
 import { useQueryClient } from "@tanstack/react-query";
-import { Badge, Callout, Card, Empty, Icon, PageHeader, useToast } from "../components/ui";
+import { Badge, Callout, Card, Icon, PageHeader, useToast } from "../components/ui";
 import { dateTime } from "../lib/format";
 
 const LOOP = [
@@ -92,8 +92,38 @@ function NewProject() {
   );
 }
 
+function ProjectList({ projects }: { projects: Project[] }) {
+  return (
+    <ul className="project-list">
+      {projects.map((p) => (
+        <li key={p.id}>
+          <Link to={`/p/${p.id}/research`} className="project-row">
+            <span className="project-name">{p.name}</span>
+            {p.is_demo ? <Badge tone="warning">Synthetic demo</Badge> : <span />}
+            <span className="project-question">{p.business_question}</span>
+            <span className="project-meta">{p.currency} · {p.industry || "general"} · created {dateTime(p.created_at)}</span>
+          </Link>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function ListSkeleton() {
+  return (
+    <div aria-hidden className="stack-sm" style={{ paddingTop: 8 }}>
+      {[0, 1, 2].map((i) => (
+        <div key={i}>
+          <span className="skeleton skeleton-line" style={{ width: "40%" }} />
+          <span className="skeleton skeleton-line" style={{ width: "75%" }} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function Home() {
-  const { data: projects, isLoading } = useProjects();
+  const { data: projects, isLoading, error } = useProjects();
   const { data: provider } = useProvider();
   const navigate = useNavigate();
   const toast = useToast();
@@ -111,44 +141,52 @@ export default function Home() {
       setDemoBusy(false);
     }
   };
+  const firstRun = !isLoading && !error && !projects?.length;
+  const demoButton = (
+    <button className="btn" onClick={loadDemo} disabled={demoBusy}>
+      <Icon name="play" size={14} />{demoBusy ? "Building the demo" : "Load the Lake Toba demo"}
+    </button>
+  );
   return (
-    <div className="stack">
-      <PageHeader eyebrow="Marketing Decision OS" title="From business question to defensible marketing evidence"
-        description="Design research, analyze data with visible assumptions, simulate strategy on evidence, and redesign customer journeys you can test. Agents draft; people decide."
-        actions={<button className="btn lg" onClick={loadDemo} disabled={demoBusy}><Icon name="play" size={14} />{demoBusy ? "Building demo" : "Load the Lake Toba demo"}</button>} />
+    <div className="stack" style={{ gap: 32 }}>
+      <PageHeader title="From business question to defensible marketing evidence"
+        description="Design research, analyze data with visible assumptions, simulate strategy on evidence and redesign customer journeys you can test. Agents draft; people decide."
+        actions={firstRun ? undefined : demoButton} />
       {provider && (
-        <Callout tone={provider.mode === "claude" ? "good" : "info"} icon="sparkles">
-          <strong>{provider.mode === "claude" ? `Claude drafting on (${provider.model})` : "Offline mode"}.</strong> {provider.note}
+        <Callout tone={provider.mode === "claude" ? "good" : "info"} icon={provider.mode === "claude" ? "check" : "info"}>
+          <strong>{provider.mode === "claude" ? `Claude drafting is on (${provider.model}).` : "Offline mode."}</strong> {provider.note}
         </Callout>
       )}
-      <div className="grid grid-2">
-        <Card title="Start a project" subtitle="The Research Director agent turns your question into a research design.">
+      {!firstRun && (
+        <section aria-labelledby="projects-title">
+          <div className="section-title">
+            <h2 id="projects-title">Projects</h2>
+            {projects && <p>{projects.length} in this workspace</p>}
+          </div>
+          {isLoading ? <ListSkeleton /> : error ? (
+            <Callout tone="critical">Your projects could not be loaded: {errorMessage(error)}</Callout>
+          ) : <ProjectList projects={projects ?? []} />}
+        </section>
+      )}
+      <div className="grid grid-2 align-start">
+        <Card title={firstRun ? "Start with your business question" : "Start a new project"}
+          subtitle="The Research Director agent turns your question into a research design you can review.">
           <NewProject />
         </Card>
-        <Card title="The closed loop" subtitle="Research findings feed strategy, strategy feeds the journey, experiments feed research.">
-          <ClosedLoop />
-        </Card>
-      </div>
-      <Card title="Projects" subtitle={projects ? `${projects.length} in this workspace` : undefined}>
-        {isLoading ? <span className="muted">Loading</span> : !projects?.length ? (
-          <Empty title="No projects yet">Create one above, or load the demo to see the full loop on synthetic data.</Empty>
-        ) : (
-          <div className="grid grid-auto">
-            {projects.map((p) => (
-              <Link key={p.id} to={`/p/${p.id}/research`} className="card flat" style={{ color: "inherit", textDecoration: "none" }}>
-                <div className="card-body stack-sm">
-                  <div className="row" style={{ justifyContent: "space-between" }}>
-                    <strong>{p.name}</strong>
-                    {p.is_demo && <Badge tone="warning">Synthetic demo</Badge>}
-                  </div>
-                  <span className="small secondary">{p.business_question}</span>
-                  <span className="small muted">{p.currency} · {p.industry || "general"} · created {dateTime(p.created_at)}</span>
-                </div>
-              </Link>
-            ))}
+        <section className="stack-sm" aria-labelledby="loop-title">
+          <div className="section-title" style={{ marginBottom: 0 }}>
+            <h2 id="loop-title">How the loop works</h2>
           </div>
-        )}
-      </Card>
+          <p className="small secondary measure">Research findings feed strategy, strategy feeds the journey, and experiment results come back as evidence.</p>
+          <ClosedLoop />
+          {firstRun && (
+            <div className="stack-sm" style={{ marginTop: 16 }}>
+              <p className="small secondary measure">New to MDOS? The demo builds the whole loop on synthetic Lake Toba tourism data in a few seconds.</p>
+              <div>{demoButton}</div>
+            </div>
+          )}
+        </section>
+      </div>
     </div>
   );
 }

@@ -4,7 +4,7 @@ import { useEvidence, useGraph, useInsights, useProjectMutation, useRecommendati
 import type { Evidence, Insight, Recommendation } from "../../api/types";
 import { EvidenceModal } from "../../components/domain";
 import { LineageGraph } from "../../components/LineageGraph";
-import { Badge, Callout, Card, Empty, EvidenceChips, Icon, ModelBadge, OriginBadge, StatusBadge, Tabs, useToast } from "../../components/ui";
+import { Callout, Card, Empty, EvidenceChips, Icon, ModelBadge, OriginBadge, StatusBadge, Tabs, useToast } from "../../components/ui";
 import { num, pValue, sentence } from "../../lib/format";
 
 type View = "insights" | "recommendations" | "register" | "graph";
@@ -40,7 +40,7 @@ function DecideButtons({ pending, onDecide }: { pending: boolean; onDecide: (dec
   return (
     <div className="row" style={{ gap: 4 }}>
       <button className="btn sm good" disabled={pending} onClick={() => onDecide("approved")}><Icon name="check" size={12} />Approve</button>
-      <button className="btn sm danger" disabled={pending} onClick={() => onDecide("rejected")}><Icon name="x" size={12} />Reject</button>
+      <button className="btn sm ghost danger" disabled={pending} onClick={() => onDecide("rejected")}><Icon name="x" size={12} />Reject</button>
     </div>
   );
 }
@@ -56,6 +56,26 @@ function InsightList({ pid, insights, evidence, onEvidence }: { pid: string; ins
   );
 }
 
+/** Copies the insight with its evidence codes, ready to paste into a deck or an email. */
+function CopyCitation({ insight }: { insight: Insight }) {
+  const [copied, setCopied] = useState(false);
+  const copy = async () => {
+    const codes = insight.evidence.map((e) => e.code).join(", ");
+    try {
+      await navigator.clipboard.writeText(`${insight.code} ${insight.title}: ${insight.statement}${codes ? ` (Evidence ${codes})` : ""}`);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+    }
+  };
+  return (
+    <button className="btn sm ghost" onClick={copy} aria-live="polite">
+      {copied ? <span className="copied">Copied</span> : <><Icon name="link" size={12} />Copy with evidence</>}
+    </button>
+  );
+}
+
 function InsightCard({ pid, insight, onEvidence }: { pid: string; insight: Insight; onEvidence: (id: string) => void }) {
   const toast = useToast();
   const [error, setError] = useState("");
@@ -65,19 +85,22 @@ function InsightCard({ pid, insight, onEvidence }: { pid: string; insight: Insig
     onError: (e) => setError(errorMessage(e)),
   });
   return (
-    <Card title={<span className="row" style={{ gap: 8 }}><span className="chip">{insight.code}</span>{insight.title}</span>}
-      actions={<>{insight.is_model_generated && <ModelBadge />}<StatusBadge status={insight.status} /></>}>
+    <Card title={<span className="row" style={{ gap: 8 }}><span className="mono muted">{insight.code}</span>{insight.title}</span>}
+      actions={<>{insight.is_model_generated && <ModelBadge />}{insight.status !== "draft" && <StatusBadge status={insight.status} />}</>}>
       <div className="stack-sm">
-        <p style={{ margin: 0 }}>{insight.statement}</p>
-        {insight.implication && <div><span className="small muted">So what: </span>{insight.implication}</div>}
-        {insight.uncertainty && <div className="small secondary"><Icon name="alert" size={12} /> {insight.uncertainty}</div>}
+        <p className="measure" style={{ margin: 0 }}>{insight.statement}</p>
+        {insight.implication && <div className="measure"><span className="small muted">So what: </span>{insight.implication}</div>}
+        {insight.uncertainty && <div className="small secondary measure"><Icon name="alert" size={12} /> {insight.uncertainty}</div>}
         <div className="row" style={{ justifyContent: "space-between" }}>
-          <div className="row" style={{ gap: 6 }}>
+          <div className="row" style={{ gap: 8 }}>
             <span className="small muted">Evidence</span>
             <EvidenceChips evidence={insight.evidence} onOpen={onEvidence} />
-            <Badge>{sentence(insight.confidence)} confidence</Badge>
+            <span className="small muted">{sentence(insight.confidence)} confidence</span>
           </div>
-          {insight.status === "draft" && <DecideButtons pending={decide.isPending} onDecide={run} />}
+          <div className="row" style={{ gap: 4 }}>
+            <CopyCitation insight={insight} />
+            {insight.status === "draft" && <DecideButtons pending={decide.isPending} onDecide={run} />}
+          </div>
         </div>
         {error && <Callout tone="critical">{error}</Callout>}
       </div>
@@ -93,7 +116,7 @@ function EvidencePicker({ evidence, value, onChange }: { evidence: Evidence[]; v
         {evidence.map((e) => (
           <label key={e.id} className="list-item" style={{ padding: "4px 6px", cursor: "pointer" }}>
             <input type="checkbox" checked={value.includes(e.id)} onChange={(ev) => onChange(ev.target.checked ? [...value, e.id] : value.filter((x) => x !== e.id))} />
-            <span className={`chip strength-${e.strength}`}>{e.code}</span>
+            <span className={`chip code strength-${e.strength}`}>{e.code}</span>
             <span className="small grow">{e.title}</span>
             <span className="small muted">{sentence(e.design)}</span>
           </label>
@@ -176,10 +199,10 @@ function RecommendationCard({ pid, rec, onEvidence }: { pid: string; rec: Recomm
   const [error, setError] = useState("");
   const decide = useProjectMutation(pid, (decision: string) => api.post(`/projects/${pid}/recommendations/${rec.id}/decide`, { decision }));
   return (
-    <Card title={<span className="row" style={{ gap: 8 }}><span className="chip">{rec.code}</span>{sentence(rec.module)} recommendation</span>}
+    <Card title={<span className="row" style={{ gap: 8 }}><span className="mono muted">{rec.code}</span>{sentence(rec.module)} recommendation</span>}
       actions={<>{rec.is_model_generated && <ModelBadge />}<StatusBadge status={rec.priority} label={`${sentence(rec.priority)} priority`} /><StatusBadge status={rec.status} /></>}>
       <div className="stack-sm">
-        <p style={{ margin: 0, fontWeight: 500 }}>{rec.statement}</p>
+        <p className="measure" style={{ margin: 0 }}>{rec.statement}</p>
         {rec.rationale && <div className="small secondary">{rec.rationale}</div>}
         <div className="row" style={{ justifyContent: "space-between" }}>
           <div className="row" style={{ gap: 6 }}><span className="small muted">Evidence</span><EvidenceChips evidence={rec.evidence} onOpen={onEvidence} /></div>
@@ -251,7 +274,7 @@ function EvidenceRegister({ pid, evidence, onOpen }: { pid: string; evidence: Ev
               <tbody>
                 {rows.map((e) => (
                   <tr key={e.id} onClick={() => onOpen(e.id)} style={{ cursor: "pointer" }}>
-                    <td><button className="chip" onClick={(ev) => { ev.stopPropagation(); onOpen(e.id); }}>{e.code}</button></td>
+                    <td><button className="chip code" onClick={(ev) => { ev.stopPropagation(); onOpen(e.id); }}>{e.code}</button></td>
                     <td><div style={{ fontWeight: 600 }}>{e.title}</div><div className="small secondary">{e.statement.length > 180 ? `${e.statement.slice(0, 179)}…` : e.statement}</div></td>
                     <td><OriginBadge origin={e.origin} /></td>
                     <td className="small">{sentence(e.design)}</td>

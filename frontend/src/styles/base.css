@@ -13,7 +13,8 @@ body,
 body {
   margin: 0;
   font-family: var(--font-sans);
-  font-size: 14px;
+  font-size: var(--text-base);
+  font-weight: var(--weight-regular);
   line-height: 1.5;
   color: var(--text-primary);
   background: var(--page);
@@ -27,20 +28,26 @@ h3,
 h4 {
   margin: 0;
   line-height: 1.25;
-  font-weight: 650;
+  font-weight: var(--weight-strong);
   letter-spacing: -0.01em;
 }
 
 h1 {
-  font-size: 22px;
+  font-size: var(--text-xl);
+  letter-spacing: -0.02em;
 }
 
 h2 {
-  font-size: 17px;
+  font-size: var(--text-md);
 }
 
 h3 {
-  font-size: 14px;
+  font-size: var(--text-base);
+}
+
+strong,
+b {
+  font-weight: var(--weight-strong);
 }
 
 p {
@@ -67,13 +74,13 @@ textarea {
 :focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 2px;
-  border-radius: 4px;
 }
 
 code,
-kbd {
+kbd,
+.mono {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--text-xs);
 }
 
 .num {

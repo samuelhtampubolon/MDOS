@@ -59,7 +59,7 @@ export default function Plan({ pid }: { pid: string }) {
           <div className="stack-sm">
             {data.constructs.map((c) => (
               <div key={c.id} className="list-item" style={{ padding: "6px 0" }}>
-                <span className="chip">{c.code}</span>
+                <span className="chip code">{c.code}</span>
                 <div className="grow">
                   <strong>{c.name}</strong>
                   <div className="small secondary">{c.definition}</div>
@@ -231,7 +231,7 @@ function HypothesisRow({ pid, h, onEvidence }: { pid: string; h: Hypothesis; onE
   }
   return (
     <div className="list-item">
-      <span className="chip" style={{ minWidth: 30, justifyContent: "center" }}>{h.code}</span>
+      <span className="chip code" style={{ minWidth: 30, justifyContent: "center" }}>{h.code}</span>
       <div className="grow stack-sm">
         <div>{h.statement}</div>
         <div className="small muted">

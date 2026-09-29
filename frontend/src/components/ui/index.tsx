@@ -148,11 +148,11 @@ export function EvidenceChips({ evidence, onOpen }: { evidence: EvidenceRef[]; o
     <span className="row" style={{ gap: 4 }}>
       {evidence.map((e) =>
         onOpen ? (
-          <button key={e.id} className={`chip strength-${e.strength}`} title={`${e.title} (${e.strength})`} onClick={() => onOpen(e.id)}>
+          <button key={e.id} className={`chip code strength-${e.strength}`} title={`${e.title} (${e.strength})`} onClick={() => onOpen(e.id)}>
             {e.code}
           </button>
         ) : (
-          <span key={e.id} className={`chip strength-${e.strength}`} title={`${e.title} (${e.strength})`}>{e.code}</span>
+          <span key={e.id} className={`chip code strength-${e.strength}`} title={`${e.title} (${e.strength})`}>{e.code}</span>
         ),
       )}
     </span>

@@ -76,7 +76,7 @@ export default function ModelCanvas({ pid, baseline, currency }: { pid: string; 
                     </select>
                     {(a.source === "guess" || a.source === "benchmark") && <div style={{ marginTop: 4 }}><Badge tone="warning"><Icon name="alert" size={12} />Replace</Badge></div>}
                   </td>
-                  <td>{a.evidence_id ? <button className="chip" onClick={() => setEvidenceId(a.evidence_id)}>{codes.get(a.evidence_id) ?? "view"}</button> : <span className="muted small">None</span>}</td>
+                  <td>{a.evidence_id ? <button className="chip code" onClick={() => setEvidenceId(a.evidence_id)}>{codes.get(a.evidence_id) ?? "view"}</button> : <span className="muted small">None</span>}</td>
                   <td>
                     <select className="select sm" aria-label={`Confidence in ${a.label}`} value={a.confidence}
                       onChange={(e) => edit((m) => { m.assumptions[i].confidence = e.target.value; })}>

@@ -122,7 +122,7 @@ function QuestionRow({ pid, survey, q, lang }: { pid: string; survey: Survey; q:
   const showId = lang !== "en" && q.text_id;
   return (
     <div className="list-item" style={{ alignItems: "flex-start" }}>
-      <code className="chip" style={{ minWidth: 92, justifyContent: "center" }}>{q.code}</code>
+      <code className="chip code" style={{ minWidth: 92, justifyContent: "center" }}>{q.code}</code>
       <div className="grow stack-sm">
         {showEn && <div>{q.text}</div>}
         {showId && <div className={showEn ? "secondary" : ""} lang="id">{q.text_id}</div>}
