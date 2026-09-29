@@ -53,6 +53,7 @@ class Settings(BaseSettings):
     max_cols: int = 500
 
     cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
+    allowed_hosts: str = "*"  # cloud mode: comma-separated host names the server answers to
     execution_mode: Literal["thread", "sync"] = "thread"
 
     rate_limit_auth_per_minute: int = 10

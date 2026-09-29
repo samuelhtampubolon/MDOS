@@ -1,0 +1,41 @@
+# Local trial of the cloud deployment: the app plus PostgreSQL.
+#   cp .env.example .env   (set SECRET_KEY and POSTGRES_PASSWORD)
+#   docker compose up --build
+# Then open http://localhost:8000 and create the first account.
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: mdos
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: mdos
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mdos -d mdos"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  app:
+    build: .
+    environment:
+      MDOS_MODE: cloud
+      DATABASE_URL: postgresql+psycopg://mdos:${POSTGRES_PASSWORD}@db:5432/mdos
+      SECRET_KEY: ${SECRET_KEY:?Set SECRET_KEY (at least 32 characters) in .env}
+      ALLOW_REGISTRATION: ${ALLOW_REGISTRATION:-true}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-*}
+      CORS_ORIGINS: ""
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      MDOS_LLM_MODEL: ${MDOS_LLM_MODEL:-claude-opus-5-5}
+    ports:
+      - "8000:8000"
+    volumes:
+      - mdosdata:/data
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  mdosdata:

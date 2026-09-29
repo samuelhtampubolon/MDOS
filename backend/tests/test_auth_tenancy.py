@@ -92,3 +92,13 @@ def test_project_crud_and_audit(local_client, project):
     assert "project.create" in actions and "project.update" in actions
     assert local_client.delete(f"/api/v1/projects/{pid}").status_code == 204
     assert local_client.get(f"/api/v1/projects/{pid}").status_code == 404
+
+
+def test_security_headers_and_cloud_allowed_hosts(make_client):
+    local = make_client("local")
+    res = local.get("/api/health")
+    assert res.headers["x-frame-options"] == "DENY" and res.headers["x-content-type-options"] == "nosniff"
+    assert local.get("/api/health", headers={"Host": "evil.example"}).status_code == 400  # DNS rebinding defense
+    cloud = make_client("cloud", ALLOWED_HOSTS="mdos.example.com,testserver")
+    assert cloud.get("/api/health").status_code == 200
+    assert cloud.get("/api/health", headers={"Host": "other.example"}).status_code == 400

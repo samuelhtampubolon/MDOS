@@ -46,6 +46,18 @@ def create_app(*, run_migrations: bool = True) -> FastAPI:
     if settings.is_local:
         # Defends the passwordless local mode against DNS-rebinding style attacks.
         app.add_middleware(TrustedHostMiddleware, allowed_hosts=["127.0.0.1", "localhost", "testserver"])
+    elif settings.allowed_hosts.strip() != "*":
+        app.add_middleware(TrustedHostMiddleware,
+                           allowed_hosts=[h.strip() for h in settings.allowed_hosts.split(",") if h.strip()])
+
+    @app.middleware("http")
+    async def security_headers(request, call_next):
+        response = await call_next(request)
+        response.headers.setdefault("X-Content-Type-Options", "nosniff")
+        response.headers.setdefault("X-Frame-Options", "DENY")
+        response.headers.setdefault("Referrer-Policy", "no-referrer")
+        response.headers.setdefault("Content-Security-Policy", "frame-ancestors 'none'; object-src 'none'; base-uri 'self'")
+        return response
     if settings.cors_origin_list:
         app.add_middleware(
             CORSMiddleware,
