@@ -16,8 +16,11 @@ from .approvals import handler
 
 @handler("apply_cleaning")
 def _apply_cleaning(db: Session, project: Project, approval: Approval, decision: str) -> dict[str, Any]:
+    workflow_run_id = approval.payload.get("workflow_run_id")
+    resume = {"resume_workflow": workflow_run_id} if workflow_run_id else {}
     if decision != "approved":
-        return {"applied": False}
+        # The workflow continues on the current version; a person decided the data needs no cleaning.
+        return {"applied": False, **resume}
     parent = db.get(DatasetVersion, approval.entity_id)
     if not parent or parent.project_id != project.id:
         raise NotFound("Dataset version not found.")
@@ -25,7 +28,23 @@ def _apply_cleaning(db: Session, project: Project, approval: Approval, decision:
     version = dataset_service.derive_version(db, project, parent, approval.payload.get("operations", []),
                                              user_id=user_id, approved_by=user_id,
                                              source_run_id=approval.payload.get("run_id"))
-    return {"applied": True, "version_id": version.id, "version": version.version, "rows": version.n_rows}
+    return {"applied": True, "version_id": version.id, "version": version.version, "rows": version.n_rows, **resume}
+
+
+@handler("adopt_design")
+def _adopt_design(db: Session, project: Project, approval: Approval, decision: str) -> dict[str, Any]:
+    from ..agents import supervisor
+    from ..models import WorkflowRun
+
+    run = db.get(WorkflowRun, approval.entity_id)
+    if not run or run.project_id != project.id:
+        raise NotFound("Workflow run not found.")
+    if decision != "approved":
+        run.status = "cancelled"
+        run.finished_at = utcnow()
+        return {"adopted": False}
+    counts = supervisor.adopt(db, project, run, approval.decided_by or "system")
+    return {"adopted": True, **counts}
 
 
 @handler("approve_insight")

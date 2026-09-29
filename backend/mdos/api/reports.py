@@ -13,10 +13,10 @@ from sqlalchemy.orm import Session
 from .. import audit
 from ..db import get_db, utcnow
 from ..deps import ProjectAccess, project_access
-from ..errors import ValidationFailed
-from ..models import Experiment, Report
+from ..models import Report
 from ..reports import builder
 from ..services import approvals
+from ..services import reports as report_service
 from .common import get_owned, to_dict
 
 router = APIRouter(prefix="/projects/{project_id}/reports", tags=["reports"])
@@ -29,27 +29,6 @@ class ReportIn(BaseModel):
     experiment_id: str | None = None
 
 
-def generate(db: Session, access: ProjectAccess, kind: str, experiment_id: str | None = None,
-             source_run_id: str | None = None, actor_type: str = "user", actor_id: str | None = None) -> Report:
-    if kind == "experiment_brief":
-        if not experiment_id:
-            raise ValidationFailed("experiment_id is required for an experiment brief.")
-        experiment = get_owned(db, Experiment, experiment_id, access.project.id)
-        doc = builder.build_experiment_brief(db, access.project, experiment)
-    else:
-        doc = builder.BUILDERS[kind](db, access.project)
-    previous = db.scalars(select(Report).where(Report.project_id == access.project.id, Report.kind == kind)).all()
-    report = Report(project_id=access.project.id, kind=kind, title=doc["title"], document=doc,
-                    version=len(previous) + 1, evidence_ids=doc["evidence_ids"], created_by=actor_id or access.actor,
-                    is_model_generated=any(b.get("model_generated") for b in doc["blocks"]), source_run_id=source_run_id)
-    db.add(report)
-    db.flush()
-    audit.record(db, org_id=access.project.org_id, project_id=access.project.id, actor_type=actor_type,
-                 actor_id=actor_id or access.actor, action="report.generate", entity_type="report", entity_id=report.id,
-                 details={"kind": kind, "version": report.version})
-    return report
-
-
 @router.get("")
 def list_reports(access: ProjectAccess = Depends(project_access), db: Session = Depends(get_db)) -> list[dict]:
     rows = db.scalars(select(Report).where(Report.project_id == access.project.id).order_by(Report.created_at.desc())).all()
@@ -59,7 +38,7 @@ def list_reports(access: ProjectAccess = Depends(project_access), db: Session = 
 @router.post("", status_code=201)
 def create_report(body: ReportIn, access: ProjectAccess = Depends(project_access), db: Session = Depends(get_db)) -> dict:
     access.require("editor")
-    report = generate(db, access, body.kind, body.experiment_id)
+    report = report_service.generate(db, access.project, body.kind, actor_id=access.actor, experiment_id=body.experiment_id)
     db.commit()
     return to_dict(report)
 

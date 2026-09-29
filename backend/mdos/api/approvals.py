@@ -39,4 +39,11 @@ def decide(approval_id: str, body: DecideIn, access: ProjectAccess = Depends(pro
     approval = get_owned(db, Approval, approval_id, access.project.id)
     outcome = svc.decide(db, access.project, approval, body.decision, access.actor, body.rationale)
     db.commit()
+    if outcome.get("resume_workflow"):
+        from ..agents import supervisor
+        from ..models import WorkflowRun
+
+        run = db.get(WorkflowRun, outcome["resume_workflow"])
+        if run and run.status == "awaiting_approval":
+            supervisor.resume(db, run, access.actor)
     return {"approval": to_dict(approval), "outcome": outcome}

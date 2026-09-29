@@ -3,6 +3,7 @@
 from fastapi import APIRouter
 
 from . import (
+    agents,
     analyses,
     approvals,
     auth,
@@ -18,5 +19,6 @@ from . import (
 )
 
 router = APIRouter()
-for module in (auth, projects, research, datasets, analyses, evidence, approvals, reports, strategy, journey, experiments, tools):
+for module in (auth, projects, research, datasets, analyses, evidence, approvals, reports, strategy, journey, experiments,
+               agents, tools):
     router.include_router(module.router)
