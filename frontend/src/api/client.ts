@@ -1,31 +1,5 @@
-/* Thin fetch wrapper: bearer token, JSON, typed errors and file downloads. */
-
-const TOKEN_KEY = "mdos.token";
-
-let token: string | null = null;
-
-function readStored(): string | null {
-  try {
-    return window.localStorage.getItem(TOKEN_KEY);
-  } catch {
-    return null;
-  }
-}
-
-export function setToken(value: string | null, persist = false): void {
-  token = value;
-  try {
-    if (value && persist) window.localStorage.setItem(TOKEN_KEY, value);
-    if (!value) window.localStorage.removeItem(TOKEN_KEY);
-  } catch {
-    /* storage unavailable: keep the token in memory only */
-  }
-}
-
-export function getToken(): string | null {
-  if (!token) token = readStored();
-  return token;
-}
+/* Thin fetch wrapper: cookie session, CSRF header, JSON, typed errors and file downloads.
+   The session lives in an HttpOnly cookie that page scripts cannot read, so the app never stores a token. */
 
 export class ApiError extends Error {
   status: number;
@@ -41,11 +15,18 @@ export class ApiError extends Error {
 }
 
 const BASE = "/api/v1";
+// The server rejects cookie-authenticated changes without this header; other sites cannot add it (CSRF defense).
+const CSRF_HEADERS: Record<string, string> = { "X-Requested-With": "mdos" };
+
+let unauthorizedHandler: (() => void) | null = null;
+
+/** Called when the server says the session ended (expired, signed out elsewhere, or MDOS restarted). */
+export function onUnauthorized(handler: (() => void) | null): void {
+  unauthorizedHandler = handler;
+}
 
 async function request<T>(method: string, path: string, body?: unknown, isForm = false): Promise<T> {
-  const headers: Record<string, string> = {};
-  const t = getToken();
-  if (t) headers.Authorization = `Bearer ${t}`;
+  const headers: Record<string, string> = { ...CSRF_HEADERS };
   let payload: BodyInit | undefined;
   if (body !== undefined) {
     if (isForm) {
@@ -55,7 +36,8 @@ async function request<T>(method: string, path: string, body?: unknown, isForm =
       payload = JSON.stringify(body);
     }
   }
-  const res = await fetch(`${BASE}${path}`, { method, headers, body: payload });
+  const res = await fetch(`${BASE}${path}`, { method, headers, body: payload, credentials: "same-origin" });
+  if (res.status === 401 && !path.startsWith("/auth/")) unauthorizedHandler?.();
   if (res.status === 204) return undefined as T;
   const text = await res.text();
   let data: unknown = null;
@@ -84,10 +66,9 @@ export const api = {
   upload: <T>(path: string, form: FormData) => request<T>("POST", path, form, true),
 };
 
-/** Download a file from an authenticated endpoint. */
+/** Download a file from an authenticated endpoint (the session cookie authenticates the request). */
 export async function download(path: string, fallbackName: string): Promise<void> {
-  const t = getToken();
-  const res = await fetch(`${BASE}${path}`, { headers: t ? { Authorization: `Bearer ${t}` } : {} });
+  const res = await fetch(`${BASE}${path}`, { headers: CSRF_HEADERS, credentials: "same-origin" });
   if (!res.ok) throw new ApiError(res.status, "download_failed", "Download failed");
   const blob = await res.blob();
   const disposition = res.headers.get("Content-Disposition") || "";
@@ -102,17 +83,9 @@ export async function download(path: string, fallbackName: string): Promise<void
   setTimeout(() => URL.revokeObjectURL(url), 2000);
 }
 
-/** Open an authenticated HTML export in a new tab. */
-export async function openHtml(path: string): Promise<void> {
-  const t = getToken();
-  const win = window.open("", "_blank");
-  const res = await fetch(`${BASE}${path}`, { headers: t ? { Authorization: `Bearer ${t}` } : {} });
-  const html = await res.text();
-  if (win) {
-    win.document.open();
-    win.document.write(html);
-    win.document.close();
-  }
+/** Open an HTML export in a new tab. The server sends it sandboxed (no scripts); the tab cannot reach this page. */
+export function openHtml(path: string): void {
+  window.open(`${BASE}${path}`, "_blank", "noopener,noreferrer");
 }
 
 export function errorMessage(err: unknown): string {

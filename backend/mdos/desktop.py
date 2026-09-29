@@ -2,19 +2,26 @@
 
 Used by the ``mdos`` console command and by the packaged desktop executable. The server always binds to
 127.0.0.1 in local mode, so nothing is reachable from other machines.
+
+Each launch creates a random key. The browser receives it once, in the address fragment (never sent over the
+network), to open a session; other accounts and programs on this computer do not know it. The browser is opened
+through a small redirect file readable only by you, so the key never appears in the process list.
 """
 
 from __future__ import annotations
 
 import argparse
+import html
 import multiprocessing
 import os
+import secrets
 import socket
 import sys
 import threading
 import time
 import urllib.request
 import webbrowser
+from pathlib import Path
 
 
 def _free_port(preferred: int, strict: bool = False) -> int:
@@ -31,13 +38,27 @@ def _free_port(preferred: int, strict: bool = False) -> int:
     raise RuntimeError(f"Port {preferred} is already in use." if strict else "No free local port is available.")
 
 
-def _open_when_ready(url: str, timeout: float = 60.0) -> None:
+def _write_launcher(folder: Path, open_url: str) -> Path:
+    """A private (0600) HTML file that redirects to ``open_url``, so the key is not passed on a command line."""
+    folder.mkdir(parents=True, exist_ok=True)
+    path = folder / "open-mdos.html"
+    target = html.escape(open_url, quote=True)
+    page = (f'<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0;url={target}">'
+            f'<title>Opening Marketing Decision OS</title><p><a href="{target}">Open Marketing Decision OS</a></p>')
+    path.unlink(missing_ok=True)
+    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    with os.fdopen(fd, "w", encoding="utf-8") as f:
+        f.write(page)
+    return path
+
+
+def _open_when_ready(url: str, launcher: Path, timeout: float = 60.0) -> None:
     deadline = time.monotonic() + timeout
     while time.monotonic() < deadline:
         try:
             with urllib.request.urlopen(f"{url}api/health", timeout=2) as res:  # noqa: S310 - fixed loopback URL
                 if res.status == 200:
-                    webbrowser.open(url)
+                    webbrowser.open(launcher.as_uri())
                     return
         except OSError:
             time.sleep(0.4)
@@ -57,6 +78,8 @@ def main(argv: list[str] | None = None) -> None:
     os.environ["MDOS_MODE"] = "local"  # the desktop build is always single-user and loopback-only
     if args.data_dir:
         os.environ["MDOS_DATA_DIR"] = args.data_dir
+    key = os.environ.get("MDOS_LOCAL_KEY") or secrets.token_urlsafe(32)  # set by tests; otherwise new per launch
+    os.environ["MDOS_LOCAL_KEY"] = key
 
     import uvicorn
 
@@ -67,14 +90,19 @@ def main(argv: list[str] | None = None) -> None:
     settings = get_settings()
     port = _free_port(args.port, strict=args.strict_port)
     url = f"http://127.0.0.1:{port}/"
+    open_url = f"{url}#key={key}"
     app = create_app()
+    launcher = _write_launcher(settings.mdos_data_dir, open_url)
     if not args.no_browser:
-        threading.Thread(target=_open_when_ready, args=(url,), daemon=True).start()
+        threading.Thread(target=_open_when_ready, args=(url, launcher), daemon=True).start()
     print("Marketing Decision OS is running.")
-    print(f"  Open: {url}")
+    print(f"  Open this private link (it works until MDOS is closed): {open_url}")
     print(f"  Data folder: {settings.mdos_data_dir}")
     print("  Press Ctrl+C to stop.")
-    uvicorn.run(app, host="127.0.0.1", port=port, log_level="warning")
+    try:
+        uvicorn.run(app, host="127.0.0.1", port=port, log_level="warning")
+    finally:
+        launcher.unlink(missing_ok=True)
 
 
 if __name__ == "__main__":

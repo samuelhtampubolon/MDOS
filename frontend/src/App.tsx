@@ -10,7 +10,7 @@ import DataPage from "./pages/Data";
 import Experiments from "./pages/Experiments";
 import Home from "./pages/Home";
 import Journey from "./pages/journey/Journey";
-import Login from "./pages/Login";
+import Login, { Locked } from "./pages/Login";
 import Reports from "./pages/Reports";
 import Research from "./pages/research/Research";
 import Settings from "./pages/Settings";
@@ -192,6 +192,7 @@ function Routed() {
   if (auth.status === "loading") return <div className="content"><Spinner label="Starting Marketing Decision OS" /></div>;
   if (auth.status === "error") return <div className="content"><Callout tone="critical">Could not reach the MDOS server: {auth.error}</Callout></div>;
   if (auth.status === "signed_out") return <Login />;
+  if (auth.status === "locked") return <Locked />;
   return (
     <Shell>
       <Routes>

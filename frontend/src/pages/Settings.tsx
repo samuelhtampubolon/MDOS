@@ -28,6 +28,7 @@ export default function Settings({ pid }: { pid?: string }) {
         <Appearance />
         <Workspace />
       </div>
+      <Security />
       <Provider />
       {pid && <ProjectSettings pid={pid} />}
     </div>
@@ -65,6 +66,51 @@ function Workspace() {
           <Callout>Desktop mode keeps all data in a local folder and only accepts connections from this computer. Use the cloud deployment to collaborate.</Callout>
         </div>
       )}
+    </Card>
+  );
+}
+
+function Security() {
+  const { mode, logoutEverywhere } = useAuth();
+  const toast = useToast();
+  const [confirming, setConfirming] = useState(false);
+  const signOutAll = async () => {
+    try {
+      await logoutEverywhere();
+    } catch (err) {
+      toast(errorMessage(err), "error");
+    }
+  };
+  return (
+    <Card title="Security and privacy" subtitle="How MDOS protects your session and your data.">
+      <div className="grid grid-2">
+        <KV items={[
+          ["Session", "Protected browser cookie that page scripts cannot read"],
+          ["Connections", mode === "local" ? "This computer only (127.0.0.1)" : "Your organization's server"],
+          ["Your data", mode === "local" ? "A local folder on this computer" : "Your organization's database"],
+          ["AI drafting", "Sends only drafting context to Claude, with emails and phone numbers masked"],
+        ]} />
+        <div className="stack-sm">
+          {mode === "local" ? (
+            <span className="small secondary">
+              Every start of MDOS creates a new private link. Closing MDOS ends the session, and pages opened without
+              the link stay locked.
+            </span>
+          ) : (
+            <>
+              <span className="small secondary">Lost a device or used a shared computer? End every session for your account.</span>
+              {confirming ? (
+                <div className="row">
+                  <button className="btn danger sm" onClick={signOutAll}>Yes, sign out everywhere</button>
+                  <button className="btn ghost sm" onClick={() => setConfirming(false)}>Cancel</button>
+                </div>
+              ) : (
+                <div><button className="btn sm" onClick={() => setConfirming(true)}>Sign out on all devices</button></div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
     </Card>
   );
 }
@@ -118,7 +164,7 @@ function ProjectSettings({ pid }: { pid: string }) {
   const rows = (audit ?? []).filter((a) => !filter || `${a.action} ${a.entity_type} ${a.actor_id}`.toLowerCase().includes(filter.toLowerCase()));
   const remove = async () => {
     try {
-      await api.del(`/projects/${pid}`);
+      await api.del(`/projects/${pid}?confirm=${encodeURIComponent(confirm)}`);
       await qc.invalidateQueries({ queryKey: ["projects"] });
       try {
         window.localStorage.removeItem("mdos.lastProject");

@@ -3,9 +3,13 @@
 import { expect, test, type Page } from "@playwright/test";
 
 let pid = "";
+const KEY = process.env.MDOS_E2E_KEY ?? "";
+const CSRF = { "X-Requested-With": "mdos" };
 
-async function token(page: Page): Promise<string> {
-  const res = await page.request.post("/api/v1/auth/local-session");
+/** Open a session the way the private desktop link does; the browser context keeps the session cookie. */
+async function signIn(page: Page): Promise<string> {
+  const res = await page.request.post("/api/v1/auth/local-session", { data: { key: KEY }, headers: CSRF });
+  expect(res.ok()).toBeTruthy();
   return (await res.json()).access_token as string;
 }
 
@@ -16,14 +20,40 @@ function watchErrors(page: Page): string[] {
   return errors;
 }
 
+test.describe("desktop access", () => {
+  test("without the private link the app stays locked", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.getByRole("heading", { name: "Open MDOS from its window" })).toBeVisible();
+    expect((await page.request.get("/api/v1/projects")).status()).toBe(401);
+    const wrong = await page.request.post("/api/v1/auth/local-session", { data: { key: "not-the-key" }, headers: CSRF });
+    expect(wrong.status()).toBe(401);
+  });
+
+  test("the private link opens a protected session and leaves the address bar", async ({ page, context }) => {
+    await page.goto(`/#key=${KEY}`);
+    await expect(page.getByRole("heading", { name: /From business question to defensible marketing evidence/ })).toBeVisible();
+    expect(page.url()).not.toContain("key=");
+    const session = (await context.cookies()).find((c) => c.name.startsWith("mdos_session"));
+    expect(session?.httpOnly).toBe(true);
+    expect(session?.sameSite).toBe("Strict");
+    expect(await page.evaluate(() => document.cookie)).not.toContain("mdos_session");
+    const noHeader = await page.request.post("/api/v1/projects", { data: { name: "x", business_question: "Would it work?" } });
+    expect(noHeader.status()).toBe(403); // cookie alone is not enough to change data
+  });
+});
+
 test.describe.serial("closed loop on the demo project", () => {
+  test.beforeEach(async ({ page }) => {
+    await signIn(page);
+  });
+
   test("load the demo and wait for the agents", async ({ page }) => {
     await page.goto("/");
     await expect(page.getByRole("heading", { name: /From business question to defensible marketing evidence/ })).toBeVisible();
     await page.getByRole("button", { name: /Load the Lake Toba demo/ }).click();
     await page.waitForURL(/\/p\/[^/]+\/research/);
     pid = new URL(page.url()).pathname.split("/")[2];
-    const auth = { Authorization: `Bearer ${await token(page)}` };
+    const auth = { Authorization: `Bearer ${await signIn(page)}` };
     await expect.poll(async () => (await (await page.request.get(`/api/v1/projects/${pid}`, { headers: auth })).json()).brief?.demo_status,
       { timeout: 240_000, intervals: [1000] }).toBe("ready");
     await page.reload();
@@ -112,6 +142,17 @@ test.describe.serial("closed loop on the demo project", () => {
     await expect(page.getByText(/Saved as evidence E\d+/).first()).toBeVisible();
   });
 
+  test("the HTML report export is sandboxed", async ({ page }) => {
+    const created = await page.request.post(`/api/v1/projects/${pid}/reports`, { data: { kind: "executive_summary" }, headers: CSRF });
+    expect(created.status()).toBe(201);
+    const report = await created.json();
+    const res = await page.request.get(`/api/v1/projects/${pid}/reports/${report.id}/export?format=html`);
+    expect(res.status()).toBe(200);
+    const csp = res.headers()["content-security-policy"];
+    expect(csp).toContain("sandbox");
+    expect(csp).toContain("default-src 'none'");
+  });
+
   test("approvals page decides pending requests", async ({ page }) => {
     await page.goto(`/p/${pid}/approvals`);
     await expect(page.getByRole("tab", { name: /Waiting \(\d+\)/ })).toBeVisible();
@@ -124,6 +165,7 @@ test.describe("dark theme", () => {
   test.use({ colorScheme: "dark" });
   test("home and strategy render in dark mode", async ({ page }, testInfo) => {
     const errors = watchErrors(page);
+    await signIn(page);
     await page.goto("/");
     await page.screenshot({ path: testInfo.outputPath("home-dark.png"), fullPage: true });
     if (pid) {

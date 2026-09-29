@@ -22,6 +22,9 @@ from .common import get_owned, to_dict
 router = APIRouter(prefix="/projects/{project_id}/reports", tags=["reports"])
 
 KINDS = Literal["research_report", "executive_summary", "decision_memo", "methods_appendix", "experiment_brief"]
+# The HTML export is a standalone page opened in its own tab: styles only, no scripts, no network, opaque origin.
+EXPORT_CSP = "default-src 'none'; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'; " \
+             "frame-ancestors 'none'; sandbox"
 
 
 class ReportIn(BaseModel):
@@ -57,7 +60,7 @@ def export_report(report_id: str, format: Literal["md", "html"] = "html", access
         return Response(builder.to_markdown(report.document), media_type="text/markdown; charset=utf-8",
                         headers={"Content-Disposition": f'attachment; filename="{slug}.md"'})
     return Response(builder.to_html(report.document), media_type="text/html; charset=utf-8",
-                    headers={"Content-Disposition": f'inline; filename="{slug}.html"'})
+                    headers={"Content-Disposition": f'inline; filename="{slug}.html"', "Content-Security-Policy": EXPORT_CSP})
 
 
 @router.post("/{report_id}/finalize")

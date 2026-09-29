@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -120,10 +120,16 @@ def update_project(body: ProjectPatch, access: ProjectAccess = Depends(project_a
 
 
 @router.delete("/{project_id}", status_code=204)
-def delete_project(access: ProjectAccess = Depends(project_access), db: Session = Depends(get_db)) -> None:
-    """Data deletion workflow: removes every project row (cascade) and every stored file."""
+def delete_project(confirm: str = Query(default="", max_length=200), access: ProjectAccess = Depends(project_access),
+                   db: Session = Depends(get_db)) -> None:
+    """Data deletion workflow: removes every project row (cascade) and every stored file.
+
+    Irreversible, so the caller must repeat the project name in ``confirm``.
+    """
     access.require("owner")
     project = access.project
+    if confirm.strip() != project.name.strip():
+        raise ValidationFailed("Type the project name exactly to confirm deletion.")
     org_id, project_id = project.org_id, project.id
     db.delete(project)
     audit.record(db, org_id=org_id, project_id=None, actor_type="user", actor_id=access.actor,

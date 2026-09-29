@@ -72,3 +72,32 @@ export default function Login() {
     </div>
   );
 }
+
+/** Desktop build: shown when the page was opened without the private link from the MDOS window. */
+export function Locked() {
+  return (
+    <div style={{ minHeight: "100%", display: "grid", placeItems: "center", padding: 16 }}>
+      <section className="card" style={{ width: "min(460px, 100%)" }} aria-labelledby="locked-title">
+        <div className="card-body stack">
+          <div className="brand" style={{ padding: 0 }}>
+            <span className="brand-mark"><Icon name="journey" size={18} /></span>
+            <span>
+              <div className="brand-name">Marketing Decision OS</div>
+              <div className="brand-sub">Desktop mode</div>
+            </span>
+          </div>
+          <h1 id="locked-title">Open MDOS from its window</h1>
+          <p className="secondary" style={{ margin: 0 }}>
+            For your safety, this page needs the private link shown in the MDOS window. The link changes every time
+            MDOS starts, so other programs and accounts on this computer cannot open your workspace.
+          </p>
+          <ol className="small secondary" style={{ margin: 0, paddingLeft: 18 }}>
+            <li>Find the MDOS window (or the terminal where you started it).</li>
+            <li>Open the link that starts with <code>http://127.0.0.1</code>.</li>
+            <li>Closed MDOS? Start it again and your browser opens automatically.</li>
+          </ol>
+        </div>
+      </section>
+    </div>
+  );
+}

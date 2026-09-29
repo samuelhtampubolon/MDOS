@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import secrets
 from collections.abc import Iterator
 from pathlib import Path
 
@@ -11,6 +12,7 @@ from fastapi.testclient import TestClient
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SAMPLES = REPO_ROOT / "samples"
+TEST_SECRET_KEY = secrets.token_urlsafe(48)  # generated for each run; no fixed signing key lives in the repo
 
 
 def _reset_database(url: str) -> None:
@@ -42,7 +44,7 @@ def make_client(tmp_path, monkeypatch) -> Iterator:
             _reset_database(server_db)
         monkeypatch.setenv("DATABASE_URL", server_db or f"sqlite:///{(tmp_path / 'test.db').as_posix()}")
         monkeypatch.setenv("EXECUTION_MODE", "sync")
-        monkeypatch.setenv("SECRET_KEY", "test-secret-key-that-is-long-enough-1234567890")
+        monkeypatch.setenv("SECRET_KEY", TEST_SECRET_KEY)
         monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
         for key, value in env.items():
             monkeypatch.setenv(key, value)
@@ -52,7 +54,8 @@ def make_client(tmp_path, monkeypatch) -> Iterator:
         limiter.reset()
         from mdos.main import create_app
 
-        client = TestClient(create_app())
+        # Same host and CSRF header as the real web app; tests that check the header remove it explicitly.
+        client = TestClient(create_app(), base_url="http://localhost", headers={"X-Requested-With": "mdos"})
         client.__enter__()
         clients.append(client)
         return client
@@ -65,9 +68,10 @@ def make_client(tmp_path, monkeypatch) -> Iterator:
 
 @pytest.fixture()
 def local_client(make_client) -> TestClient:
+    """Signed in the way the browser is: the HttpOnly session cookie set by the local session."""
     client = make_client("local")
-    token = client.post("/api/v1/auth/local-session").json()["access_token"]
-    client.headers.update({"Authorization": f"Bearer {token}"})
+    res = client.post("/api/v1/auth/local-session")
+    assert res.status_code == 200, res.text
     return client
 
 

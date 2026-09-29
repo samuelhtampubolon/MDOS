@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 import jwt
-from fastapi import Depends, Header
+from fastapi import Depends, Header, Request
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -13,7 +13,9 @@ from .config import get_settings
 from .db import get_db
 from .errors import Forbidden, NotFound, Unauthorized
 from .models import Organization, Project, ProjectMember, User
-from .security import decode_access_token
+from .security import CSRF_HEADER, CSRF_VALUE, decode_access_token, launch_tag, session_cookie_name
+
+SAFE_METHODS = {"GET", "HEAD", "OPTIONS"}
 
 ROLE_RANK = {"viewer": 1, "editor": 2, "owner": 3}
 LOCAL_OWNER_EMAIL = "owner@local.mdos"
@@ -33,20 +35,33 @@ def ensure_local_owner(db: Session) -> User:
     return user
 
 
+def require_csrf_header(request: Request) -> None:
+    """Cookie-authenticated state changes must carry a header other sites cannot set (CSRF defense)."""
+    if request.method not in SAFE_METHODS and request.headers.get(CSRF_HEADER, "").lower() != CSRF_VALUE:
+        raise Forbidden("This request is missing a required header. Reload the page and try again.")
+
+
 def get_current_user(
+    request: Request,
     authorization: str | None = Header(default=None),
     db: Session = Depends(get_db),
 ) -> User:
-    if not authorization or not authorization.lower().startswith("bearer "):
-        raise Unauthorized("Missing bearer token.")
-    token = authorization.split(" ", 1)[1].strip()
+    if authorization and authorization.lower().startswith("bearer "):
+        token = authorization.split(" ", 1)[1].strip()
+    else:
+        token = request.cookies.get(session_cookie_name(request), "")
+        if token:
+            require_csrf_header(request)
+    if not token:
+        raise Unauthorized("Please sign in.")
     try:
         payload = decode_access_token(token)
     except jwt.PyJWTError as exc:
-        raise Unauthorized("Invalid or expired token.") from exc
+        raise Unauthorized("Your session has expired. Please sign in again.") from exc
     user = db.get(User, payload.get("sub"))
-    if not user or not user.is_active or user.org_id != payload.get("org"):
-        raise Unauthorized("Invalid or expired token.")
+    if (not user or not user.is_active or user.org_id != payload.get("org")
+            or payload.get("ver", 0) != (user.session_version or 0) or payload.get("lt") != launch_tag()):
+        raise Unauthorized("Your session has expired. Please sign in again.")
     return user
 
 

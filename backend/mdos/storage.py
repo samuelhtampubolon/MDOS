@@ -7,6 +7,8 @@ kept only as metadata and never used to build paths.
 from __future__ import annotations
 
 import hashlib
+import logging
+import re
 import shutil
 import uuid
 from pathlib import Path
@@ -15,6 +17,9 @@ import pandas as pd
 
 from .config import get_settings
 from .errors import NotFound
+
+logger = logging.getLogger("mdos.storage")
+_ID = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
 
 
 def _root() -> Path:
@@ -68,6 +73,16 @@ def delete_key(key: str) -> None:
 
 
 def delete_project_files(org_id: str, project_id: str) -> None:
-    folder = _safe_path(f"{org_id}/{project_id}")
-    if folder.exists():
-        shutil.rmtree(folder, ignore_errors=True)
+    """Remove one project's folder. Only ever a ``<org uuid>/<project uuid>`` folder inside the storage root."""
+    root = _root().resolve()
+    folder = root / org_id / project_id
+    if (not (_ID.match(org_id) and _ID.match(project_id)) or folder.is_symlink() or folder.parent.is_symlink()
+            or folder.resolve().parent.parent != root):
+        logger.warning("Refused to remove %s: it is not a project storage folder", folder)
+        return
+    if not folder.exists():
+        return
+    try:
+        shutil.rmtree(folder)
+    except OSError:
+        logger.warning("Some stored files of a deleted project could not be removed from %s", folder)

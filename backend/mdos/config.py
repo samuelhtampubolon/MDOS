@@ -52,8 +52,17 @@ class Settings(BaseSettings):
     max_rows: int = 100_000
     max_cols: int = 500
 
-    cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
-    allowed_hosts: str = "*"  # cloud mode: comma-separated host names the server answers to
+    # Browser origins allowed to call the API from another domain. Empty: the app serves its own UI (and the Vite
+    # dev server proxies /api), so no cross-origin access is granted.
+    cors_origins: str = ""
+    # Cloud mode: host names the server answers to (set your public domain). "*" disables the check.
+    allowed_hosts: str = "localhost,127.0.0.1"
+    # Session cookie Secure flag: None means "when the request arrived over HTTPS" (behind a TLS proxy).
+    cookie_secure: bool | None = None
+    # Desktop: a per-launch key the browser must present once to open a session (set by the launcher).
+    mdos_local_key: str | None = None
+    # Interactive API docs at /api/docs (loads Swagger UI from a CDN). Off unless a developer turns it on.
+    enable_api_docs: bool = False
     execution_mode: Literal["thread", "sync"] = "thread"
 
     rate_limit_auth_per_minute: int = 10
@@ -76,6 +85,10 @@ class Settings(BaseSettings):
     @property
     def storage_dir(self) -> Path:
         return self.mdos_data_dir / "files"
+
+    @property
+    def api_docs_enabled(self) -> bool:
+        return self.enable_api_docs
 
     @property
     def cors_origin_list(self) -> list[str]:

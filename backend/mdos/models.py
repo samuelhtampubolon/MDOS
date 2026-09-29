@@ -50,6 +50,8 @@ class User(IdMixin, TimestampMixin, Base):
     password_hash: Mapped[str | None] = mapped_column(String(255), nullable=True)
     role: Mapped[str] = mapped_column(String(20), default="member")  # owner | admin | member
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    # Incremented by "sign out everywhere"; tokens carry the version they were issued with.
+    session_version: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
 
     organization: Mapped[Organization] = relationship()
 
