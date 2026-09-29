@@ -17,6 +17,7 @@ export function pct(v: unknown, digits = 0): string {
 export function signedPct(v: unknown, digits = 0): string {
   if (!isNum(v)) return "n/a";
   const s = (v * 100).toFixed(digits);
+  if (Number(s) === 0) return `${(0).toFixed(digits)}%`;
   return `${v > 0 ? "+" : ""}${s}%`;
 }
 

@@ -18,8 +18,10 @@ from .. import audit
 from ..config import get_settings
 from ..db import session_factory
 from ..models import Approval, Project, ProjectMember, WorkflowRun
-from . import approval_handlers  # noqa: F401  (register handlers)
-from . import approvals
+from . import (
+    approval_handlers,  # noqa: F401  (register handlers)
+    approvals,
+)
 from . import datasets as dataset_service
 
 logger = logging.getLogger("mdos.demo")

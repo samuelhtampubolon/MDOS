@@ -139,3 +139,11 @@ def test_strategy_api_flow(local_client, project):
     decided = c.post(f"/api/v1/projects/{pid}/approvals/{pending[0]['id']}/decide", json={"decision": "approved"}).json()
     assert decided["outcome"]["status"] == "approved"
     assert c.get(f"/api/v1/projects/{pid}/scenarios/{first['id']}").json()["status"] == "adopted"
+
+
+def test_price_curve_optimum_stays_inside_the_tested_prices():
+    model = default_model(name="Toba", offering="cultural experience", inputs={"target_price": 150000, "price_points": POINTS})
+    curve = analysis.price_curve(model)
+    low, high = curve["tested_range"]
+    assert low <= curve["profit_max_price"] <= high and low <= curve["revenue_max_price"] <= high
+    assert curve["points"][-1]["price"] <= high * 1.1 + 1

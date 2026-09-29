@@ -29,6 +29,7 @@ interface PriceCurve {
   revenue_max_price: number;
   profit_max_price: number;
   current_price: number;
+  tested_range: [number, number] | null;
   research: { pmc?: number; pme?: number; opp?: number; ipp?: number } | null;
 }
 
@@ -128,10 +129,17 @@ export function PriceView({ pid, baseline, currency }: { pid: string; baseline: 
           <Stat label="Current price" value={money(data.current_price, currency)} />
           <Stat label="Profit-maximizing price" value={money(data.profit_max_price, currency)} hint="Within the tested price range" />
           <Stat label="Revenue-maximizing price" value={money(data.revenue_max_price, currency)} />
-          <Stat label="Acceptable range (research)" value={research?.pmc ? `${money(research.pmc, currency, { compact: true })} to ${money(research.pme, currency, { compact: true })}` : "No Van Westendorp data"}
+          <Stat label="Acceptable range (research)"
+            value={<span style={{ fontSize: 17 }}>{research?.pmc ? `${money(research.pmc, currency)} to ${money(research.pme, currency)}` : "No Van Westendorp data"}</span>}
             delta={research?.opp ? `Optimal price point ${money(research.opp, currency)}` : undefined} />
         </div>
       </div>
+      {data.tested_range && (
+        <Callout>
+          The survey tested prices from {money(data.tested_range[0], currency)} to {money(data.tested_range[1], currency)}. The optimum is searched only inside
+          that range; the curves outside it are extrapolations, not evidence.
+        </Callout>
+      )}
       {research?.pme && data.profit_max_price > research.pme && (
         <Callout tone="warning">The model's profit-maximizing price is above the range most respondents find acceptable. Stated intent overstates demand at high prices; test before raising it.</Callout>
       )}

@@ -21,7 +21,7 @@ export function Heatmap({ title, subtitle, rows, cols, data, diverging = false, 
   const values = data.flat().filter((v): v is number => v !== null && Number.isFinite(v));
   const [lo, hi] = domain ?? [diverging ? -1 : 0, max(values) ?? 1];
   const labelW = Math.min(170, Math.max(50, ...rows.map((r) => textWidth(r) + 10)));
-  const colHead = Math.min(110, Math.max(36, ...cols.map((c) => textWidth(c) * 0.72 + 12)));
+  const colHead = Math.min(150, Math.max(36, ...cols.map((c) => textWidth(c.slice(0, 26)) * 0.72 + 12)));
   const cell = Math.max(18, Math.min(44, (width - labelW - 8) / Math.max(cols.length, 1)));
   const height = colHead + rows.length * cell + 4;
   const color = (v: number | null) => {
@@ -30,6 +30,7 @@ export function Heatmap({ title, subtitle, rows, cols, data, diverging = false, 
       const t = (v - lo) / (hi - lo);
       return t < 0.5 ? mix("var(--div-mid)", "var(--div-neg)", (0.5 - t) * 2) : mix("var(--div-mid)", "var(--div-pos)", (t - 0.5) * 2);
     }
+    if (v === 0 && fmt === "number") return "var(--surface-2)";
     return mix("var(--surface-1)", "var(--seq-600)", (v - lo) / (hi - lo || 1));
   };
   const textOn = (v: number | null) => {
@@ -45,7 +46,7 @@ export function Heatmap({ title, subtitle, rows, cols, data, diverging = false, 
         <svg width={width} height={height}>
           {cols.map((c, j) => (
             <text key={c} className="viz-label" transform={`translate(${labelW + j * cell + cell / 2} ${colHead - 6}) rotate(-35)`} textAnchor="start">
-              {c.length > 18 ? `${c.slice(0, 17)}…` : c}
+              {c.length > 26 ? `${c.slice(0, 25)}…` : c}
             </text>
           ))}
           {rows.map((r, i) => (
@@ -57,7 +58,7 @@ export function Heatmap({ title, subtitle, rows, cols, data, diverging = false, 
                   <g key={c} onPointerMove={(e) => show({ x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY, title: `${r} x ${c}`, rows: [{ value: v === null ? "n/a" : fmtValue(v, fmt), label: title }] })}
                     onPointerLeave={hide}>
                     <rect x={labelW + j * cell + 1} y={colHead + i * cell + 1} width={cell - 2} height={cell - 2} rx={3} style={{ fill: color(v) }} />
-                    {cell >= 30 && v !== null && (
+                    {cell >= 30 && v !== null && !(v === 0 && fmt === "number") && (
                       <text x={labelW + j * cell + cell / 2} y={colHead + i * cell + cell / 2 + 4} textAnchor="middle" style={{ fill: textOn(v), fontSize: 10.5 }}>
                         {fmt === "number" ? num(v) : num(v, 2)}
                       </text>
@@ -186,8 +187,10 @@ export function Tornado({ title, subtitle, base, rows, fmt = "money", currency =
 export function EmotionCurve({ title, subtitle, data }: { title: string; subtitle?: string; data: { label: string; value: number | null; n: number }[] }) {
   const { ref, width } = useWidth<HTMLDivElement>();
   const { tip, show, hide } = useTooltip();
-  const height = 230;
-  const m = { l: 40, r: 16, t: 16, b: 34 };
+  const step = (width - 56) / Math.max(1, data.length);
+  const crowded = data.some((d) => textWidth(d.label) > step - 6);
+  const height = crowded ? 242 : 230;
+  const m = { l: 40, r: 16, t: 16, b: crowded ? 46 : 34 };
   const x = scaleBand().domain(data.map((d) => d.label)).range([m.l, width - m.r]).padding(0.5);
   const y = scaleLinear().domain([-1, 1]).range([height - m.b, m.t]);
   const pts = data.map((d) => ({ ...d, cx: (x(d.label) ?? 0) + x.bandwidth() / 2 }));
@@ -208,7 +211,7 @@ export function EmotionCurve({ title, subtitle, data }: { title: string; subtitl
             <text x={m.l + 4} y={height - m.b - 6} textAnchor="start">Negative</text>
           </g>
           <path d={path} fill="none" style={{ stroke: "var(--series-1)" }} strokeWidth={2} strokeLinejoin="round" />
-          {pts.map((p) => (
+          {pts.map((p, i) => (
             <g key={p.label} onPointerMove={(e) => show({ x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY, title: p.label,
               rows: [{ value: p.value === null ? "no mentions" : num(p.value, 2), label: `mean sentiment, ${p.n} reviews` }] })} onPointerLeave={hide}>
               <rect className="viz-hit" x={x(p.label)} y={m.t} width={x.bandwidth()} height={height - m.t - m.b} />
@@ -218,7 +221,7 @@ export function EmotionCurve({ title, subtitle, data }: { title: string; subtitl
               ) : (
                 <circle cx={p.cx} cy={y(0)} r={4} style={{ fill: "var(--surface-1)", stroke: "var(--axis)" }} strokeWidth={1.5} />
               )}
-              <text className="viz-label" x={p.cx} y={height - m.b + 16} textAnchor="middle">{p.label}</text>
+              <text className="viz-label" x={p.cx} y={height - m.b + 16 + (crowded && i % 2 ? 13 : 0)} textAnchor="middle">{p.label}</text>
             </g>
           ))}
         </svg>

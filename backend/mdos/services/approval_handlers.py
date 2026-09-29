@@ -4,20 +4,37 @@ from __future__ import annotations
 
 from typing import Any
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..db import utcnow
 from ..errors import NotFound
-from ..models import Approval, DatasetVersion, Hypothesis, Insight, Project, Recommendation, Report
+from ..models import AgentRun, Approval, DatasetVersion, Hypothesis, Insight, Project, Recommendation, Report
 from . import datasets as dataset_service
 from . import evidence as evidence_service
 from .approvals import handler
+
+
+def _close_gated_step(db: Session, workflow_run_id: str | None, note: str) -> None:
+    """Record the person's decision on the agent step that stopped the workflow for approval."""
+    if not workflow_run_id:
+        return
+    step = db.scalar(select(AgentRun).where(AgentRun.workflow_run_id == workflow_run_id, AgentRun.status == "awaiting_approval")
+                     .order_by(AgentRun.step_index.desc()))
+    if step is not None:
+        result = dict(step.result or {})
+        result["actions_taken"] = [*result.get("actions_taken", []), note]
+        result["status"] = "succeeded"
+        step.result = result
+        step.status = "succeeded"
 
 
 @handler("apply_cleaning")
 def _apply_cleaning(db: Session, project: Project, approval: Approval, decision: str) -> dict[str, Any]:
     workflow_run_id = approval.payload.get("workflow_run_id")
     resume = {"resume_workflow": workflow_run_id} if workflow_run_id else {}
+    _close_gated_step(db, workflow_run_id, "A person approved the cleaning plan." if decision == "approved"
+                      else "A person rejected the cleaning plan; analysis continues on the current version.")
     if decision != "approved":
         # The workflow continues on the current version; a person decided the data needs no cleaning.
         return {"applied": False, **resume}

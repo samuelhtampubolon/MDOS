@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Link, Navigate, NavLink, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { useApprovals, useProject, useProjects } from "./api/hooks";
 import { AuthProvider, useAuth } from "./auth";
 import { Callout, Icon, Spinner } from "./components/ui";
@@ -156,6 +157,16 @@ function Shell({ children }: { children: ReactNode }) {
 function ProjectRoute({ children }: { children: (pid: string) => ReactNode }) {
   const { pid = "" } = useParams();
   const { data: project, error, isLoading } = useProject(pid);
+  const qc = useQueryClient();
+  const demoStatus = project?.brief?.demo_status;
+  const [wasBuilding, setWasBuilding] = useState(false);
+  useEffect(() => {
+    if (demoStatus === "building") setWasBuilding(true);
+    else if (wasBuilding) {
+      setWasBuilding(false);
+      void qc.invalidateQueries({ queryKey: [pid] });
+    }
+  }, [demoStatus, wasBuilding, pid, qc]);
   if (isLoading) return <Spinner />;
   if (error || !project) return <Callout tone="critical">This project was not found or you do not have access to it.</Callout>;
   return (

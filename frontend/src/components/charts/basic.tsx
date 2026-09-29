@@ -14,7 +14,8 @@ export function fmtValue(v: number | null | undefined, fmt: Fmt, currency = "IDR
   if (fmt === "percent") return pct(v, Math.abs(v) < 0.1 ? 1 : 0);
   if (fmt === "money") return money(v, currency, { compact: Math.abs(v) >= 1e5 });
   if (fmt === "decimal") return num(v, 2);
-  return Math.abs(v) >= 1000 ? num(v) : num(v, Math.abs(v) < 10 ? 2 : 1);
+  if (Number.isInteger(v) || Math.abs(v) >= 1000) return num(v);
+  return num(v, Math.abs(v) < 10 ? 2 : 1);
 }
 
 /* ---------- Horizontal bar chart (single series, optional interval whiskers) ---------- */

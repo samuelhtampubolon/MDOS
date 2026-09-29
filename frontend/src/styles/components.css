@@ -1016,3 +1016,20 @@ details.disclosure[open] > summary {
 .report-doc li {
   margin: 4px 0;
 }
+
+/* Controls placed inline (rows, toolbars, list items) size to their content instead of filling the line. */
+.row > .input,
+.row > .select,
+.actions > .input,
+.actions > .select,
+.list-item > .input,
+.list-item > .select {
+  width: auto;
+  max-width: 100%;
+  flex: 0 1 auto;
+}
+
+.table td.num,
+.table th.num {
+  white-space: nowrap;
+}

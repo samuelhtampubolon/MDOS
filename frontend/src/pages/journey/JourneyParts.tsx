@@ -138,6 +138,10 @@ function InterventionCard({ pid, journey, iv, currency }: { pid: string; journey
   const stage = journey.stages.find((s) => s.key === iv.stage_key)?.name ?? iv.stage_key;
   const pain = journey.pain_points.find((p) => p.id === iv.pain_point_id);
   const levels = iv.simulation?.levels;
+  const steps = iv.kind === "reduce_steps" ? (iv.params as { steps_from?: number; steps_to?: number }) : null;
+  const assumed = (lvl: "low" | "mid" | "high") => steps
+    ? `${{ low: "25%", mid: "50%", high: "100%" }[lvl]} of the gain`
+    : pct(lvl === "low" ? iv.uplift_low : lvl === "mid" ? iv.uplift_mid : iv.uplift_high, 1);
   return (
     <Card title={iv.title} subtitle={`${stage} · ${KIND_LABELS[iv.kind] ?? sentence(iv.kind)}${pain ? ` · addresses "${pain.theme || pain.title}"` : ""}`}
       actions={<>
@@ -150,6 +154,7 @@ function InterventionCard({ pid, journey, iv, currency }: { pid: string; journey
       </>}>
       <div className="stack-sm">
         {iv.description && <div className="secondary">{iv.description}</div>}
+        {steps?.steps_to !== undefined && <div className="small">Steps at this stage: {steps.steps_from ?? "current"} to {steps.steps_to}</div>}
         {levels && (
           <div className="table-wrap">
             <table className="table">
@@ -158,7 +163,7 @@ function InterventionCard({ pid, journey, iv, currency }: { pid: string; journey
                 {(["low", "mid", "high"] as const).map((lvl) => (
                   <tr key={lvl}>
                     <td>{sentence(lvl)}</td>
-                    <td className="num">{pct(lvl === "low" ? iv.uplift_low : lvl === "mid" ? iv.uplift_mid : iv.uplift_high, 1)}</td>
+                    <td className="num">{assumed(lvl)}</td>
                     <td className="num">{num(levels[lvl].delta_customers, 1)}</td>
                     <td className="num">{money(levels[lvl].delta_revenue, currency, { compact: true })}</td>
                     <td className="num">{signedPct(levels[lvl].pct_customers, 1)}</td>

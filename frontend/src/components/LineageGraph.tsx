@@ -130,9 +130,12 @@ export function LineageGraph({ data, title = "Evidence graph", subtitle, only }:
             const a = layout.pos.get(e.from);
             const b = layout.pos.get(e.to);
             if (!a || !b) return null;
-            const back = b.layer <= a.layer;
+            const same = b.layer === a.layer;
+            const back = b.layer < a.layer;
             const on = !highlighted || (highlighted.has(e.from) && highlighted.has(e.to));
-            const d = back
+            const d = same
+              ? `M${a.x},${a.y + NODE_H / 2} C${a.x - 16},${a.y + NODE_H / 2} ${b.x - 16},${b.y + NODE_H / 2} ${b.x - 2},${b.y + NODE_H / 2}`
+              : back
               ? `M${a.x + NODE_W / 2},${a.y + NODE_H} C${a.x + NODE_W / 2},${a.y + NODE_H + 70} ${b.x + NODE_W / 2},${b.y + NODE_H + 70} ${b.x + NODE_W / 2},${b.y + NODE_H + 2}`
               : `M${a.x + NODE_W},${a.y + NODE_H / 2} C${a.x + NODE_W + 26},${a.y + NODE_H / 2} ${b.x - 26},${b.y + NODE_H / 2} ${b.x - 2},${b.y + NODE_H / 2}`;
             return <path key={i} d={d} className="graph-edge" markerEnd="url(#lg-arrow)" strokeDasharray={back ? "4 3" : undefined}

@@ -213,7 +213,7 @@ export function ApprovalCard({ pid, approval }: { pid: string; approval: Approva
           </ul>
         )}
         <div className="row">
-          <input className="input sm" style={{ maxWidth: 360 }} placeholder="Rationale (optional, stored in the audit log)" value={rationale}
+          <input className="input sm" style={{ width: 360 }} placeholder="Rationale (optional, stored in the audit log)" value={rationale}
             onChange={(e) => setRationale(e.target.value)} aria-label="Rationale" />
           <button className="btn sm good" disabled={decide.isPending} onClick={() => run("approved")}><Icon name="check" size={14} />Approve</button>
           <button className="btn sm danger" disabled={decide.isPending} onClick={() => run("rejected")}><Icon name="x" size={14} />Reject</button>

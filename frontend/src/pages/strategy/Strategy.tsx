@@ -5,14 +5,16 @@ import type { Scenario } from "../../api/types";
 import { BarChart } from "../../components/charts/basic";
 import { Waterfall } from "../../components/charts/special";
 import { StartWorkflow } from "../../components/domain";
-import { Badge, Callout, Card, Empty, Icon, PageHeader, Stat, StatusBadge, Tabs, useToast } from "../../components/ui";
-import { compact, money, num, pct, signedPct } from "../../lib/format";
+import { Callout, Card, Empty, Icon, PageHeader, Stat, StatusBadge, Tabs, useToast } from "../../components/ui";
+import { compact, money, num, pct, sentence, signedPct } from "../../lib/format";
 import Decisions from "./Decisions";
 import ModelCanvas from "./ModelCanvas";
 import { MediaMix, PriceView, RiskView } from "./StrategyAnalysis";
 import { ScenarioBuilder } from "./ScenarioBuilder";
 
 type View = "scenarios" | "model" | "risk" | "price" | "media" | "decisions";
+
+const METRIC_NAMES: Record<string, string> = { romi: "ROMI", cac: "CAC", clv: "CLV", gross_margin: "Gross margin", spend: "Media spend" };
 
 export default function Strategy({ pid }: { pid: string }) {
   const { data: project } = useProject(pid);
@@ -157,11 +159,11 @@ function ScenarioDetail({ pid, scenario, baseline, currency }: { pid: string; sc
                 <thead><tr><th>Metric</th><th className="num">Baseline</th><th className="num">Scenario</th><th className="num">Change</th></tr></thead>
                 <tbody>
                   {Object.entries(cmp ?? {}).map(([key, v]) => {
-                    const isMoney = ["revenue", "profit", "spend", "cac", "clv"].includes(key);
+                    const isMoney = ["revenue", "profit", "spend", "cac", "clv", "gross_margin", "commission", "fixed_costs"].includes(key);
                     const f = (x: number) => (isMoney ? money(x, currency, { compact: true }) : key === "romi" ? `${num(x, 2)}x` : num(x));
                     return (
                       <tr key={key}>
-                        <td>{key === "romi" ? "ROMI" : key === "cac" ? "CAC" : key === "clv" ? "CLV" : key.charAt(0).toUpperCase() + key.slice(1)}</td>
+                        <td>{METRIC_NAMES[key] ?? sentence(key)}</td>
                         <td className="num">{f(v.baseline)}</td><td className="num">{f(v.scenario)}</td>
                         <td className="num">{v.pct !== null ? signedPct(v.pct, 1) : ""}</td>
                       </tr>
@@ -213,7 +215,6 @@ function ScenarioDetail({ pid, scenario, baseline, currency }: { pid: string; sc
           )}
         </Card>
       </div>
-      {scenario.status === "draft" && isScenario && <Badge>Draft scenario. Log a decision to adopt it.</Badge>}
     </div>
   );
 }

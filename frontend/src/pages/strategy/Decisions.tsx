@@ -48,7 +48,7 @@ function DecisionCard({ pid, d, scenarios, currency, onEvidence }: { pid: string
         </div>
         {d.status === "proposed" && (
           <div className="row">
-            <input className="input sm" style={{ maxWidth: 360 }} placeholder="Rationale (optional)" aria-label="Decision rationale" value={rationale} onChange={(e) => setRationale(e.target.value)} />
+            <input className="input sm" style={{ width: 360 }} placeholder="Rationale (optional)" aria-label="Decision rationale" value={rationale} onChange={(e) => setRationale(e.target.value)} />
             <button className="btn sm good" disabled={decide.isPending} onClick={() => decide.mutate(true, { onSuccess: () => toast("Decision approved."), onError: (e) => toast(errorMessage(e), "error") })}>
               <Icon name="check" size={12} />Approve</button>
             <button className="btn sm danger" disabled={decide.isPending} onClick={() => decide.mutate(false, { onSuccess: () => toast("Decision rejected."), onError: (e) => toast(errorMessage(e), "error") })}>

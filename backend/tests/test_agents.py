@@ -90,6 +90,8 @@ def test_full_agent_closed_loop(local_client, project):
     approve_all(c, pid, "apply_cleaning")
     analysis = c.get(f"/api/v1/projects/{pid}/workflows/{analysis['id']}").json()
     assert analysis["status"] == "succeeded", analysis
+    assert all(s["status"] == "succeeded" for s in analysis["step_runs"])  # the gated step records the decision
+    assert analysis["step_runs"][2]["summary"] == ["A person approved the cleaning plan."]
     insights = c.get(f"/api/v1/projects/{pid}/insights").json()
     assert insights and all(i["status"] == "draft" and i["evidence"] for i in insights)
     hyps = c.get(f"/api/v1/projects/{pid}/research").json()["hypotheses"]

@@ -143,17 +143,24 @@ def _assign(data: dict, path: str, value: float) -> None:
 
 
 def price_curve(model: MarketModel, low: float | None = None, high: float | None = None, steps: int = 25) -> dict[str, Any]:
+    """Customers, revenue and profit across prices.
+
+    With a research price-response curve, the range stays close to the tested prices and the optimum is only
+    searched inside them: beyond the tested range the curve is an extrapolation, not evidence.
+    """
     ref = model.offer.reference_price
-    low = low or ref * 0.5
-    high = high or ref * 1.6
+    tested = sorted(p.price for p in model.price_response.points) if model.price_response.mode == "curve" else []
+    low = low or (tested[0] * 0.75 if tested else ref * 0.5)
+    high = high or (tested[-1] * 1.1 if tested else ref * 1.6)
     rows = []
     for price in np.linspace(low, high, steps):
         k = simulate(apply_levers(model, [{"type": "set_price", "value": float(price)}]))["kpis"]
         rows.append({"price": float(price), "customers": k["customers"], "revenue": k["revenue"], "profit": k["profit"]})
-    best_rev = max(rows, key=lambda r: r["revenue"])
-    best_profit = max(rows, key=lambda r: r["profit"])
+    candidates = [r for r in rows if not tested or tested[0] <= r["price"] <= tested[-1]] or rows
+    best_rev = max(candidates, key=lambda r: r["revenue"])
+    best_profit = max(candidates, key=lambda r: r["profit"])
     return {"points": rows, "revenue_max_price": best_rev["price"], "profit_max_price": best_profit["price"],
-            "current_price": model.offer.price}
+            "current_price": model.offer.price, "tested_range": [tested[0], tested[-1]] if tested else None}
 
 
 def break_even_price(model: MarketModel) -> float | None:
