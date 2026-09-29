@@ -22,7 +22,7 @@
 </div>
 
 <p align="center">
-  <b>From a business question to defensible marketing evidence, strategy scenarios and a customer journey you can test.</b>
+  <b>From a business question to defensible marketing evidence, strategy scenarios and a customer journey you can test :) .</b>
 </p>
 
 ## Table of Contents
