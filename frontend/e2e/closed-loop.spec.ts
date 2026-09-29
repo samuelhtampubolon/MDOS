@@ -66,6 +66,28 @@ test.describe.serial("closed loop on the demo project", () => {
     await expect(page.getByText("Insight saved as a draft.")).toBeVisible();
   });
 
+  test("add a hypothesis and size a sample on the research plan", async ({ page }) => {
+    await page.goto(`/p/${pid}/research/plan`);
+    await page.getByText("Add a hypothesis").click();
+    await page.getByLabel("Statement").fill("Guide storytelling quality is positively associated with satisfaction.");
+    await page.getByLabel("Independent variable", { exact: true }).fill("storytelling");
+    await page.getByLabel("Dependent variable", { exact: true }).fill("satisfaction");
+    await page.getByRole("button", { name: "Add hypothesis" }).click();
+    await expect(page.getByText("Hypothesis added.")).toBeVisible();
+    await expect(page.getByText("Guide storytelling quality is positively associated with satisfaction.")).toBeVisible();
+    await page.getByRole("button", { name: "Calculate" }).click();
+    await expect(page.getByText("n = 385")).toBeVisible(); // 50% share, ±5 points, 95% confidence
+  });
+
+  test("add a journey touchpoint", async ({ page }) => {
+    await page.goto(`/p/${pid}/journey`);
+    await page.getByRole("tab", { name: "Stages and settings" }).click();
+    await page.getByLabel("Touchpoint name").fill("Hotel front desk");
+    await page.getByLabel("Channel").fill("In person");
+    await page.getByRole("button", { name: "Add", exact: true }).click();
+    await expect(page.getByRole("cell", { name: "Hotel front desk", exact: true })).toBeVisible();
+  });
+
   test("simulate a pricing scenario", async ({ page }) => {
     await page.goto(`/p/${pid}/strategy`);
     await page.getByLabel("Scenario name").fill("E2E launch at Rp 150.000");

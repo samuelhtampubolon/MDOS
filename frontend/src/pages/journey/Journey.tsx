@@ -209,6 +209,7 @@ function JourneySettings({ pid, journey, currency }: { pid: string; journey: Jou
         </Card>
         <VocRunner pid={pid} journey={journey} />
       </div>
+      <Touchpoints pid={pid} journey={journey} />
       <Card title="Stage continue rates" subtitle="Share of people who move on to the next stage. Template defaults are assumptions; replace them with analytics or booking data.">
         <div className="table-wrap">
           <table className="table">
@@ -235,6 +236,47 @@ function JourneySettings({ pid, journey, currency }: { pid: string; journey: Jou
         </div>
       </Card>
     </div>
+  );
+}
+
+function Touchpoints({ pid, journey }: { pid: string; journey: JourneyT }) {
+  const toast = useToast();
+  const [form, setForm] = useState({ stage_key: journey.stages[0]?.key ?? "", name: "", channel: "" });
+  const add = useProjectMutation(pid, () => api.post(`/projects/${pid}/journeys/${journey.id}/touchpoints`, form));
+  const remove = useProjectMutation(pid, (tid: string) => api.del(`/projects/${pid}/journeys/${journey.id}/touchpoints/${tid}`));
+  return (
+    <Card title="Touchpoints" subtitle="Where customers meet the offer at each stage: channels, pages, people and places.">
+      <div className="stack-sm">
+        <div className="table-wrap">
+          <table className="table">
+            <thead><tr><th>Stage</th><th>Touchpoint</th><th>Channel</th><th /></tr></thead>
+            <tbody>
+              {journey.touchpoints.map((t) => (
+                <tr key={t.id}>
+                  <td>{journey.stages.find((s) => s.key === t.stage_key)?.name ?? t.stage_key}</td>
+                  <td>{t.name}</td>
+                  <td className="small secondary">{t.channel}</td>
+                  <td><button className="btn ghost icon sm" aria-label={`Remove ${t.name}`}
+                    onClick={() => remove.mutate(t.id, { onError: (e) => toast(errorMessage(e), "error") })}><Icon name="trash" size={14} /></button></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <form className="row" onSubmit={(e) => { e.preventDefault(); add.mutate(undefined, {
+          onSuccess: () => { toast("Touchpoint added."); setForm({ ...form, name: "", channel: "" }); }, onError: (er) => toast(errorMessage(er), "error"),
+        }); }}>
+          <select className="select sm" aria-label="Stage" value={form.stage_key} onChange={(e) => setForm({ ...form, stage_key: e.target.value })}>
+            {journey.stages.map((s) => <option key={s.key} value={s.key}>{s.name}</option>)}
+          </select>
+          <input className="input sm" required placeholder="Touchpoint, for example WhatsApp booking" aria-label="Touchpoint name" style={{ width: 280 }}
+            value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+          <input className="input sm" placeholder="Channel, for example Messaging" aria-label="Channel" style={{ width: 220 }}
+            value={form.channel} onChange={(e) => setForm({ ...form, channel: e.target.value })} />
+          <button className="btn sm primary" disabled={add.isPending}><Icon name="plus" size={12} />Add</button>
+        </form>
+      </div>
+    </Card>
   );
 }
 

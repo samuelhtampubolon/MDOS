@@ -51,6 +51,7 @@ export default function Plan({ pid }: { pid: string }) {
       <Card title="Hypothesis canvas" subtitle="Agents may propose verdicts from evidence; only a person can approve them.">
         <div className="stack-sm">
           {data.hypotheses.map((h) => <HypothesisRow key={h.id} pid={pid} h={h} onEvidence={setEvidenceId} />)}
+          <NewHypothesis pid={pid} />
         </div>
       </Card>
       <div className="grid grid-2">
@@ -106,16 +107,128 @@ export default function Plan({ pid }: { pid: string }) {
           <ol style={{ margin: 0, paddingLeft: 18 }} className="stack-sm">{list(guide.questions).map((q) => <li key={q}>{q}</li>)}</ol>
         </Card>
       </div>
+      <SampleSizeCalculator />
       <VariableDictionary pid={pid} />
       <EvidenceModal pid={pid} evidenceId={evidenceId} onClose={() => setEvidenceId(null)} />
     </div>
   );
 }
 
+type HypothesisFields = Pick<Hypothesis, "statement" | "iv" | "dv" | "mediator" | "moderator" | "expected_direction" | "rationale">;
+
+function HypothesisForm({ initial, busy, submitLabel, onSubmit, onCancel }: {
+  initial: HypothesisFields; busy: boolean; submitLabel: string; onSubmit: (v: HypothesisFields) => void; onCancel?: () => void;
+}) {
+  const [v, setV] = useState(initial);
+  const field = (key: keyof HypothesisFields, label: string) => (
+    <div className="field"><label htmlFor={`hf-${key}`}>{label}</label>
+      <input id={`hf-${key}`} className="input sm" value={v[key]} onChange={(e) => setV({ ...v, [key]: e.target.value })} /></div>
+  );
+  return (
+    <form className="stack-sm" onSubmit={(e) => { e.preventDefault(); onSubmit(v); }}>
+      <div className="field"><label htmlFor="hf-statement">Statement</label>
+        <textarea id="hf-statement" className="textarea" required minLength={5} value={v.statement} onChange={(e) => setV({ ...v, statement: e.target.value })}
+          placeholder="Perceived authenticity is positively associated with purchase intention." /></div>
+      <div className="grid grid-4">
+        {field("iv", "Independent variable")}{field("dv", "Dependent variable")}{field("mediator", "Mediator (optional)")}{field("moderator", "Moderator (optional)")}
+      </div>
+      <div className="grid grid-2">
+        <div className="field"><label htmlFor="hf-dir">Expected direction</label>
+          <select id="hf-dir" className="select sm" value={v.expected_direction} onChange={(e) => setV({ ...v, expected_direction: e.target.value })}>
+            <option value="positive">Positive</option><option value="negative">Negative</option><option value="difference">Difference between groups</option><option value="none">No effect</option>
+          </select></div>
+        {field("rationale", "Rationale (theory or prior evidence)")}
+      </div>
+      <div className="row">
+        <button className="btn sm primary" disabled={busy}>{submitLabel}</button>
+        {onCancel && <button type="button" className="btn sm ghost" onClick={onCancel}>Cancel</button>}
+      </div>
+    </form>
+  );
+}
+
+function NewHypothesis({ pid }: { pid: string }) {
+  const toast = useToast();
+  const [key, setKey] = useState(0);
+  const create = useProjectMutation(pid, (v: HypothesisFields) => api.post(`/projects/${pid}/hypotheses`, v));
+  return (
+    <details className="disclosure" style={{ marginTop: 6 }}>
+      <summary><Icon name="plus" size={12} />Add a hypothesis</summary>
+      <HypothesisForm key={key} busy={create.isPending} submitLabel="Add hypothesis"
+        initial={{ statement: "", iv: "", dv: "", mediator: "", moderator: "", expected_direction: "positive", rationale: "" }}
+        onSubmit={(v) => create.mutate(v, { onSuccess: () => { toast("Hypothesis added."); setKey((k) => k + 1); }, onError: (e) => toast(errorMessage(e), "error") })} />
+    </details>
+  );
+}
+
+function SampleSizeCalculator() {
+  const toast = useToast();
+  const [kind, setKind] = useState("proportion");
+  const [form, setForm] = useState({ p: 50, margin: 5, confidence: 95, population: "", sd: 1, meanMargin: 0.1, n: 400, baseline: 5, mde: 20, power: 80 });
+  const [result, setResult] = useState<Record<string, unknown> | null>(null);
+  const run = async () => {
+    const body: Record<string, unknown> = { kind, confidence: form.confidence / 100, population: form.population ? Number(form.population) : null };
+    if (kind === "proportion") Object.assign(body, { p: form.p / 100, margin: form.margin / 100 });
+    if (kind === "mean") Object.assign(body, { sd: form.sd, margin: form.meanMargin });
+    if (kind === "margin_of_error") Object.assign(body, { n: form.n, p: form.p / 100 });
+    if (kind === "ab_test") Object.assign(body, { baseline: form.baseline / 100, mde_relative: form.mde / 100, power: form.power / 100 });
+    try {
+      setResult(await api.post<Record<string, unknown>>("/tools/sample-size", body));
+    } catch (err) {
+      toast(errorMessage(err), "error");
+    }
+  };
+  const num_ = (key: keyof typeof form, label: string, step = "any") => (
+    <div className="field"><label htmlFor={`ss-${key}`}>{label}</label>
+      <input id={`ss-${key}`} className="input sm" type="number" step={step} value={form[key]} onChange={(e) => setForm({ ...form, [key]: e.target.value === "" ? "" : Number(e.target.value) })} /></div>
+  );
+  return (
+    <Card title="Sample size calculator" subtitle="Closed-form formulas with finite population correction. Use it to check the plan or size a new wave.">
+      <div className="stack-sm">
+        <div className="grid grid-4">
+          <div className="field"><label htmlFor="ss-kind">I want to</label>
+            <select id="ss-kind" className="select sm" value={kind} onChange={(e) => { setKind(e.target.value); setResult(null); }}>
+              <option value="proportion">Estimate a share (for example % willing to pay)</option>
+              <option value="mean">Estimate an average</option>
+              <option value="margin_of_error">Find the margin of error for a sample</option>
+              <option value="ab_test">Size an A/B test</option>
+            </select></div>
+          {kind === "proportion" && <>{num_("p", "Expected share (%)")}{num_("margin", "Margin of error (± points)")}</>}
+          {kind === "mean" && <>{num_("sd", "Standard deviation")}{num_("meanMargin", "Margin of error (same unit)")}</>}
+          {kind === "margin_of_error" && <>{num_("n", "Sample size", "1")}{num_("p", "Expected share (%)")}</>}
+          {kind === "ab_test" && <>{num_("baseline", "Current conversion (%)")}{num_("mde", "Smallest relative lift (%)")}</>}
+        </div>
+        <div className="grid grid-4">
+          {kind !== "ab_test" ? <>{num_("confidence", "Confidence (%)")}{num_("population", "Population size (optional)", "1")}</> : num_("power", "Power (%)")}
+          <div style={{ alignSelf: "end" }}><button className="btn sm primary" onClick={run}>Calculate</button></div>
+        </div>
+        {result && (
+          <Callout tone="good">
+            {kind === "ab_test" ? <><strong>{num(result.n_per_arm)} per variant</strong> ({num(result.total)} in total) to detect a change from {pct(result.baseline, 1)} to {pct(result.target, 1)}.</>
+              : kind === "margin_of_error" ? <><strong>±{pct(result.margin_of_error, 1)}</strong> margin of error with n = {num(result.n)}.</>
+                : <><strong>n = {num(result.n)}</strong> completed responses{result.population ? ` for a population of ${num(result.population)}` : ""} (n = {num(result.n_infinite)} without the population correction). <span className="small muted">{String(result.formula ?? "")}</span></>}
+          </Callout>
+        )}
+      </div>
+    </Card>
+  );
+}
+
 function HypothesisRow({ pid, h, onEvidence }: { pid: string; h: Hypothesis; onEvidence: (id: string) => void }) {
   const toast = useToast();
+  const [editing, setEditing] = useState(false);
   const decide = useProjectMutation(pid, (approve: boolean) => api.post(`/projects/${pid}/hypotheses/${h.id}/verdict/decide`, { approve }));
+  const update = useProjectMutation(pid, (v: HypothesisFields) => api.patch(`/projects/${pid}/hypotheses/${h.id}`, v));
   const proposed = h.status.startsWith("proposed_");
+  const decided = ["supported", "not_supported", "inconclusive"].includes(h.status);
+  if (editing) {
+    return (
+      <div className="list-item"><div className="grow">
+        <HypothesisForm initial={h} busy={update.isPending} submitLabel="Save" onCancel={() => setEditing(false)}
+          onSubmit={(v) => update.mutate(v, { onSuccess: () => { toast(`${h.code} saved.`); setEditing(false); }, onError: (e) => toast(errorMessage(e), "error") })} />
+      </div></div>
+    );
+  }
   return (
     <div className="list-item">
       <span className="chip" style={{ minWidth: 30, justifyContent: "center" }}>{h.code}</span>
@@ -134,6 +247,7 @@ function HypothesisRow({ pid, h, onEvidence }: { pid: string; h: Hypothesis; onE
       </div>
       <div className="stack-sm" style={{ alignItems: "flex-end" }}>
         <StatusBadge status={h.status} />
+        {!decided && <button className="btn ghost sm" onClick={() => setEditing(true)}>Edit</button>}
         {proposed && (
           <div className="row" style={{ gap: 4 }}>
             <button className="btn sm good" onClick={() => decide.mutate(true, { onSuccess: () => toast(`${h.code} verdict approved.`), onError: (e) => toast(errorMessage(e), "error") })}>
