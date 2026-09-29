@@ -65,3 +65,27 @@ def _finalize_report(db: Session, project: Project, approval: Approval, decision
         report.finalized_by = approval.decided_by
         report.finalized_at = utcnow()
     return {"report": report.id, "status": report.status}
+
+
+@handler("approve_decision")
+def _approve_decision(db: Session, project: Project, approval: Approval, decision: str) -> dict[str, Any]:
+    from ..models import Decision
+    from . import strategy as strategy_service
+
+    d = db.get(Decision, approval.entity_id)
+    if not d or d.project_id != project.id:
+        raise NotFound("Decision not found.")
+    strategy_service.decide_decision(db, project, d, decision == "approved", approval.decided_by or "system")
+    return {"decision": d.id, "status": d.status}
+
+
+@handler("launch_experiment")
+def _launch_experiment(db: Session, project: Project, approval: Approval, decision: str) -> dict[str, Any]:
+    from ..models import Experiment
+    from . import journey as journey_service
+
+    exp = db.get(Experiment, approval.entity_id)
+    if not exp or exp.project_id != project.id:
+        raise NotFound("Experiment not found.")
+    journey_service.decide_experiment(db, project, exp, decision == "approved", approval.decided_by or "system")
+    return {"experiment": exp.id, "status": exp.status}

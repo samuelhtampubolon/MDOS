@@ -430,6 +430,7 @@ class Journey(IdMixin, TimestampMixin, Base):
     name: Mapped[str] = mapped_column(String(200))
     template: Mapped[str] = mapped_column(String(40), default="tourism")
     stages: Mapped[list] = mapped_column(default=list)
+    settings: Mapped[dict] = mapped_column(default=dict)
     voc: Mapped[dict] = mapped_column(default=dict)
     voc_dataset_version_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
     status: Mapped[str] = mapped_column(String(20), default="draft")  # draft | adopted

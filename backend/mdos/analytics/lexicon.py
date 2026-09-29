@@ -90,6 +90,7 @@ PHRASES = {
     "luar biasa": 3.0, "worth it": 2.2, "must visit": 2.6, "must see": 2.6, "highly recommend": 3.0,
     "highly recommended": 3.0, "sangat direkomendasikan": 3.0, "wajib dikunjungi": 2.7, "wajib datang": 2.4,
     "tidak rugi": 2.0, "gak rugi": 2.0, "nggak rugi": 2.0, "biasa saja": -0.6, "biasa aja": -0.6,
+    "lebih lama": 0.8, "menginap lebih lama": 1.5, "stay longer": 1.5, "longer stay": 1.5, "tidak sabar": 1.2,
     "waste of money": -3.0, "waste of time": -2.8, "rip off": -3.0, "buang uang": -2.8, "buang waktu": -2.5,
     "tidak sesuai": -2.0, "tidak worth": -2.0, "not worth": -2.0, "kurang terawat": -2.0, "never again": -2.8,
     "tidak akan kembali": -2.6, "gak lagi": -1.8, "bikin kecewa": -2.6, "kurang informasi": -1.6,

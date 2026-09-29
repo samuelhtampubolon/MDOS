@@ -120,6 +120,12 @@ class SentimentParams(BaseModel):
     group: str | None = None
 
 
+class JourneyVOCParams(BaseModel):
+    text_column: str
+    template: Literal["tourism", "generic"] = "tourism"
+    rating_column: str | None = None
+
+
 @dataclass
 class Method:
     key: str
@@ -188,6 +194,12 @@ def _run_sentiment(df, p: SentimentParams, ctx):
     return sentiment.sentiment(df, p.text_column, p.group, ctx["labels"])
 
 
+def _run_journey_voc(df, p: JourneyVOCParams, ctx):
+    from ..journey import voc
+
+    return voc.analyze(df, p.text_column, p.template, p.rating_column)
+
+
 METHODS: dict[str, Method] = {
     m.key: m
     for m in [
@@ -219,6 +231,8 @@ METHODS: dict[str, Method] = {
                "Keywords, bigrams and NMF themes for English and Indonesian text."),
         Method("sentiment", "Sentiment analysis", "Text", SentimentParams, _run_sentiment,
                "Explainable bilingual lexicon sentiment, overall and by group."),
+        Method("journey_voc", "Voice of the customer by journey stage", "Text", JourneyVOCParams, _run_journey_voc,
+               "Maps reviews to journey stages, scores emotion per stage and finds prioritized pain points."),
     ]
 }
 
