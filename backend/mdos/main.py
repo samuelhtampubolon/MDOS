@@ -25,10 +25,6 @@ STATIC_DIR = Path(__file__).parent / "static"
 # The single-page app: everything from this origin, no inline scripts, no third-party requests.
 APP_CSP = ("default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self' data:; "
            "connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'")
-# FastAPI's interactive docs page (opt-in) loads Swagger UI from a CDN and runs one inline script.
-DOCS_CSP = ("default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
-            "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https://fastapi.tiangolo.com; "
-            "connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'")
 PERMISSIONS_POLICY = "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
 
 
@@ -55,7 +51,8 @@ def create_app(*, run_migrations: bool = True) -> FastAPI:
         version=__version__,
         description="Research Lab, Strategy Simulator and Journey Designer. All numbers come from code.",
         lifespan=lifespan,
-        docs_url="/api/docs" if docs else None,
+        # Only the machine-readable schema; an interactive docs page would load scripts from a CDN.
+        docs_url=None,
         openapi_url="/api/openapi.json" if docs else None,
         redoc_url=None,
     )
@@ -83,7 +80,7 @@ def create_app(*, run_migrations: bool = True) -> FastAPI:
         headers.setdefault("Cross-Origin-Opener-Policy", "same-origin")
         headers.setdefault("Cross-Origin-Resource-Policy", "same-origin")
         headers.setdefault("Permissions-Policy", PERMISSIONS_POLICY)
-        headers.setdefault("Content-Security-Policy", DOCS_CSP if docs and path == "/api/docs" else APP_CSP)
+        headers.setdefault("Content-Security-Policy", APP_CSP)
         if path.startswith("/api/"):
             headers.setdefault("Cache-Control", "no-store")  # account data never lands in shared or disk caches
         if not settings.is_local and request.url.scheme == "https":

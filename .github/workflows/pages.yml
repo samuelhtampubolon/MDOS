@@ -1,0 +1,49 @@
+name: Project page
+
+# Publishes the static project page in site/ to GitHub Pages (https://<owner>.github.io/MDOS/). The page has no
+# scripts and loads nothing from other sites; the screenshots and logos are copied from docs/assets.
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/mdos-analysis-he0sf5]
+    paths: ["site/**", "docs/assets/**", ".github/workflows/pages.yml"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Assemble
+        run: |
+          mkdir -p _site/assets
+          cp -R site/. _site/
+          cp docs/assets/*.svg docs/assets/*.png _site/assets/
+          # Every link must be https: refuse the build if a plain http link slipped in.
+          if grep -nE '(href|src|srcset|content)="http://' _site/*.html; then exit 1; fi
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: _site
+
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

@@ -37,7 +37,8 @@ Playwright) are used only to build and test it and are not redistributed.
 
 **IBM Plex Sans and IBM Plex Mono** are Copyright 2017 IBM Corp., with Reserved Font Name "Plex", and are
 distributed unmodified under the SIL Open Font License 1.1 (`node_modules/@fontsource/ibm-plex-sans/LICENSE`,
-<https://openfontlicense.org>).
+<https://openfontlicense.org>). The project page ships two of the font files, with the license in
+`site/fonts/LICENSE-OFL.txt`.
 
 ## 2. Server and desktop app (Python)
 

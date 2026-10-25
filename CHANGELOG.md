@@ -11,6 +11,8 @@ versioning.
   connection poolers), a Hugging Face Space that runs the published image, and front doors for Vercel, Netlify and
   Cloudflare Pages that forward `/api/*` and send the same security headers as the server.
 - "Container image" workflow that tests and publishes the image to GitHub Container Registry on version tags.
+- Project page on GitHub Pages (`site/`, "Project page" workflow): static, with no scripts and nothing loaded from
+  other sites.
 
 ### Changed
 
@@ -19,6 +21,11 @@ versioning.
 - Accessibility: every page passes an automated axe-core audit with no violations. Scrollable tables take keyboard
   focus, disabled navigation items meet contrast, link and button names match their visible text, and lineage graph
   labels are shortened at word breaks.
+
+### Removed
+
+- The interactive API docs page, which loaded Swagger UI scripts from a CDN. `ENABLE_API_DOCS=true` now serves only
+  the OpenAPI schema at `/api/openapi.json`, under the app's strict CSP.
 
 ### Security
 

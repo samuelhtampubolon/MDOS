@@ -121,10 +121,13 @@ def test_security_headers_on_app_and_api(make_client):
 
 
 def test_api_docs_are_off_unless_enabled(make_client):
-    assert make_client("local").get("/api/docs").status_code == 404
+    assert make_client("local").get("/api/openapi.json").status_code == 404
     enabled = make_client("local", ENABLE_API_DOCS="true")
-    docs = enabled.get("/api/docs")
-    assert docs.status_code == 200 and "cdn.jsdelivr.net" in docs.headers["content-security-policy"]
+    schema = enabled.get("/api/openapi.json")
+    assert schema.status_code == 200 and schema.json()["info"]["title"] == "Marketing Decision OS API"
+    # No interactive page: it would load scripts from a CDN and need a looser CSP.
+    assert enabled.get("/api/docs").status_code != 200
+    assert "cdn.jsdelivr.net" not in schema.headers["content-security-policy"]
 
 
 def test_cors_wildcard_is_refused(make_client):

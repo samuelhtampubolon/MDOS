@@ -37,7 +37,7 @@ Severity follows the Repair Protocol scale. "Your hands" lists what only the own
 | M1 | Medium | Cookie changes | Moving to cookies without a CSRF defense would let other sites trigger changes. | `X-Requested-With: mdos` required on cookie-authenticated changes and on sign-in. | Revert f592e07 | None |
 | M2 | Medium | Browser | No `script-src` policy; the report preview wrote HTML into a same-origin window. | Strict CSP; exports served sandboxed and opened as a normal link. | Revert f592e07 | None |
 | M3 | Medium | Local host check | The test-only host name `testserver` was accepted in production. | Removed; tests use `localhost`. | Revert f592e07 | None |
-| M4 | Medium | API docs | Interactive docs were on by default and loaded scripts from a CDN. | Off unless `ENABLE_API_DOCS=true`, with their own narrow CSP. | Revert f592e07 | None |
+| M4 | Medium | API docs | Interactive docs were on by default and loaded scripts from a CDN. | Off unless `ENABLE_API_DOCS=true`; later removed entirely, leaving only the schema at `/api/openapi.json`. | Revert f592e07 | None |
 | M5 | Medium | Data deletion | One request deleted a project, and file cleanup trusted a computed path. | The name must be typed again (in the request body); cleanup only removes a validated `<org uuid>/<project uuid>` folder. | Revert f592e07, ce88a79 | None |
 | M6 | Medium | Cloud sign-up | Open by default: strangers could create workspaces that spend the owner's Claude credit. | First account only unless `ALLOW_REGISTRATION=true`. | Set `ALLOW_REGISTRATION=true` | None |
 | M7 | Medium | Personal data | Emails and phone numbers in answers and reviews reached Claude unmasked. | Masking at the provider boundary, counted in the agent trace. | Revert ce88a79 | None |

@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Static page: no scripts, no forms, nothing loaded from other sites. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; img-src 'self'; font-src 'self'; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
+  <meta name="color-scheme" content="light dark">
+  <title>MDOS, Marketing Decision OS</title>
+  <meta name="description" content="From a business question to defensible marketing evidence, strategy scenarios and a customer journey you can test. Free and open source, for desktop or cloud.">
+  <meta name="author" content="Samuel Hasudungan Tampubolon">
+  <meta property="og:title" content="MDOS, Marketing Decision OS">
+  <meta property="og:description" content="From a business question to defensible marketing evidence, strategy scenarios and a customer journey you can test.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://samuelhtampubolon.github.io/MDOS/">
+  <meta property="og:image" content="https://samuelhtampubolon.github.io/MDOS/assets/screenshot-research.png">
+  <link rel="canonical" href="https://samuelhtampubolon.github.io/MDOS/">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="top">
+    <div class="wrap top-row">
+      <a class="brand" href="./">
+        <picture>
+          <source media="(prefers-color-scheme: dark)" srcset="assets/mdos-logo-dark.svg">
+          <img src="assets/mdos-logo-light.svg" alt="MDOS, Marketing Decision OS" width="168" height="36">
+        </picture>
+      </a>
+      <nav aria-label="Main">
+        <a href="#modules">Modules</a>
+        <a href="#start">Get started</a>
+        <a href="#security">Security</a>
+        <a href="https://github.com/samuelhtampubolon/MDOS" rel="noopener noreferrer">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero wrap">
+      <p class="eyebrow">Free and open source · version 0.1.0</p>
+      <h1>From a business question to defensible marketing evidence</h1>
+      <p class="lead">Research, strategy scenarios and a customer journey you can test, in one app. Agents do the legwork, numbers always come from code, and people approve every decision.</p>
+      <div class="actions">
+        <a class="btn primary" href="https://github.com/samuelhtampubolon/MDOS/releases" rel="noopener noreferrer">Download the desktop app</a>
+        <a class="btn" href="https://github.com/samuelhtampubolon/MDOS" rel="noopener noreferrer">View the source</a>
+      </div>
+      <p class="note">Windows, macOS and Linux. The Lake Toba demo uses synthetic data.</p>
+      <img class="shot" src="assets/screenshot-research.png" alt="Research dashboard showing the next step, key numbers and the research workflow checklist" width="1280" height="800">
+    </section>
+
+    <section id="modules" class="band" aria-labelledby="modules-title">
+      <div class="wrap">
+        <h2 id="modules-title">Three modules, one closed loop</h2>
+        <div class="grid">
+          <article class="card">
+            <h3>Research Lab</h3>
+            <p>Turns a question into a research design and a bilingual questionnaire, cleans the data, runs 15 statistical methods with assumption checks and drafts insights.</p>
+          </article>
+          <article class="card">
+            <h3>Strategy Simulator</h3>
+            <p>Builds a market model from the evidence and tests price, budget and audience changes with sensitivity and Monte Carlo risk.</p>
+          </article>
+          <article class="card">
+            <h3>Journey Designer</h3>
+            <p>Maps the customer journey, finds friction in reviews and turns the best fixes into A/B tests whose results return as evidence.</p>
+          </article>
+        </div>
+        <figure class="pair">
+          <img src="assets/screenshot-strategy.png" alt="Strategy Simulator showing a scenario's marketing funnel and unit economics" width="1280" height="800" loading="lazy">
+          <img src="assets/screenshot-journey-dark.png" alt="Journey Designer in dark mode showing stages, emotions and touchpoints" width="1280" height="800" loading="lazy">
+        </figure>
+      </div>
+    </section>
+
+    <section class="wrap" aria-labelledby="trust-title">
+      <h2 id="trust-title">Research that stays defensible</h2>
+      <ul class="checks">
+        <li>Every analysis shows its sample size, assumption checks and limitations.</li>
+        <li>Insights must cite evidence, traceable back to the data version.</li>
+        <li>Causal words are blocked unless the evidence comes from an experiment.</li>
+        <li>Only a person can approve a verdict, a decision or a cleaning step.</li>
+      </ul>
+    </section>
+
+    <section id="start" class="band" aria-labelledby="start-title">
+      <div class="wrap">
+        <h2 id="start-title">Get started</h2>
+        <div class="grid">
+          <article class="card">
+            <h3>Desktop</h3>
+            <ol>
+              <li>Download the zip for your system from <a href="https://github.com/samuelhtampubolon/MDOS/releases" rel="noopener noreferrer">Releases</a>.</li>
+              <li>Unzip it and run MDOS.</li>
+              <li>Click <strong>Load the Lake Toba demo</strong>.</li>
+            </ol>
+            <p class="small">Your data stays on your computer.</p>
+          </article>
+          <article class="card">
+            <h3>Cloud for teams</h3>
+            <p>Run the Docker image with PostgreSQL, with accounts for each person.</p>
+            <p><a href="https://github.com/samuelhtampubolon/MDOS#43-cloud-teams-accounts-postgresql" rel="noopener noreferrer">Cloud setup</a></p>
+          </article>
+          <article class="card">
+            <h3>Free hosting</h3>
+            <p>Supabase, Hugging Face Spaces and Vercel, Netlify or Cloudflare Pages, at no cost.</p>
+            <p><a href="https://github.com/samuelhtampubolon/MDOS/blob/claude/mdos-analysis-he0sf5/deploy/README.md" rel="noopener noreferrer">Hosting guide</a></p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="security" class="wrap" aria-labelledby="security-title">
+      <h2 id="security-title">Private by design</h2>
+      <dl class="facts">
+        <div><dt>Desktop</dt><dd>Accepts connections from your own computer only</dd></div>
+        <div><dt>Browser</dt><dd>Strict content security policy and no third-party requests</dd></div>
+        <div><dt>Claude</dt><dd>Optional; personal identifiers are masked first</dd></div>
+        <div><dt>Supply chain</dt><dd>Pinned dependencies, audits and a secret scan in CI</dd></div>
+      </dl>
+      <p class="small">Found a vulnerability? Report it privately as described in the <a href="https://github.com/samuelhtampubolon/MDOS/security/policy" rel="noopener noreferrer">security policy</a>.</p>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap foot-row">
+      <p>Copyright © 2026 Samuel Hasudungan Tampubolon. Released under the <a href="https://github.com/samuelhtampubolon/MDOS/blob/claude/mdos-analysis-he0sf5/LICENSE" rel="noopener noreferrer">MIT License</a>.</p>
+      <p><a href="https://github.com/samuelhtampubolon/MDOS/issues/new/choose" rel="noopener noreferrer">Questions and ideas</a></p>
+    </div>
+  </footer>
+</body>
+</html>

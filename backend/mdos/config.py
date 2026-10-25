@@ -75,7 +75,7 @@ class Settings(BaseSettings):
     cookie_secure: bool | None = None
     # Desktop: a per-launch key the browser must present once to open a session (set by the launcher).
     mdos_local_key: str | None = None
-    # Interactive API docs at /api/docs (loads Swagger UI from a CDN). Off unless a developer turns it on.
+    # The OpenAPI schema at /api/openapi.json, for developer tools. Off unless a developer turns it on.
     enable_api_docs: bool = False
     execution_mode: Literal["thread", "sync"] = "thread"
 
