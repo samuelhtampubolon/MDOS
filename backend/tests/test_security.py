@@ -316,3 +316,13 @@ def test_desktop_cookie_ends_with_the_browser_session(make_client):
     cloud = make_client("cloud", ALLOW_REGISTRATION="true")  # same database: the local owner already exists
     body = {"email": "ana@example.com", "password": "correct horse battery", "name": "Ana", "organization": "Org"}
     assert "max-age=" in cloud.post("/api/v1/auth/register", json=body).headers["set-cookie"].lower()
+
+
+def test_hosted_postgres_urls_use_the_bundled_driver():
+    from mdos.config import normalize_database_url
+
+    supabase = "postgresql://postgres.abc:pw@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=require"
+    assert normalize_database_url(supabase).startswith("postgresql+psycopg://postgres.abc:pw@aws-0-")
+    assert normalize_database_url("postgres://u:p@h/db") == "postgresql+psycopg://u:p@h/db"
+    assert normalize_database_url("postgresql+psycopg://u:p@h/db") == "postgresql+psycopg://u:p@h/db"
+    assert normalize_database_url("sqlite:///x.db") == "sqlite:///x.db"

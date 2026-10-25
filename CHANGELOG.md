@@ -5,6 +5,17 @@ versioning.
 
 ## [Unreleased]
 
+### Added
+
+- Free hosting kit ([deploy/README.md](deploy/README.md)): Supabase connection strings work as given (including its
+  connection poolers), a Hugging Face Space that runs the published image, and front doors for Vercel, Netlify and
+  Cloudflare Pages that forward `/api/*` and send the same security headers as the server.
+- "Container image" workflow that tests and publishes the image to GitHub Container Registry on version tags.
+
+### Security
+
+- Vite and its helper packages updated past new advisories; GitHub Actions moved to their latest pinned releases.
+
 ## [0.1.0] - 2026-09-29
 
 First MVP: the Research Lab in full, with working slices of the Strategy Simulator and the Journey Designer connected

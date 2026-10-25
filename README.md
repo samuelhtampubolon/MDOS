@@ -118,6 +118,12 @@ Open `http://localhost:8000` and create the first account; sign-up then closes u
 published on your own computer only. For a team, put a TLS reverse proxy in front and follow
 [docs/13-deployment.md](docs/13-deployment.md).
 
+### 4.4 Free hosting
+
+Supabase Free (database), Hugging Face Spaces (backend) and Vercel, Netlify or Cloudflare Pages (front door) work
+together at no cost; [deploy/README.md](deploy/README.md) has the steps and explains what Firebase Spark, Glitch and
+Cloudflare D1, R2 and KV can and cannot do for MDOS.
+
 ## 5. Claude drafting (optional)
 
 Without an API key everything works offline with deterministic drafting. To let Claude draft wording (numbers never

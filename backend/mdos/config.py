@@ -31,6 +31,15 @@ def default_data_dir() -> Path:
     return Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local" / "share")) / "mdos"
 
 
+def normalize_database_url(url: str) -> str:
+    """Accept the PostgreSQL addresses hosts hand out (Supabase, Neon, Render: ``postgresql://`` or
+    ``postgres://``) and select the psycopg driver MDOS ships with. Other URLs are returned unchanged."""
+    for prefix in ("postgresql://", "postgres://"):
+        if url.startswith(prefix):
+            return "postgresql+psycopg://" + url[len(prefix):]
+    return url
+
+
 class Settings(BaseSettings):
     # Empty values (``SECRET_KEY=``) count as unset, so a copied .env.example never sets a blank secret.
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore", env_ignore_empty=True)
@@ -84,7 +93,7 @@ class Settings(BaseSettings):
     @property
     def resolved_database_url(self) -> str:
         if self.database_url:
-            return self.database_url
+            return normalize_database_url(self.database_url)
         return f"sqlite:///{(self.mdos_data_dir / 'mdos.db').as_posix()}"
 
     @property

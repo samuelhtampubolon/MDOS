@@ -159,7 +159,7 @@ def test_upload_limits_and_formula_injection(make_client):
     big = b"a,b\n" + b"1,2\n" * 400_000
     assert c.post(f"/api/v1/projects/{pid}/datasets", files={"file": ("big.csv", big, "text/csv")}).status_code == 422
     assert c.post(f"/api/v1/projects/{pid}/datasets", files={"file": ("x.exe", b"MZ", "application/octet-stream")}).status_code == 422
-    semicolon = b"id;rating;comment\n1;5;=HYPERLINK(\"http://evil\")\n2;4;ok\n3;3;fine\n"
+    semicolon = b"id;rating;comment\n1;5;=HYPERLINK(\"https://evil.example\")\n2;4;ok\n3;3;fine\n"
     res = c.post(f"/api/v1/projects/{pid}/datasets", files={"file": ("semi.csv", semicolon, "text/csv")})
     assert res.status_code == 201
     assert {col["name"] for col in res.json()["versions"][0]["columns"]} == {"id", "rating", "comment"}

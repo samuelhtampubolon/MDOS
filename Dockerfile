@@ -13,6 +13,9 @@ RUN npm run build
 
 # ---- 2. Python runtime ------------------------------------------------------------------------------
 FROM python:3.11-slim AS runtime
+LABEL org.opencontainers.image.title="MDOS, Marketing Decision OS" \
+      org.opencontainers.image.source="https://github.com/samuelhtampubolon/MDOS" \
+      org.opencontainers.image.licenses="MIT"
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \

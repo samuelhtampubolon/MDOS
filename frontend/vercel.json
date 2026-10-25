@@ -1,0 +1,5 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "npm ci --ignore-scripts",
+  "buildCommand": "npm run build:dist && node scripts/static-host.mjs vercel"
+}

@@ -59,6 +59,9 @@ values keep the defaults.
 
 ### Hosting options (choose one)
 
+For the free plans (Supabase, Hugging Face Spaces, Vercel, Netlify, Cloudflare Pages), follow
+[deploy/README.md](../deploy/README.md).
+
 | Option | Fit | Notes |
 |---|---|---|
 | A container platform (Google Cloud Run, AWS App Runner, Azure Container Apps, Fly.io, Railway, Render) with managed PostgreSQL | Recommended for the MVP | Mount or attach persistent storage for `/data`, or move files to object storage (Phase 2). Keep one instance until the rate limiter uses a shared store |

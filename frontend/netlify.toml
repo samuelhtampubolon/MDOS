@@ -1,0 +1,8 @@
+# Netlify: set the site's base directory to "frontend" and the environment variable MDOS_BACKEND_URL
+# (for example https://your-space.hf.space). See deploy/README.md.
+[build]
+  command = "npm ci --ignore-scripts && npm run build:dist && node scripts/static-host.mjs netlify"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "24"

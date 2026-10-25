@@ -56,6 +56,10 @@ def _sqlite_pragmas(dbapi_connection, _record) -> None:  # pragma: no cover - dr
 def make_engine(settings: Settings) -> Engine:
     url = settings.resolved_database_url
     kwargs: dict = {"pool_pre_ping": True}
+    if url.startswith("postgresql+psycopg"):
+        # No server-side prepared statements, so connection poolers in transaction mode (Supabase port 6543,
+        # PgBouncer) work too.
+        kwargs["connect_args"] = {"prepare_threshold": None}
     if url.startswith("sqlite"):
         kwargs["connect_args"] = {"check_same_thread": False}
         if ":memory:" not in url and url.startswith("sqlite:///"):
