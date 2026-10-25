@@ -61,7 +61,7 @@ export default function ModelCanvas({ pid, baseline, currency }: { pid: string; 
         })}><Icon name="refresh" size={14} />Save and re-run</button>
       </div>
       <Card title="Assumption register" subtitle="Every number in the model, where it came from and how confident we are.">
-        <div className="table-wrap">
+        <div className="table-wrap" tabIndex={0} role="group" aria-label="Table, scrolls when wide">
           <table className="table">
             <thead><tr><th>Assumption</th><th>Value</th><th>Source</th><th>Evidence</th><th>Confidence</th><th>Note</th></tr></thead>
             <tbody>
@@ -106,7 +106,7 @@ export default function ModelCanvas({ pid, baseline, currency }: { pid: string; 
           </div>
         </Card>
         <Card title="Competitors">
-          <div className="table-wrap">
+          <div className="table-wrap" tabIndex={0} role="group" aria-label="Table, scrolls when wide">
             <table className="table">
               <thead><tr><th>Competitor</th><th className="num">Price</th>{model.positioning_axes.slice(1).map((ax) => <th key={ax} className="num">{ax}</th>)}</tr></thead>
               <tbody>
@@ -123,7 +123,7 @@ export default function ModelCanvas({ pid, baseline, currency }: { pid: string; 
         </Card>
       </div>
       <Card title="Segments" subtitle="Shares must add up to 100%. WTP multiplier scales willingness to pay relative to the research average.">
-        <div className="table-wrap">
+        <div className="table-wrap" tabIndex={0} role="group" aria-label="Table, scrolls when wide">
           <table className="table">
             <thead><tr><th>Segment</th><th className="num">Share (%)</th><th className="num">WTP multiplier</th><th className="num">Conversion multiplier</th><th className="num">Repeat rate (%)</th><th className="num">Competitor sensitivity</th></tr></thead>
             <tbody>
@@ -143,7 +143,7 @@ export default function ModelCanvas({ pid, baseline, currency }: { pid: string; 
         <div className="small muted" style={{ marginTop: 6 }}>Total share: {pct(model.segments.reduce((a, s) => a + s.share, 0), 1)}</div>
       </Card>
       <Card title="Channels" subtitle="Monthly budget, cost per 1,000 impressions and funnel rates. Replace benchmarks with your own campaign data.">
-        <div className="table-wrap">
+        <div className="table-wrap" tabIndex={0} role="group" aria-label="Table, scrolls when wide">
           <table className="table">
             <thead><tr><th>Channel</th><th className="num">Budget</th><th className="num">CPM</th><th className="num">Engagement (%)</th><th className="num">Lead (%)</th><th className="num">Conversion (%)</th><th className="num">Commission (%)</th></tr></thead>
             <tbody>

@@ -143,7 +143,7 @@ function Block({ block: b, cite }: { block: ReportBlock; cite: (list?: string[])
       return <ul>{(b.items ?? []).map((it, i) => <li key={i}>{inline(it.text ?? "")}{cite(it.citations)}</li>)}</ul>;
     case "table":
       return (
-        <div className="table-wrap" style={{ margin: "10px 0" }}>
+        <div className="table-wrap" tabIndex={0} role="group" aria-label="Table, scrolls when wide" style={{ margin: "10px 0" }}>
           <table className="table">
             <thead><tr>{(b.columns ?? []).map((c) => <th key={c}>{c}</th>)}</tr></thead>
             <tbody>{(b.rows ?? []).map((r, i) => <tr key={i}>{r.map((v, j) => <td key={j} className={typeof v === "number" ? "num" : ""}>{String(v)}</td>)}</tr>)}</tbody>
@@ -152,7 +152,7 @@ function Block({ block: b, cite }: { block: ReportBlock; cite: (list?: string[])
       );
     case "evidence_register":
       return (
-        <div className="table-wrap" style={{ margin: "10px 0" }}>
+        <div className="table-wrap" tabIndex={0} role="group" aria-label="Table, scrolls when wide" style={{ margin: "10px 0" }}>
           <table className="table">
             <thead><tr><th>Code</th><th>Finding</th><th>Design</th><th>Strength</th><th>Source</th></tr></thead>
             <tbody>

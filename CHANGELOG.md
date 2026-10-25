@@ -12,6 +12,14 @@ versioning.
   Cloudflare Pages that forward `/api/*` and send the same security headers as the server.
 - "Container image" workflow that tests and publishes the image to GitHub Container Registry on version tags.
 
+### Changed
+
+- Data page: quality, columns and preview sit behind tabs, and older versions fold their change lists, so the page
+  shows about a sixth of the text it did.
+- Accessibility: every page passes an automated axe-core audit with no violations. Scrollable tables take keyboard
+  focus, disabled navigation items meet contrast, link and button names match their visible text, and lineage graph
+  labels are shortened at word breaks.
+
 ### Security
 
 - Vite and its helper packages updated past new advisories; GitHub Actions moved to their latest pinned releases.

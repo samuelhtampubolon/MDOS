@@ -193,7 +193,7 @@ export function MediaMix({ pid, baseline, currency }: { pid: string; baseline: S
                   deltaTone={result.optimized_value >= result.baseline_value ? "up" : "down"} />
                 <Stat label="Budget" value={money(result.total_budget, currency, { compact: true })} />
               </div>
-              <div className="table-wrap">
+              <div className="table-wrap" tabIndex={0} role="group" aria-label="Table, scrolls when wide">
                 <table className="table">
                   <thead><tr><th>Channel</th><th className="num">Current</th><th className="num">Optimized</th><th style={{ width: "40%" }}>Current (gray) and optimized (blue)</th></tr></thead>
                   <tbody>

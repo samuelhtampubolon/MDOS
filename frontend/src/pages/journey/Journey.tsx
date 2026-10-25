@@ -146,7 +146,7 @@ function JourneyMap({ journey, currency }: { journey: JourneyT; currency: string
           <h2 id="stages-title">Journey stages</h2>
           {journey.stages.length > 4 && <p>{journey.stages.length} stages. Scroll sideways to see them all.</p>}
         </div>
-        <div className="scroller" role="region" aria-labelledby="stages-title" tabIndex={0}>
+        <div className="scroller" role="group" aria-label="Journey stages, scrolls sideways" tabIndex={0}>
           {journey.stages.map((s) => <StageColumn key={s.key} stage={s} touchpoints={journey.touchpoints.filter((t) => t.stage_key === s.key)} />)}
         </div>
       </section>
@@ -225,7 +225,7 @@ function JourneySettings({ pid, journey, currency }: { pid: string; journey: Jou
       </div>
       <Touchpoints pid={pid} journey={journey} />
       <Card title="Stage continue rates" subtitle="Share of people who move on to the next stage. Template defaults are assumptions; replace them with analytics or booking data.">
-        <div className="table-wrap">
+        <div className="table-wrap" tabIndex={0} role="group" aria-label="Table, scrolls when wide">
           <table className="table">
             <thead><tr><th>Stage</th><th>Type</th><th className="num">Rate (%)</th><th>Source</th></tr></thead>
             <tbody>
@@ -261,7 +261,7 @@ function Touchpoints({ pid, journey }: { pid: string; journey: JourneyT }) {
   return (
     <Card title="Touchpoints" subtitle="Where customers meet the offer at each stage: channels, pages, people and places.">
       <div className="stack-sm">
-        <div className="table-wrap">
+        <div className="table-wrap" tabIndex={0} role="group" aria-label="Table, scrolls when wide">
           <table className="table">
             <thead><tr><th>Stage</th><th>Touchpoint</th><th>Channel</th><th /></tr></thead>
             <tbody>

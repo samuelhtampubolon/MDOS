@@ -57,7 +57,7 @@ export default function Agents({ pid }: { pid: string }) {
       )}
       {view === "registry" && registry && (
         <Card title="Executable agents" subtitle="Tools are allowlisted per agent. Agents marked with a gate stop for human approval.">
-          <div className="table-wrap">
+          <div className="table-wrap" tabIndex={0} role="group" aria-label="Table, scrolls when wide">
             <table className="table">
               <thead><tr><th>Agent</th><th>Module</th><th>What it does</th><th>Allowed tools</th><th>Covers from the specification</th></tr></thead>
               <tbody>
@@ -77,7 +77,7 @@ export default function Agents({ pid }: { pid: string }) {
       )}
       {view === "coverage" && registry && (
         <Card title="The 50 agents in the specification" subtitle="How each one is covered in this version. Deferred agents are planned for a later phase.">
-          <div className="table-wrap">
+          <div className="table-wrap" tabIndex={0} role="group" aria-label="Table, scrolls when wide">
             <table className="table">
               <thead><tr><th>Specification agent</th><th>Module</th><th>Status</th><th>Implemented by</th><th>Note</th></tr></thead>
               <tbody>
@@ -131,7 +131,7 @@ function RunLog({ pid, onOpen }: { pid: string; onOpen: (id: string) => void }) 
   const { data: runs } = useApi<AgentRun[]>([pid, "agent-runs"], `/projects/${pid}/agent-runs`);
   return (
     <Card title="Agent run log" subtitle="The latest 200 runs. Open a run to see its full output contract.">
-      <div className="table-wrap" style={{ maxHeight: 620 }}>
+      <div className="table-wrap" tabIndex={0} role="group" aria-label="Table, scrolls when wide" style={{ maxHeight: 620 }}>
         <table className="table">
           <thead><tr><th>Agent</th><th>Status</th><th>Provider</th><th className="num">Attempt</th><th>Started</th><th /></tr></thead>
           <tbody>

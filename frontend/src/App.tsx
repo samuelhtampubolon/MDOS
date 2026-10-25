@@ -52,7 +52,7 @@ function Sidebar({ pid, open, onNavigate }: { pid: string | null; open: boolean;
   const pending = approvals?.length ?? 0;
   return (
     <nav className={`sidebar ${open ? "open" : ""}`} aria-label="Main navigation" onClick={onNavigate}>
-      <Link to="/" className="brand" aria-label="Marketing Decision OS home">
+      <Link to="/" className="brand">
         <span className="brand-mark"><Icon name="journey" size={16} /></span>
         <span>
           <div className="brand-name">MDOS</div>
@@ -130,9 +130,9 @@ function ThemeToggle() {
     }
   };
   return (
-    <button className="btn ghost sm" onClick={cycle} title="Theme: system, dark, light" aria-label={`Theme: ${theme}`}>
+    <button className="btn ghost sm" onClick={cycle} title="Theme: auto, dark or light">
       <Icon name={theme === "dark" ? "moon" : "sun"} size={14} />
-      {theme === "system" ? "Auto" : theme === "dark" ? "Dark" : "Light"}
+      <span className="visually-hidden">Theme: </span>{theme === "system" ? "Auto" : theme === "dark" ? "Dark" : "Light"}
     </button>
   );
 }

@@ -96,7 +96,7 @@ export function ChartFrame({ title, subtitle, legend, table, summary, children, 
       </figcaption>
       {legend}
       {showTable ? (
-        <div className="table-wrap" style={{ marginTop: 8 }}>
+        <div className="table-wrap" tabIndex={0} role="group" aria-label="Table, scrolls when wide" style={{ marginTop: 8 }}>
           <table className="table">
             <thead>
               <tr>{table.columns.map((c) => <th key={c}>{c}</th>)}</tr>
@@ -111,7 +111,7 @@ export function ChartFrame({ title, subtitle, legend, table, summary, children, 
           </table>
         </div>
       ) : (
-        <div className="viz-plot" role="img" aria-label={summary}>
+        <div className="viz-plot" role="group" aria-label={summary}>
           {children}
           <Tooltip tip={tip} width={width} />
         </div>

@@ -152,7 +152,7 @@ function ScenarioDetail({ pid, scenario, baseline, currency }: { pid: string; sc
         <div className="grid grid-2 align-start">
           <Card><Waterfall title="Profit bridge from the baseline" subtitle="Each lever applied in order" steps={scenario.results.waterfall} currency={currency} /></Card>
           <Card title="Scenario versus baseline">
-            <div className="table-wrap">
+            <div className="table-wrap" tabIndex={0} role="group" aria-label="Table, scrolls when wide">
               <table className="table">
                 <thead><tr><th>Metric</th><th className="num">Baseline</th><th className="num">Scenario</th><th className="num">Change</th></tr></thead>
                 <tbody>
@@ -175,7 +175,7 @@ function ScenarioDetail({ pid, scenario, baseline, currency }: { pid: string; sc
       )}
       <div className="grid grid-2">
         <Card title="Channels" subtitle="Spend, reach and customers by channel">
-          <div className="table-wrap">
+          <div className="table-wrap" tabIndex={0} role="group" aria-label="Table, scrolls when wide">
             <table className="table">
               <thead><tr><th>Channel</th><th className="num">Spend</th><th className="num">Reach</th><th className="num">Customers</th><th className="num">CAC</th><th className="num">ROMI</th></tr></thead>
               <tbody>
@@ -191,7 +191,7 @@ function ScenarioDetail({ pid, scenario, baseline, currency }: { pid: string; sc
           </div>
         </Card>
         <Card title="Segments" subtitle="Who buys under this scenario">
-          <div className="table-wrap">
+          <div className="table-wrap" tabIndex={0} role="group" aria-label="Table, scrolls when wide">
             <table className="table">
               <thead><tr><th>Segment</th><th className="num">Customers</th><th className="num">Share</th><th className="num">Revenue</th><th className="num">CLV</th></tr></thead>
               <tbody>

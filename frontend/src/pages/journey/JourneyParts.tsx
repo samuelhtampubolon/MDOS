@@ -156,7 +156,7 @@ function InterventionCard({ pid, journey, iv, currency }: { pid: string; journey
         {iv.description && <div className="secondary">{iv.description}</div>}
         {steps?.steps_to !== undefined && <div className="small">Steps at this stage: {steps.steps_from ?? "current"} to {steps.steps_to}</div>}
         {levels && (
-          <div className="table-wrap">
+          <div className="table-wrap" tabIndex={0} role="group" aria-label="Table, scrolls when wide">
             <table className="table">
               <thead><tr><th>Case</th><th className="num">Uplift assumed</th><th className="num">Extra customers per month</th><th className="num">Extra revenue per month</th><th className="num">Change</th></tr></thead>
               <tbody>

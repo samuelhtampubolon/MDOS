@@ -145,17 +145,20 @@ export function LineageGraph({ data, title = "Evidence graph", subtitle, only }:
             const p = layout.pos.get(n.id);
             if (!p) return null;
             const on = !highlighted || highlighted.has(n.id);
-            const text = n.label.length > 27 ? `${n.label.slice(0, 26)}…` : n.label;
+            // Shorten at a word break, outside parentheses, so the visible text stays part of the accessible name.
+            const cut = n.label.length > 27;
+            let shown = cut ? n.label.slice(0, 26).replace(/\s+\S*$/, "") || n.label.slice(0, 26) : n.label;
+            if (cut && shown.lastIndexOf("(") > shown.lastIndexOf(")")) shown = shown.slice(0, shown.lastIndexOf("(")).trimEnd() || shown;
             return (
               <g key={n.id} className={`graph-node ${statusClass(n.status)}`} transform={`translate(${p.x} ${p.y})`} style={{ opacity: on ? 1 : 0.25, cursor: "pointer" }}
-                role="button" tabIndex={0} aria-label={`${KINDS[n.kind].label}: ${n.label}${n.status ? `, ${sentence(n.status)}` : ""}`}
+                role="button" tabIndex={0} aria-label={`${n.label}, ${KINDS[n.kind].label.toLowerCase()}${n.status ? `, ${sentence(n.status).toLowerCase()}` : ""}`}
                 onClick={() => setFocus((f) => (f === n.id ? null : n.id))}
                 onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && setFocus((f) => (f === n.id ? null : n.id))}
                 onPointerMove={(e) => show({ ...relative(e), title: n.label,
                   rows: [{ value: KINDS[n.kind].label, label: [n.status && sentence(n.status), n.strength && `${n.strength} evidence`, n.origin && sentence(n.origin)].filter(Boolean).join(" · ") }] })}
                 onPointerLeave={hide}>
                 <rect width={NODE_W} height={NODE_H} rx={6} strokeWidth={focus === n.id ? 2.5 : 1.5} />
-                <text x={8} y={17}>{text}</text>
+                <text x={8} y={17}>{shown}{cut && <tspan aria-hidden> …</tspan>}</text>
               </g>
             );
           })}

@@ -112,7 +112,7 @@ function EvidencePicker({ evidence, value, onChange }: { evidence: Evidence[]; v
   return (
     <div className="field">
       <label>Supporting evidence</label>
-      <div className="table-wrap" style={{ maxHeight: 200 }}>
+      <div className="table-wrap" tabIndex={0} role="group" aria-label="Table, scrolls when wide" style={{ maxHeight: 200 }}>
         {evidence.map((e) => (
           <label key={e.id} className="list-item" style={{ padding: "4px 6px", cursor: "pointer" }}>
             <input type="checkbox" checked={value.includes(e.id)} onChange={(ev) => onChange(ev.target.checked ? [...value, e.id] : value.filter((x) => x !== e.id))} />
@@ -268,7 +268,7 @@ function EvidenceRegister({ pid, evidence, onOpen }: { pid: string; evidence: Ev
           </select>
         </>}>
         {!evidence.length ? <Empty title="No evidence yet">Save evidence candidates from the Analysis studio, or add an external source below.</Empty> : (
-          <div className="table-wrap" style={{ maxHeight: 560 }}>
+          <div className="table-wrap" tabIndex={0} role="group" aria-label="Table, scrolls when wide" style={{ maxHeight: 560 }}>
             <table className="table">
               <thead><tr><th>Code</th><th>Finding</th><th>Origin</th><th>Design</th><th>Strength</th><th className="num">n</th><th className="num">p</th><th className="num">Effect</th></tr></thead>
               <tbody>

@@ -3,7 +3,7 @@ import { api, errorMessage } from "../../api/client";
 import { useApi, useApprovals, useDataset, useDatasets, useProjectMutation } from "../../api/hooks";
 import type { ColumnProfile, Dataset, DatasetVersion, Json, QualityIssue } from "../../api/types";
 import { AGENT_LABELS, ApprovalCard, StartWorkflow } from "../../components/domain";
-import { Badge, Callout, Card, Empty, Icon, OriginBadge, Stat, StatusBadge, useToast } from "../../components/ui";
+import { Badge, Callout, Card, Empty, Icon, OriginBadge, Stat, StatusBadge, Tabs, useToast } from "../../components/ui";
 import { dateTime, num, pct, sentence } from "../../lib/format";
 
 const KINDS: [string, string][] = [
@@ -119,6 +119,7 @@ function UploadCard({ pid, onUploaded }: { pid: string; onUploaded: (id: string)
 function DatasetDetail({ pid, did, onDeleted }: { pid: string; did: string; onDeleted: () => void }) {
   const { data: dataset } = useDataset(pid, did);
   const [versionId, setVersionId] = useState<string | undefined>();
+  const [view, setView] = useState<"quality" | "columns" | "preview">("quality");
   const toast = useToast();
   const remove = useProjectMutation(pid, () => api.del(`/projects/${pid}/datasets/${did}`));
   const scales = useProjectMutation(pid, () => api.post<DatasetVersion>(`/projects/${pid}/datasets/${did}/compute-scales`));
@@ -151,9 +152,14 @@ function DatasetDetail({ pid, did, onDeleted }: { pid: string; did: string; onDe
         </>}>
         <VersionLineage pid={pid} dataset={dataset} versions={versions} currentId={current?.id} shownId={shown.id} onShow={setVersionId} />
       </Card>
-      <QualityPanel pid={pid} dataset={dataset} version={shown} isCurrent={shown.id === current?.id} />
-      <ColumnDictionary columns={shown.columns} />
-      <PreviewGrid pid={pid} did={did} vid={shown.id} />
+      <Tabs value={view} onChange={setView} tabs={[
+        { key: "quality", label: "Quality" },
+        { key: "columns", label: `Columns (${shown.columns.length})` },
+        { key: "preview", label: "Preview" },
+      ]} />
+      {view === "quality" && <QualityPanel pid={pid} dataset={dataset} version={shown} isCurrent={shown.id === current?.id} />}
+      {view === "columns" && <ColumnDictionary columns={shown.columns} />}
+      {view === "preview" && <PreviewGrid pid={pid} did={did} vid={shown.id} />}
     </div>
   );
 }
@@ -180,10 +186,12 @@ function VersionLineage({ pid, dataset, versions, currentId, shownId, onShow }: 
                   <Icon name="undo" size={12} />Restore</button>
               )}
             </div>
-            <ul className="small secondary" style={{ margin: 0, paddingLeft: 18 }}>
-              {v.operations.slice(0, 8).map((o, i) => <li key={i}>{describeOperation(o)}</li>)}
-              {v.operations.length > 8 && <li>and {v.operations.length - 8} more</li>}
-            </ul>
+            {v.id === shownId ? <OperationList operations={v.operations} /> : v.operations.length > 0 && (
+              <details className="small secondary">
+                <summary>{v.operations.length === 1 ? "1 change" : `${v.operations.length} changes`}</summary>
+                <OperationList operations={v.operations} />
+              </details>
+            )}
             <div className="small muted">
               {v.parent_id ? `Created by ${actor(v.created_by)}` : "Original upload"}
               {v.approved_by ? `, approved by ${actor(v.approved_by)}` : ""}
@@ -193,6 +201,15 @@ function VersionLineage({ pid, dataset, versions, currentId, shownId, onShow }: 
         </div>
       ))}
     </div>
+  );
+}
+
+function OperationList({ operations }: { operations: DatasetVersion["operations"] }) {
+  return (
+    <ul className="small secondary" style={{ margin: 0, paddingLeft: 18 }}>
+      {operations.slice(0, 8).map((o, i) => <li key={i}>{describeOperation(o)}</li>)}
+      {operations.length > 8 && <li>and {operations.length - 8} more</li>}
+    </ul>
   );
 }
 
@@ -230,7 +247,7 @@ function QualityPanel({ pid, dataset, version, isCurrent }: { pid: string; datas
         )}
         {plan && !plan.approval_id && <Callout tone="good">No automatic fixes are needed. Review the remaining notes below.</Callout>}
         {!issues.length ? <Callout tone="good">No quality issues found.</Callout> : (
-          <div className="table-wrap">
+          <div className="table-wrap" tabIndex={0} role="group" aria-label="Table, scrolls when wide">
             <table className="table">
               <thead><tr><th>Severity</th><th>Issue</th><th>Suggested action</th><th className="num">Rows</th><th>Automatic fix</th></tr></thead>
               <tbody>
@@ -258,7 +275,7 @@ function ColumnDictionary({ columns }: { columns: ColumnProfile[] }) {
   return (
     <Card title="Columns" subtitle={`${columns.length} columns with inferred types and summaries`}
       actions={<input className="input sm" placeholder="Filter" aria-label="Filter columns" value={filter} onChange={(e) => setFilter(e.target.value)} />}>
-      <div className="table-wrap" style={{ maxHeight: 380 }}>
+      <div className="table-wrap" tabIndex={0} role="group" aria-label="Table, scrolls when wide" style={{ maxHeight: 380 }}>
         <table className="table">
           <thead><tr><th>Column</th><th>Type</th><th className="num">Missing</th><th className="num">Unique</th><th>Summary</th></tr></thead>
           <tbody>
@@ -288,7 +305,7 @@ function PreviewGrid({ pid, did, vid }: { pid: string; did: string; vid: string 
   if (!data) return null;
   return (
     <Card title="Preview" subtitle={`First ${data.rows.length} of ${num(data.n_rows)} rows`}>
-      <div className="table-wrap" style={{ maxHeight: 360 }}>
+      <div className="table-wrap" tabIndex={0} role="group" aria-label="Table, scrolls when wide" style={{ maxHeight: 360 }}>
         <table className="table">
           <thead><tr>{data.columns.map((c) => <th key={c}>{c}</th>)}</tr></thead>
           <tbody>

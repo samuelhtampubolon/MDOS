@@ -216,7 +216,7 @@ function ProjectSettings({ pid }: { pid: string }) {
       </div>
       <Card title="Audit log" subtitle="Every change by people and agents, newest first."
         actions={<input className="input sm" placeholder="Filter" aria-label="Filter audit log" value={filter} onChange={(e) => setFilter(e.target.value)} />}>
-        <div className="table-wrap" style={{ maxHeight: 520 }}>
+        <div className="table-wrap" tabIndex={0} role="group" aria-label="Table, scrolls when wide" style={{ maxHeight: 520 }}>
           <table className="table">
             <thead><tr><th>When</th><th>Who</th><th>Action</th><th>Item</th></tr></thead>
             <tbody>

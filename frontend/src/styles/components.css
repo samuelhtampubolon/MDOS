@@ -108,7 +108,7 @@
 }
 
 .nav-item.disabled {
-  opacity: 0.55;
+  color: var(--text-muted);
 }
 
 .sidebar-footer {

@@ -20,7 +20,7 @@ export default function Approvals({ pid }: { pid: string }) {
         )
       ) : (
         <Card>
-          <div className="table-wrap">
+          <div className="table-wrap" tabIndex={0} role="group" aria-label="Table, scrolls when wide">
             <table className="table">
               <thead><tr><th>Request</th><th>Requested by</th><th>Requested</th><th>Status</th><th>Decided</th><th>Rationale</th></tr></thead>
               <tbody>

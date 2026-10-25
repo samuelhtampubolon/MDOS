@@ -78,7 +78,7 @@ export default function Plan({ pid }: { pid: string }) {
             <dt>Frame</dt><dd>{list(sampling.sampling_frame).join("; ")}</dd>
           </dl>
           {Array.isArray(sampling.quotas) && sampling.quotas.length > 0 && (
-            <div className="table-wrap" style={{ marginTop: 10 }}>
+            <div className="table-wrap" tabIndex={0} role="group" aria-label="Table, scrolls when wide" style={{ marginTop: 10 }}>
               <table className="table">
                 <thead><tr><th>Quota</th><th className="num">Share</th><th className="num">n</th></tr></thead>
                 <tbody>{(sampling.quotas as { group: string; share: number; n: number }[]).map((q) => (
@@ -269,7 +269,7 @@ function VariableDictionary({ pid }: { pid: string }) {
   return (
     <Card title="Variable dictionary" subtitle={`${data.variables.length} variables. Names match the questionnaire and the uploaded data.`}
       actions={<input className="input sm" placeholder="Filter" value={filter} onChange={(e) => setFilter(e.target.value)} aria-label="Filter variables" />}>
-      <div className="table-wrap" style={{ maxHeight: 420 }}>
+      <div className="table-wrap" tabIndex={0} role="group" aria-label="Table, scrolls when wide" style={{ maxHeight: 420 }}>
         <table className="table">
           <thead><tr><th>Variable</th><th>Label</th><th>Type</th><th>Role</th><th>Construct</th><th>Scale</th></tr></thead>
           <tbody>
