@@ -1,6 +1,8 @@
 /* Thin fetch wrapper: cookie session, CSRF header, JSON, typed errors and file downloads.
    The session lives in an HttpOnly cookie that page scripts cannot read, so the app never stores a token. */
 
+import { openInNewTab, send } from "./transport";
+
 export class ApiError extends Error {
   status: number;
   code: string;
@@ -36,7 +38,7 @@ async function request<T>(method: string, path: string, body?: unknown, isForm =
       payload = JSON.stringify(body);
     }
   }
-  const res = await fetch(`${BASE}${path}`, { method, headers, body: payload, credentials: "same-origin" });
+  const res = await send(`${BASE}${path}`, { method, headers, body: payload, credentials: "same-origin" });
   if (res.status === 401 && !path.startsWith("/auth/")) unauthorizedHandler?.();
   if (res.status === 204) return undefined as T;
   const text = await res.text();
@@ -68,7 +70,7 @@ export const api = {
 
 /** Download a file from an authenticated endpoint (the session cookie authenticates the request). */
 export async function download(path: string, fallbackName: string): Promise<void> {
-  const res = await fetch(`${BASE}${path}`, { headers: CSRF_HEADERS, credentials: "same-origin" });
+  const res = await send(`${BASE}${path}`, { headers: CSRF_HEADERS, credentials: "same-origin" });
   if (!res.ok) throw new ApiError(res.status, "download_failed", "Download failed");
   const blob = await res.blob();
   const disposition = res.headers.get("Content-Disposition") || "";
@@ -85,7 +87,7 @@ export async function download(path: string, fallbackName: string): Promise<void
 
 /** Open an HTML export in a new tab. The server sends it sandboxed (no scripts); the tab cannot reach this page. */
 export function openHtml(path: string): void {
-  window.open(`${BASE}${path}`, "_blank", "noopener,noreferrer");
+  void openInNewTab(`${BASE}${path}`);
 }
 
 export function errorMessage(err: unknown): string {

@@ -122,6 +122,7 @@ libpq (PostgreSQL License) and OpenSSL (Apache-2.0). The desktop app uses SQLite
 | PyInstaller bootloader | Starts the desktop app | GPL-2.0 with the bootloader exception, which allows distributing the result under any license |
 | `python:3.11-slim` (Debian) | Docker runtime image | Each Debian package under its own license |
 | `node:24-alpine` | Used only to build the web interface; not in the final image | MIT (Node.js) and Alpine package licenses |
+| Pyodide 314.0.7 (CPython 3.14 for WebAssembly) | Live demo on GitHub Pages, served unmodified with the compiled packages it ships (numpy, pandas, SciPy, statsmodels, scikit-learn, SQLAlchemy, FastAPI and their dependencies, each under the license listed above or in its wheel) | MPL-2.0 (Pyodide), PSF-2.0 (CPython) |
 
 To regenerate this file after changing dependencies, list the licenses from the installed package metadata
 (`importlib.metadata` for Python, each `package.json` for npm) and update the tables.

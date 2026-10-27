@@ -13,6 +13,10 @@ versioning.
 - "Container image" workflow that tests and publishes the image to GitHub Container Registry on version tags.
 - Project page on GitHub Pages (`site/`, "Project page" workflow): static, with no scripts and nothing loaded from
   other sites.
+- Live demo on GitHub Pages (`/demo/`): the full app, its FastAPI server included, runs in the visitor's browser with
+  Pyodide. Projects are kept in the browser and can be reset; nothing is sent anywhere. `scripts/build_demo.py`
+  assembles it from hash-checked downloads, and a Playwright suite (`frontend/e2e-demo/`) tests it before each
+  publish.
 
 ### Changed
 

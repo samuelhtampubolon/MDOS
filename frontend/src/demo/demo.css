@@ -1,0 +1,84 @@
+/* Live demo only: the start-up panel and the demo bar. Quiet Ledger tokens, no shadows or gradients. */
+
+.demo-boot {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: var(--page);
+}
+
+.demo-boot-card {
+  width: min(480px, 100%);
+  padding: 28px;
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.demo-boot-card h1 {
+  margin: 0 0 8px;
+  font-size: var(--text-lg);
+}
+
+.demo-boot-lead {
+  margin: 0 0 20px;
+  color: var(--text-secondary);
+}
+
+.demo-boot-bar {
+  height: 6px;
+  background: var(--surface-3);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.demo-boot-bar span {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: var(--accent);
+  transition: width var(--dur-enter) var(--ease);
+}
+
+.demo-boot-detail {
+  margin: 10px 0 0;
+  font-size: var(--text-sm);
+}
+
+.demo-boot-note {
+  margin: 16px 0 0;
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.demo-boot.failed .demo-boot-bar span {
+  background: var(--critical);
+}
+
+.demo-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  padding: 8px 24px;
+  font-size: var(--text-sm);
+  background: var(--accent-soft);
+  border-bottom: 1px solid var(--border);
+}
+
+.demo-bar .spacer {
+  flex: 1;
+}
+
+@media (max-width: 720px) {
+  .demo-bar {
+    padding: 8px 16px;
+  }
+
+  .demo-bar > svg {
+    display: none;
+  }
+}

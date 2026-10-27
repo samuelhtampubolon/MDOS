@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useApprovals, useProject, useProjects } from "./api/hooks";
 import { AuthProvider, useAuth } from "./auth";
 import { ApiError, errorMessage } from "./api/client";
+import { demo } from "./api/transport";
 import { Callout, Icon, Spinner } from "./components/ui";
 import { COPYRIGHT } from "./lib/about";
 import Agents from "./pages/Agents";
@@ -86,7 +87,7 @@ function Sidebar({ pid, open, onNavigate }: { pid: string | null; open: boolean;
       <div className="sidebar-footer">
         <div className="row" style={{ gap: 6 }}>
           {mode === "local" && <Icon name="lock" size={12} />}
-          {mode === "local" ? "Desktop: this computer only" : user?.organization}
+          {demo ? "Live demo: this browser only" : mode === "local" ? "Desktop: this computer only" : user?.organization}
         </div>
         {mode === "cloud" && (
           <button className="btn ghost sm" style={{ marginTop: 6, paddingLeft: 0 }} onClick={logout}>Sign out {user?.name}</button>
@@ -137,6 +138,21 @@ function ThemeToggle() {
   );
 }
 
+/** Live demo only: says where the data lives and offers a fresh start. */
+function DemoBar({ reset }: { reset: () => Promise<void> }) {
+  return (
+    <aside className="demo-bar" aria-label="About this demo">
+      <Icon name="info" size={14} />
+      <span><strong>Live demo.</strong> The full app runs in your browser; your projects stay on this device.</span>
+      <span className="spacer" />
+      <button className="btn ghost sm" onClick={() => window.confirm("Delete every demo project in this browser and start again?") && void reset()}>
+        <Icon name="undo" size={12} />Reset demo
+      </button>
+      <a className="btn ghost sm" href="../" title="Download MDOS for Windows, macOS or Linux">Get the desktop app</a>
+    </aside>
+  );
+}
+
 function Shell({ children }: { children: ReactNode }) {
   const location = useLocation();
   const match = /^\/p\/([^/]+)/.exec(location.pathname);
@@ -150,6 +166,7 @@ function Shell({ children }: { children: ReactNode }) {
       <Sidebar pid={pid} open={open} onNavigate={() => setOpen(false)} />
       {open && <div className="scrim" aria-hidden onClick={() => setOpen(false)} />}
       <div className="main">
+        {demo && <DemoBar reset={demo.reset} />}
         <header className="topbar">
           <button className="btn ghost icon menu-button" aria-label="Open menu" onClick={() => setOpen(true)}><Icon name="menu" /></button>
           <ProjectSwitcher pid={match ? match[1] : null} />

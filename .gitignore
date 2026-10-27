@@ -14,8 +14,11 @@ dist/
 # Node
 node_modules/
 frontend/dist/
+frontend/dist-demo/
 frontend/test-results/
 frontend/playwright-report/
+frontend/playwright-report-demo/
+frontend/test-results-demo/
 *.tsbuildinfo
 
 # Built frontend copied into the backend package
@@ -41,3 +44,4 @@ backend/dev-migrations.db
 .vercel/
 .netlify/
 .wrangler/
+.cache/

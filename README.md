@@ -19,7 +19,7 @@
   <a href="#5-claude-drafting-optional"><img alt="Claude" src="https://img.shields.io/badge/Claude-optional-1c5cab"/></a>
   <a href="SECURITY.md"><img alt="Security policy" src="https://img.shields.io/badge/Security-policy-1c5cab"/></a>
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-1c5cab"/></a>
-  <a href="https://samuelhtampubolon.github.io/MDOS/"><img alt="Project page" src="https://img.shields.io/badge/Project%20page-github.io-1c5cab"/></a>
+  <a href="https://samuelhtampubolon.github.io/MDOS/demo/"><img alt="Live demo" src="https://img.shields.io/badge/Live%20demo-in%20your%20browser-1c5cab"/></a>
 </div>
 
 <p align="center">
@@ -48,7 +48,9 @@ such as Indonesia. Agents do the legwork and draft the wording; **numbers always
 shows its assumption checks, and **people approve** every insight, verdict, decision, cleaning step and experiment.
 
 It runs two ways: as a **desktop app** that keeps everything on your computer, or as a **cloud app** for teams.
-The project page is at [samuelhtampubolon.github.io/MDOS](https://samuelhtampubolon.github.io/MDOS/).
+**Try it now:** the [live demo](https://samuelhtampubolon.github.io/MDOS/demo/) is the full app running in your browser
+(no sign-up, no server; your projects stay on your device). The project page is at
+[samuelhtampubolon.github.io/MDOS](https://samuelhtampubolon.github.io/MDOS/).
 
 > **Status:** MVP, version 0.1.0. The Lake Toba demo uses synthetic data. Replace the labeled placeholder
 > assumptions before making real decisions.
@@ -179,7 +181,7 @@ frontend/           React and TypeScript web app (built into backend/mdos/static
   e2e/              Playwright end-to-end tests against the real server
 packaging/          desktop executable build (PyInstaller)
 scripts/            desktop build, sample data generator, secret scan
-site/               the project page published to GitHub Pages
+site/               the project page published to GitHub Pages (the live demo is built from frontend/ and backend/)
 docs/               synthesis, architecture, backlog, design system, security, deployment and methods
 samples/            synthetic Lake Toba data for trying the app
 ```

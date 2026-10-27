@@ -13,6 +13,10 @@ The front door forwards the API instead of calling it from another site, so the 
 session cookie keeps its `SameSite=Strict` and `__Host-` protections. The front-door hosts send the same security
 headers as the MDOS server (a test keeps them identical).
 
+To let people try MDOS without any server, use the live demo on GitHub Pages instead: the whole app runs in the
+visitor's browser and keeps projects there (see the "Project page" workflow). It suits trying MDOS, not team work,
+because each browser has its own data.
+
 ## 1. Database: Supabase Free
 
 1. Create a project at supabase.com and choose a strong database password.

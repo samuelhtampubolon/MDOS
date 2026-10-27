@@ -1,7 +1,7 @@
 # Shortcuts for common tasks. Windows users can run the commands inside each target directly.
 PY ?= python
 
-.PHONY: install frontend run dev-api dev-web test lint e2e desktop docker migration sample-data
+.PHONY: install frontend run dev-api dev-web test lint e2e demo desktop docker migration sample-data
 
 install:          ## install backend (editable, with dev tools) and frontend dependencies
 	cd backend && $(PY) -m pip install -e ".[dev]"
@@ -30,6 +30,9 @@ lint:             ## ruff, migration drift check and the TypeScript typecheck
 
 e2e: frontend     ## end-to-end tests in Chromium against the real server
 	cd frontend && npx playwright test
+
+demo:             ## build the live demo (the app running in the browser) into frontend/dist-demo and test it
+	cd frontend && npm run build:demo && $(PY) ../scripts/build_demo.py && npx playwright test -c playwright.demo.config.ts
 
 desktop:          ## build the desktop executable for this operating system into dist/
 	$(PY) scripts/build_desktop.py

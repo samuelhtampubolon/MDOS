@@ -54,7 +54,14 @@ frontend/src/
   pages/                            one folder or file per module page
   components/  components/charts/   shared UI and hand-built SVG charts
   api/                              typed client, React Query hooks, response types
+  demo/                             live demo only: the in-browser engine (Pyodide worker) and its transport
+site/                               the GitHub Pages project page; the live demo is published under demo/
 ```
+
+* Live demo: `npm run build:demo` builds the app with `src/demo/transport.ts` in place of `src/api/transport.ts`, and
+  `scripts/build_demo.py` adds Pyodide, pinned wheels and `backend/mdos` (served by `mdos/browser.py`). Server code
+  must therefore run without threads in `EXECUTION_MODE=sync`, with no new compiled dependency that Pyodide lacks.
+  `npx playwright test -c playwright.demo.config.ts` tests it.
 
 * New analysis method: engine function with checks and evidence candidates, registry entry with a parameter schema,
   validation test against a reference library or formula, a parameter form in `AnalysisStudio.tsx`, a chart mapping in
@@ -83,6 +90,7 @@ make install                      # backend (editable, dev extras) and frontend 
 make test                         # backend tests and frontend unit tests
 make lint                         # ruff, migration drift check, TypeScript typecheck
 make e2e                          # Playwright against the real server
+make demo                         # build and test the live demo (GitHub Pages)
 cd backend && TEST_DATABASE_URL=postgresql+psycopg://user:pass@localhost:5432/mdos_test pytest   # PostgreSQL
 make migration m="describe change"   # after changing models
 ```
