@@ -329,3 +329,19 @@ def test_hosted_postgres_urls_use_the_bundled_driver():
     assert normalize_database_url("postgres://u:p@h/db") == "postgresql+psycopg://u:p@h/db"
     assert normalize_database_url("postgresql+psycopg://u:p@h/db") == "postgresql+psycopg://u:p@h/db"
     assert normalize_database_url("sqlite:///x.db") == "sqlite:///x.db"
+
+
+def test_static_files_are_served_only_from_the_build(make_client, tmp_path, monkeypatch):
+    import mdos.main
+
+    static = tmp_path / "static"
+    (static / "assets").mkdir(parents=True)
+    (static / "index.html").write_text("<!doctype html><title>MDOS</title>")
+    (static / "assets" / "app.js").write_text("console.log(1)")
+    (tmp_path / "secret.txt").write_text("do not serve")
+    monkeypatch.setattr(mdos.main, "STATIC_DIR", static)
+    client = make_client("local")
+    assert client.get("/assets/app.js").text == "console.log(1)"
+    assert "<title>MDOS</title>" in client.get("/p/123/research").text  # client-side route falls back to the app
+    for probe in ("/../secret.txt", "/%2e%2e/secret.txt", "/assets/..%2f..%2fsecret.txt", "/..%5csecret.txt"):
+        assert "do not serve" not in client.get(probe).text

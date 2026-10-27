@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import time
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -110,14 +111,27 @@ def create_app(*, run_migrations: bool = True) -> FastAPI:
 def _mount_spa(app: FastAPI) -> None:
     """Serve the built React app, falling back to index.html for client-side routes."""
     index = STATIC_DIR / "index.html"
+    # The request path is only ever a key into this map of built files; it never becomes a file system path.
+    assets: dict[str, Path] = {}
+    scanned = [0.0]
+
+    def built_files() -> dict[str, Path]:
+        root = STATIC_DIR.resolve()
+        if not root.is_dir():
+            return {}
+        return {p.relative_to(root).as_posix(): p for p in root.rglob("*") if p.is_file() and not p.is_symlink()}
 
     @app.get("/{full_path:path}", include_in_schema=False)
     def spa(full_path: str):
         if full_path.startswith("api/"):
             return JSONResponse({"error": {"code": "not_found", "message": "Not found."}}, status_code=404)
-        candidate = (STATIC_DIR / full_path).resolve()
-        if full_path and STATIC_DIR.resolve() in candidate.parents and candidate.is_file():
-            return FileResponse(candidate)
+        if full_path not in assets and time.monotonic() - scanned[0] > 2:
+            assets.clear()
+            assets.update(built_files())  # pick up a rebuilt frontend without a restart
+            scanned[0] = time.monotonic()
+        asset = assets.get(full_path) if full_path else None
+        if asset is not None:
+            return FileResponse(asset)
         if index.exists():
             return FileResponse(index)
         return JSONResponse(

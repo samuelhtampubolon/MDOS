@@ -22,6 +22,11 @@ versioning.
   focus, disabled navigation items meet contrast, link and button names match their visible text, and lineage graph
   labels are shortened at word breaks.
 
+### Security
+
+- The web app's files are served from a list of built files; the request path is never used as a file path
+  (found by CodeQL, with a test for traversal attempts).
+
 ### Removed
 
 - The interactive API docs page, which loaded Swagger UI scripts from a CDN. `ENABLE_API_DOCS=true` now serves only
