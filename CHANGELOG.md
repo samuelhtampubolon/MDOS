@@ -27,6 +27,13 @@ versioning.
 - The web app's files are served from a list of built files; the request path is never used as a file path
   (found by CodeQL, with a test for traversal attempts).
 
+### Fixed
+
+- The "Project page" workflow no longer fails while GitHub Pages is off: it builds and checks the page, then shows
+  a warning with the setting to change instead of a failed deploy.
+- The "CodeQL Advanced" workflow runs only on demand. CodeQL's default setup already scans every push, and GitHub
+  rejected the advanced results while it was on, so every automatic run failed.
+
 ### Removed
 
 - The interactive API docs page, which loaded Swagger UI scripts from a CDN. `ENABLE_API_DOCS=true` now serves only
