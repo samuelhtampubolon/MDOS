@@ -11,13 +11,11 @@
 #
 name: "CodeQL Advanced"
 
+# Manual only. CodeQL's default setup (Settings, Code security) already scans every push and pull request, and
+# GitHub rejects results from this advanced workflow while the default setup is on, so automatic runs only failed.
+# To use this workflow instead, switch the default setup off first, then add push and pull_request triggers back.
 on:
-  push:
-    branches: [ "claude/mdos-analysis-he0sf5" ]
-  pull_request:
-    branches: [ "claude/mdos-analysis-he0sf5" ]
-  schedule:
-    - cron: '39 11 * * 3'
+  workflow_dispatch:
 
 jobs:
   analyze:
