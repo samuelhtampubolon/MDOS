@@ -5,7 +5,7 @@ name: Project page
 on:
   workflow_dispatch:
   push:
-    branches: [claude/mdos-analysis-he0sf5]
+    branches: [main, claude/mdos-analysis-he0sf5]
     paths: ["site/**", "docs/assets/**", ".github/workflows/pages.yml"]
 
 permissions:

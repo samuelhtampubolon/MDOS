@@ -10,7 +10,7 @@
 </div>
 <hr>
 <div align="center" style="line-height: 1;">
-  <a href="https://github.com/samuelhtampubolon/MDOS/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/samuelhtampubolon/MDOS/actions/workflows/ci.yml/badge.svg?branch=claude/mdos-analysis-he0sf5"/></a>
+  <a href="https://github.com/samuelhtampubolon/MDOS/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/samuelhtampubolon/MDOS/actions/workflows/ci.yml/badge.svg?branch=main"/></a>
   <a href="#4-quick-start"><img alt="Desktop app" src="https://img.shields.io/badge/Desktop-Windows%20%7C%20macOS%20%7C%20Linux-1c5cab?logoColor=white"/></a>
   <a href="#4-quick-start"><img alt="Cloud" src="https://img.shields.io/badge/Cloud-Docker%20%2B%20PostgreSQL-1c5cab?logo=docker&logoColor=white"/></a>
   <br>
