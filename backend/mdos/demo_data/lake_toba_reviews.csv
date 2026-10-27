@@ -1,0 +1,241 @@
+review_id,date,platform,visitor_type,language,rating,review_text
+V0001,2026-08-03,Google Maps,domestic,id,2,Proses pesan tiket lama dan membingungkan. Website resminya kurang informasi dan jarang update.
+V0002,2025-11-23,TripAdvisor,international,en,5,We compared several tour packages and this one looked cheaper.
+V0003,2026-02-20,TripAdvisor,domestic,id,4,"Proses pesan tiket lama dan membingungkan. Pemandunya ramah dan menjelaskan sejarah dengan menarik. Info jadwal di internet minim sekali, susah cari informasi."
+V0004,2026-02-16,Google Maps,domestic,id,4,"Ingin kembali lagi dan menginap lebih lama. Pertunjukan tortor dan tenun ulos luar biasa, sangat berkesan. Rekomendasi banget buat teman-teman."
+V0005,2026-02-21,Google Maps,international,en,5,Our guide told wonderful stories about the history of the village.
+V0006,2026-03-03,Google Maps,domestic,id,3,"Perjalanan dari Medan macet dan jalannya rusak, lima jam baru sampai. Pertunjukan tortor dan tenun ulos luar biasa, sangat berkesan."
+V0007,2026-02-25,Google Maps,international,en,4,The ferry schedule was unclear and we waited two hours at the port. The online payment page failed twice before we could book. We compared several tour packages and this one looked cheaper.
+V0008,2026-02-03,Instagram,international,en,4,"Our guide told wonderful stories about the history of the village. The road from Medan was congested and damaged, it took five hours."
+V0009,2025-12-25,TripAdvisor,domestic,id,5,"Lihat postingan di Instagram, akhirnya ke sini juga. Spot fotonya keren banget, cocok buat Instagram."
+V0010,2025-10-22,TikTok,international,en,3,Very little information on the official website. The ferry schedule was unclear and we waited two hours at the port.
+V0011,2026-06-22,Google Maps,international,en,3,The online payment page failed twice before we could book.
+V0012,2025-11-23,TikTok,domestic,id,2,"Perjalanan dari Medan macet dan jalannya rusak, lima jam baru sampai. Foto-foto di sini bagus sekali, langsung upload. Awalnya membosankan, tidak ada yang menjelaskan apa-apa."
+V0013,2026-02-07,Instagram,domestic,id,5,"Pasti balik lagi tahun depan. Website resminya kurang informasi dan jarang update. Foto-foto di sini bagus sekali, langsung upload."
+V0014,2026-05-23,TikTok,international,en,5,"The road from Medan was congested and damaged, it took five hours. The views are perfect for Instagram. We first saw Lake Toba on TikTok and knew we had to go."
+V0015,2026-07-14,Google Maps,domestic,id,3,"Awalnya membosankan, tidak ada yang menjelaskan apa-apa. Info jadwal di internet minim sekali, susah cari informasi. Pemesanan online error terus, akhirnya bayar di tempat."
+V0016,2026-08-11,Google Maps,domestic,id,4,"Awalnya membosankan, tidak ada yang menjelaskan apa-apa."
+V0017,2026-07-27,Google Maps,international,en,3,Our guide told wonderful stories about the history of the village. The online payment page failed twice before we could book. The ferry schedule was unclear and we waited two hours at the port.
+V0018,2025-12-12,Google Maps,international,en,3,"The Batak cultural show and the ulos weaving were amazing. There was no way to book online, we had to call."
+V0019,2026-01-03,TripAdvisor,domestic,id,4,"Pertunjukan tortor dan tenun ulos luar biasa, sangat berkesan. Pemesanan online error terus, akhirnya bayar di tempat. Spot fotonya keren banget, cocok buat Instagram."
+V0020,2026-05-10,TikTok,international,en,5,"Great spot for photos, our pictures got so many likes. The Batak cultural show and the ulos weaving were amazing."
+V0021,2026-06-14,Google Maps,international,en,3,"The first hour was boring, nobody explained what we were looking at. The ferry schedule was unclear and we waited two hours at the port."
+V0022,2026-01-17,Google Maps,international,en,3,"We compared several tour packages and this one looked cheaper. The road from Medan was congested and damaged, it took five hours."
+V0023,2026-08-15,Google Maps,international,en,2,"The road from Medan was congested and damaged, it took five hours."
+V0024,2026-02-20,Google Maps,domestic,id,1,"Booking ribet, harus transfer manual lalu konfirmasi lewat WhatsApp. Perjalanan dari Medan macet dan jalannya rusak, lima jam baru sampai."
+V0025,2026-06-10,Instagram,international,en,4,The views are perfect for Instagram.
+V0026,2026-02-26,Google Maps,international,en,3,"The road from Medan was congested and damaged, it took five hours."
+V0027,2026-04-03,Instagram,domestic,id,2,Proses pesan tiket lama dan membingungkan.
+V0028,2025-10-14,Google Maps,domestic,id,4,"Pemesanan online error terus, akhirnya bayar di tempat. Pertunjukan tortor dan tenun ulos luar biasa, sangat berkesan."
+V0029,2026-06-24,Google Maps,domestic,id,4,"Pemesanan online error terus, akhirnya bayar di tempat. Spot fotonya keren banget, cocok buat Instagram."
+V0030,2026-04-01,TikTok,domestic,id,4,"Pertunjukan tortor dan tenun ulos luar biasa, sangat berkesan. Booking ribet, harus transfer manual lalu konfirmasi lewat WhatsApp."
+V0031,2025-11-25,TripAdvisor,domestic,id,4,"Booking ribet, harus transfer manual lalu konfirmasi lewat WhatsApp. Spot fotonya keren banget, cocok buat Instagram. Pertunjukan tortor dan tenun ulos luar biasa, sangat berkesan."
+V0032,2026-06-09,TripAdvisor,international,en,3,Found this place through an Instagram reel. The Batak cultural show and the ulos weaving were amazing. The ferry schedule was unclear and we waited two hours at the port.
+V0033,2026-03-07,Instagram,domestic,id,5,"Pertunjukan tortor dan tenun ulos luar biasa, sangat berkesan. Lihat postingan di Instagram, akhirnya ke sini juga."
+V0034,2026-04-23,TikTok,domestic,en,3,"Great spot for photos, our pictures got so many likes. Information online about opening hours and schedules was hard to find. The road from Medan was congested and damaged, it took five hours."
+V0035,2026-08-06,TripAdvisor,international,en,4,The ferry schedule was unclear and we waited two hours at the port. Our guide told wonderful stories about the history of the village.
+V0036,2026-01-27,TripAdvisor,domestic,en,2,"The road from Medan was congested and damaged, it took five hours. The first hour was boring, nobody explained what we were looking at."
+V0037,2026-06-06,Google Maps,domestic,id,4,"Info jadwal di internet minim sekali, susah cari informasi. Foto-foto di sini bagus sekali, langsung upload."
+V0038,2026-05-19,Instagram,domestic,id,3,"Website resminya kurang informasi dan jarang update. Pemesanan online error terus, akhirnya bayar di tempat."
+V0039,2025-12-22,Google Maps,domestic,id,5,Ingin kembali lagi dan menginap lebih lama.
+V0040,2026-05-05,Instagram,international,en,3,We compared several tour packages and this one looked cheaper. The ferry schedule was unclear and we waited two hours at the port.
+V0041,2026-08-16,Instagram,domestic,id,5,"Jadwal kapal tidak jelas, menunggu dua jam di pelabuhan. Sudah bandingkan beberapa paket, yang ini lebih murah. Foto-foto di sini bagus sekali, langsung upload."
+V0042,2026-02-11,TripAdvisor,international,en,5,"Great spot for photos, our pictures got so many likes."
+V0043,2026-05-24,Google Maps,domestic,id,5,"Pemandunya ramah dan menjelaskan sejarah dengan menarik. Perjalanan dari Medan macet dan jalannya rusak, lima jam baru sampai."
+V0044,2026-08-16,Google Maps,domestic,en,3,Must visit if you come to North Sumatra. Information online about opening hours and schedules was hard to find.
+V0045,2026-08-15,Google Maps,domestic,id,3,"Dibanding Bali harganya lebih terjangkau. Info jadwal di internet minim sekali, susah cari informasi."
+V0046,2026-01-30,TripAdvisor,international,en,4,"The first hour was boring, nobody explained what we were looking at. Great spot for photos, our pictures got so many likes."
+V0047,2026-07-09,Google Maps,domestic,id,3,"Awalnya membosankan, tidak ada yang menjelaskan apa-apa. Pertama kali tahu dari video TikTok, langsung penasaran."
+V0048,2026-06-07,TripAdvisor,international,en,4,We will definitely come back next year. Our guide told wonderful stories about the history of the village.
+V0049,2026-01-22,Instagram,international,en,5,Our guide told wonderful stories about the history of the village. We first saw Lake Toba on TikTok and knew we had to go.
+V0050,2026-05-12,TripAdvisor,international,en,4,We first saw Lake Toba on TikTok and knew we had to go. The online payment page failed twice before we could book. Very little information on the official website.
+V0051,2026-05-10,Google Maps,domestic,id,4,"Website resminya kurang informasi dan jarang update. Pertunjukan tortor dan tenun ulos luar biasa, sangat berkesan."
+V0052,2026-05-26,Instagram,domestic,id,5,"Awalnya membosankan, tidak ada yang menjelaskan apa-apa."
+V0053,2026-06-28,Google Maps,domestic,id,3,Website resminya kurang informasi dan jarang update.
+V0054,2026-05-18,Google Maps,international,en,3,"There was no way to book online, we had to call."
+V0055,2026-04-03,TripAdvisor,international,en,4,We compared several tour packages and this one looked cheaper.
+V0056,2026-04-06,TripAdvisor,domestic,id,3,"Sudah bandingkan beberapa paket, yang ini lebih murah. Website resminya kurang informasi dan jarang update."
+V0057,2026-06-30,Instagram,domestic,id,4,"Awalnya membosankan, tidak ada yang menjelaskan apa-apa. Dibanding Bali harganya lebih terjangkau."
+V0058,2026-04-27,TripAdvisor,domestic,id,1,"Info jadwal di internet minim sekali, susah cari informasi. Perjalanan dari Medan macet dan jalannya rusak, lima jam baru sampai."
+V0059,2026-08-18,TripAdvisor,international,en,4,We compared several tour packages and this one looked cheaper.
+V0060,2026-08-08,Google Maps,domestic,id,5,"Sudah bandingkan beberapa paket, yang ini lebih murah. Foto-foto di sini bagus sekali, langsung upload."
+V0061,2026-02-09,TripAdvisor,domestic,id,4,"Perjalanan dari Medan macet dan jalannya rusak, lima jam baru sampai."
+V0062,2026-06-28,Google Maps,international,en,2,"The first hour was boring, nobody explained what we were looking at. The online payment page failed twice before we could book."
+V0063,2026-08-20,Instagram,international,en,3,The ferry schedule was unclear and we waited two hours at the port.
+V0064,2026-07-08,Google Maps,domestic,id,5,"Sudah bandingkan beberapa paket, yang ini lebih murah."
+V0065,2025-12-11,TripAdvisor,domestic,id,3,"Booking ribet, harus transfer manual lalu konfirmasi lewat WhatsApp. Wajib dikunjungi kalau ke Sumatera Utara. Awalnya membosankan, tidak ada yang menjelaskan apa-apa."
+V0066,2026-08-14,Google Maps,domestic,id,5,Pasti balik lagi tahun depan.
+V0067,2026-01-25,Instagram,domestic,id,3,"Awalnya membosankan, tidak ada yang menjelaskan apa-apa."
+V0068,2025-10-05,Instagram,domestic,id,3,"Website resminya kurang informasi dan jarang update. Pemesanan online error terus, akhirnya bayar di tempat. Lihat postingan di Instagram, akhirnya ke sini juga."
+V0069,2026-04-11,Instagram,domestic,id,4,"Foto-foto di sini bagus sekali, langsung upload."
+V0070,2026-05-04,Google Maps,international,en,3,"Information online about opening hours and schedules was hard to find. Booking was a hassle: five steps, a bank transfer and a WhatsApp confirmation. The views are perfect for Instagram."
+V0071,2026-03-08,Google Maps,international,en,5,Highly recommend this to friends visiting Sumatra.
+V0072,2025-12-17,TripAdvisor,domestic,id,4,"Pertunjukan tortor dan tenun ulos luar biasa, sangat berkesan."
+V0073,2025-11-23,TripAdvisor,international,en,3,Very little information on the official website.
+V0074,2026-06-11,TripAdvisor,international,en,5,We first saw Lake Toba on TikTok and knew we had to go. The views are perfect for Instagram. We compared several tour packages and this one looked cheaper.
+V0075,2026-07-07,Instagram,international,en,5,Our guide told wonderful stories about the history of the village.
+V0076,2026-08-09,Google Maps,domestic,id,4,"Website resminya kurang informasi dan jarang update. Spot fotonya keren banget, cocok buat Instagram."
+V0077,2025-12-17,Instagram,international,en,5,Our guide told wonderful stories about the history of the village. Must visit if you come to North Sumatra.
+V0078,2026-04-05,TripAdvisor,international,en,5,Compared with Bali the prices are reasonable.
+V0079,2026-04-23,TripAdvisor,international,en,3,Information online about opening hours and schedules was hard to find.
+V0080,2026-04-28,Google Maps,domestic,id,3,"Perjalanan dari Medan macet dan jalannya rusak, lima jam baru sampai. Booking ribet, harus transfer manual lalu konfirmasi lewat WhatsApp."
+V0081,2025-11-27,TripAdvisor,domestic,id,5,Rekomendasi banget buat teman-teman.
+V0082,2025-12-26,TripAdvisor,domestic,id,3,"Pertunjukan tortor dan tenun ulos luar biasa, sangat berkesan. Perjalanan dari Medan macet dan jalannya rusak, lima jam baru sampai."
+V0083,2026-08-21,Instagram,domestic,en,3,"The online payment page failed twice before we could book. The first hour was boring, nobody explained what we were looking at."
+V0084,2025-11-16,Google Maps,international,en,5,Compared with Bali the prices are reasonable.
+V0085,2026-07-05,Instagram,domestic,id,4,"Jadwal kapal tidak jelas, menunggu dua jam di pelabuhan."
+V0086,2026-07-18,Google Maps,international,en,2,"The road from Medan was congested and damaged, it took five hours. The first hour was boring, nobody explained what we were looking at. There was no way to book online, we had to call."
+V0087,2026-04-24,TripAdvisor,domestic,id,5,"Foto-foto di sini bagus sekali, langsung upload."
+V0088,2026-05-16,TikTok,domestic,id,5,"Pertunjukan tortor dan tenun ulos luar biasa, sangat berkesan."
+V0089,2026-05-23,Google Maps,domestic,id,5,Pemandunya ramah dan menjelaskan sejarah dengan menarik.
+V0090,2026-03-31,Google Maps,domestic,id,4,Rekomendasi banget buat teman-teman. Pemandunya ramah dan menjelaskan sejarah dengan menarik. Pasti balik lagi tahun depan.
+V0091,2026-01-24,TikTok,international,en,3,The ferry schedule was unclear and we waited two hours at the port. Would return for a longer stay.
+V0092,2025-10-22,Instagram,domestic,en,4,We compared several tour packages and this one looked cheaper. Very little information on the official website.
+V0093,2026-01-16,Instagram,international,en,4,We compared several tour packages and this one looked cheaper.
+V0094,2026-03-26,Instagram,domestic,id,3,"Pemesanan online error terus, akhirnya bayar di tempat."
+V0095,2026-05-18,Instagram,international,en,3,"Booking was a hassle: five steps, a bank transfer and a WhatsApp confirmation. Very little information on the official website. The first hour was boring, nobody explained what we were looking at."
+V0096,2026-04-29,Google Maps,international,en,3,The online payment page failed twice before we could book. The Batak cultural show and the ulos weaving were amazing.
+V0097,2026-04-28,Google Maps,international,en,5,"Booking was a hassle: five steps, a bank transfer and a WhatsApp confirmation. Would return for a longer stay."
+V0098,2025-10-18,Google Maps,domestic,en,4,"The first hour was boring, nobody explained what we were looking at. The road from Medan was congested and damaged, it took five hours."
+V0099,2026-03-22,Instagram,international,en,4,Must visit if you come to North Sumatra.
+V0100,2026-08-02,Instagram,international,en,3,"The first hour was boring, nobody explained what we were looking at. The views are perfect for Instagram. Booking was a hassle: five steps, a bank transfer and a WhatsApp confirmation."
+V0101,2026-03-26,TripAdvisor,international,en,5,Must visit if you come to North Sumatra. We compared several tour packages and this one looked cheaper.
+V0102,2026-04-08,Google Maps,international,en,3,"The first hour was boring, nobody explained what we were looking at. Booking was a hassle: five steps, a bank transfer and a WhatsApp confirmation. Great spot for photos, our pictures got so many likes."
+V0103,2026-04-29,Google Maps,international,en,5,"Great spot for photos, our pictures got so many likes."
+V0104,2026-03-05,TripAdvisor,domestic,id,3,"Pemesanan online error terus, akhirnya bayar di tempat."
+V0105,2026-01-16,Google Maps,domestic,id,5,"Lihat postingan di Instagram, akhirnya ke sini juga."
+V0106,2026-08-14,Instagram,international,en,3,"Booking was a hassle: five steps, a bank transfer and a WhatsApp confirmation. Very little information on the official website."
+V0107,2026-03-23,TripAdvisor,domestic,id,3,"Dibanding Bali harganya lebih terjangkau. Awalnya membosankan, tidak ada yang menjelaskan apa-apa."
+V0108,2026-06-06,Google Maps,international,en,3,"Information online about opening hours and schedules was hard to find. Highly recommend this to friends visiting Sumatra. There was no way to book online, we had to call."
+V0109,2026-05-23,Google Maps,international,en,4,Information online about opening hours and schedules was hard to find. The Batak cultural show and the ulos weaving were amazing.
+V0110,2026-06-25,Google Maps,domestic,id,4,"Pertama kali tahu dari video TikTok, langsung penasaran."
+V0111,2026-07-28,Google Maps,domestic,id,5,"Wajib dikunjungi kalau ke Sumatera Utara. Pertama kali tahu dari video TikTok, langsung penasaran. Awalnya membosankan, tidak ada yang menjelaskan apa-apa."
+V0112,2026-01-29,Google Maps,domestic,id,3,"Spot fotonya keren banget, cocok buat Instagram. Pemesanan online error terus, akhirnya bayar di tempat."
+V0113,2026-07-13,TikTok,domestic,id,4,"Booking ribet, harus transfer manual lalu konfirmasi lewat WhatsApp."
+V0114,2025-10-03,Google Maps,domestic,id,4,"Perjalanan dari Medan macet dan jalannya rusak, lima jam baru sampai. Dibanding Bali harganya lebih terjangkau."
+V0115,2026-07-20,TikTok,international,en,2,Very little information on the official website.
+V0116,2026-07-16,TripAdvisor,domestic,id,4,Website resminya kurang informasi dan jarang update.
+V0117,2026-08-21,Google Maps,international,en,4,"We will definitely come back next year. The road from Medan was congested and damaged, it took five hours. We first saw Lake Toba on TikTok and knew we had to go."
+V0118,2025-11-01,Instagram,domestic,en,3,The ferry schedule was unclear and we waited two hours at the port.
+V0119,2026-01-08,TripAdvisor,international,en,3,"The road from Medan was congested and damaged, it took five hours. Our guide told wonderful stories about the history of the village."
+V0120,2026-02-17,Google Maps,domestic,id,4,"Pasti balik lagi tahun depan. Awalnya membosankan, tidak ada yang menjelaskan apa-apa."
+V0121,2026-06-29,Google Maps,international,en,4,Information online about opening hours and schedules was hard to find.
+V0122,2026-06-13,TripAdvisor,domestic,en,5,Found this place through an Instagram reel. The Batak cultural show and the ulos weaving were amazing.
+V0123,2026-04-07,Google Maps,domestic,id,2,"Pemesanan online error terus, akhirnya bayar di tempat."
+V0124,2026-06-03,Google Maps,domestic,id,5,"Pertunjukan tortor dan tenun ulos luar biasa, sangat berkesan."
+V0125,2025-12-08,Google Maps,domestic,id,3,"Spot fotonya keren banget, cocok buat Instagram. Pertunjukan tortor dan tenun ulos luar biasa, sangat berkesan."
+V0126,2026-06-23,Google Maps,international,en,5,The views are perfect for Instagram. Compared with Bali the prices are reasonable.
+V0127,2026-02-04,TripAdvisor,international,en,5,Would return for a longer stay.
+V0128,2026-03-31,Google Maps,domestic,id,4,"Pertunjukan tortor dan tenun ulos luar biasa, sangat berkesan."
+V0129,2026-01-10,Google Maps,domestic,id,4,Pemandunya ramah dan menjelaskan sejarah dengan menarik.
+V0130,2026-08-09,Google Maps,international,en,4,"Great spot for photos, our pictures got so many likes."
+V0131,2025-12-11,TripAdvisor,domestic,en,3,Information online about opening hours and schedules was hard to find. The views are perfect for Instagram.
+V0132,2026-02-13,TripAdvisor,domestic,id,4,"Pemandunya ramah dan menjelaskan sejarah dengan menarik. Jadwal kapal tidak jelas, menunggu dua jam di pelabuhan. Spot fotonya keren banget, cocok buat Instagram."
+V0133,2026-07-07,Google Maps,international,en,5,We first saw Lake Toba on TikTok and knew we had to go.
+V0134,2025-12-26,Google Maps,domestic,id,2,"Perjalanan dari Medan macet dan jalannya rusak, lima jam baru sampai. Proses pesan tiket lama dan membingungkan."
+V0135,2026-04-21,Google Maps,international,en,2,"The first hour was boring, nobody explained what we were looking at. Would return for a longer stay. Very little information on the official website."
+V0136,2026-05-30,Google Maps,international,en,4,Would return for a longer stay.
+V0137,2025-10-18,TikTok,domestic,id,3,"Info jadwal di internet minim sekali, susah cari informasi."
+V0138,2026-08-08,TripAdvisor,domestic,id,3,"Pertunjukan tortor dan tenun ulos luar biasa, sangat berkesan. Booking ribet, harus transfer manual lalu konfirmasi lewat WhatsApp."
+V0139,2026-03-15,Google Maps,international,en,4,Our guide told wonderful stories about the history of the village.
+V0140,2026-05-30,Instagram,international,en,5,"The Batak cultural show and the ulos weaving were amazing. There was no way to book online, we had to call."
+V0141,2026-02-12,TripAdvisor,domestic,id,4,"Jadwal kapal tidak jelas, menunggu dua jam di pelabuhan. Spot fotonya keren banget, cocok buat Instagram."
+V0142,2026-05-13,TripAdvisor,domestic,id,4,"Pemesanan online error terus, akhirnya bayar di tempat. Pasti balik lagi tahun depan."
+V0143,2025-11-29,TripAdvisor,domestic,en,5,We will definitely come back next year. We compared several tour packages and this one looked cheaper.
+V0144,2025-10-02,Instagram,domestic,id,5,"Pertama kali tahu dari video TikTok, langsung penasaran."
+V0145,2026-05-22,TripAdvisor,international,en,5,Our guide told wonderful stories about the history of the village.
+V0146,2026-05-23,Google Maps,domestic,en,3,"The road from Medan was congested and damaged, it took five hours."
+V0147,2026-01-03,Google Maps,domestic,id,2,"Jadwal kapal tidak jelas, menunggu dua jam di pelabuhan. Booking ribet, harus transfer manual lalu konfirmasi lewat WhatsApp."
+V0148,2025-10-28,Google Maps,domestic,id,5,"Foto-foto di sini bagus sekali, langsung upload."
+V0149,2026-07-18,Google Maps,international,en,2,"The ferry schedule was unclear and we waited two hours at the port. There was no way to book online, we had to call."
+V0150,2026-02-10,Instagram,domestic,id,4,"Pemesanan online error terus, akhirnya bayar di tempat. Pasti balik lagi tahun depan."
+V0151,2026-05-31,Instagram,domestic,id,2,Website resminya kurang informasi dan jarang update.
+V0152,2025-11-07,Instagram,domestic,en,5,Must visit if you come to North Sumatra. The Batak cultural show and the ulos weaving were amazing. The ferry schedule was unclear and we waited two hours at the port.
+V0153,2026-06-23,Google Maps,domestic,en,5,Found this place through an Instagram reel.
+V0154,2026-08-06,Google Maps,domestic,id,5,Pemandunya ramah dan menjelaskan sejarah dengan menarik.
+V0155,2025-11-15,Google Maps,international,en,3,"Highly recommend this to friends visiting Sumatra. The first hour was boring, nobody explained what we were looking at."
+V0156,2026-08-19,TikTok,domestic,id,4,"Foto-foto di sini bagus sekali, langsung upload. Pertunjukan tortor dan tenun ulos luar biasa, sangat berkesan. Pemesanan online error terus, akhirnya bayar di tempat."
+V0157,2026-08-11,TikTok,international,en,3,The online payment page failed twice before we could book.
+V0158,2026-04-28,Google Maps,domestic,id,3,"Awalnya membosankan, tidak ada yang menjelaskan apa-apa. Ingin kembali lagi dan menginap lebih lama."
+V0159,2025-12-22,TikTok,international,en,4,The Batak cultural show and the ulos weaving were amazing. Found this place through an Instagram reel.
+V0160,2025-10-09,Google Maps,international,en,3,We will definitely come back next year. Very little information on the official website. The online payment page failed twice before we could book.
+V0161,2025-10-27,Google Maps,domestic,id,4,"Foto-foto di sini bagus sekali, langsung upload. Pertama kali tahu dari video TikTok, langsung penasaran."
+V0162,2025-12-13,TripAdvisor,domestic,id,4,"Lihat postingan di Instagram, akhirnya ke sini juga. Info jadwal di internet minim sekali, susah cari informasi. Proses pesan tiket lama dan membingungkan."
+V0163,2025-11-08,Google Maps,international,en,4,Found this place through an Instagram reel.
+V0164,2026-06-29,Google Maps,international,en,5,"There was no way to book online, we had to call. The views are perfect for Instagram. Found this place through an Instagram reel."
+V0165,2025-10-01,TikTok,domestic,id,4,"Pemesanan online error terus, akhirnya bayar di tempat. Sudah bandingkan beberapa paket, yang ini lebih murah."
+V0166,2026-07-12,TikTok,international,en,5,The online payment page failed twice before we could book. We first saw Lake Toba on TikTok and knew we had to go. Highly recommend this to friends visiting Sumatra.
+V0167,2026-04-03,TripAdvisor,domestic,id,4,Wajib dikunjungi kalau ke Sumatera Utara.
+V0168,2026-07-27,Google Maps,domestic,id,4,"Pertunjukan tortor dan tenun ulos luar biasa, sangat berkesan. Spot fotonya keren banget, cocok buat Instagram."
+V0169,2026-01-27,Instagram,domestic,id,5,"Sudah bandingkan beberapa paket, yang ini lebih murah."
+V0170,2026-07-27,TripAdvisor,international,en,4,"Booking was a hassle: five steps, a bank transfer and a WhatsApp confirmation. Highly recommend this to friends visiting Sumatra."
+V0171,2026-01-06,Google Maps,international,en,4,Must visit if you come to North Sumatra.
+V0172,2026-05-13,Google Maps,domestic,en,5,Compared with Bali the prices are reasonable.
+V0173,2026-08-05,Google Maps,domestic,id,2,"Awalnya membosankan, tidak ada yang menjelaskan apa-apa."
+V0174,2026-08-08,Google Maps,international,en,2,The ferry schedule was unclear and we waited two hours at the port.
+V0175,2026-05-25,Google Maps,domestic,id,4,"Info jadwal di internet minim sekali, susah cari informasi. Jadwal kapal tidak jelas, menunggu dua jam di pelabuhan. Pasti balik lagi tahun depan."
+V0176,2025-11-01,Google Maps,domestic,id,4,"Awalnya membosankan, tidak ada yang menjelaskan apa-apa."
+V0177,2026-08-26,Google Maps,international,en,4,"The first hour was boring, nobody explained what we were looking at."
+V0178,2026-02-03,Google Maps,domestic,id,5,"Pemandunya ramah dan menjelaskan sejarah dengan menarik. Spot fotonya keren banget, cocok buat Instagram."
+V0179,2026-03-24,Instagram,international,en,3,"The road from Medan was congested and damaged, it took five hours."
+V0180,2026-05-14,Google Maps,domestic,id,3,Proses pesan tiket lama dan membingungkan.
+V0181,2025-11-02,Google Maps,international,en,4,"There was no way to book online, we had to call. We will definitely come back next year."
+V0182,2025-12-06,Google Maps,international,en,2,The ferry schedule was unclear and we waited two hours at the port.
+V0183,2025-12-15,Instagram,international,en,4,"Great spot for photos, our pictures got so many likes."
+V0184,2025-12-03,Instagram,international,en,4,"Our guide told wonderful stories about the history of the village. Very little information on the official website. The road from Medan was congested and damaged, it took five hours."
+V0185,2026-05-21,Google Maps,domestic,en,2,"The road from Medan was congested and damaged, it took five hours. Great spot for photos, our pictures got so many likes."
+V0186,2026-06-11,Instagram,domestic,id,4,"Pemesanan online error terus, akhirnya bayar di tempat."
+V0187,2025-12-27,Instagram,international,en,4,The Batak cultural show and the ulos weaving were amazing. The online payment page failed twice before we could book. Very little information on the official website.
+V0188,2026-07-06,TripAdvisor,domestic,id,3,"Awalnya membosankan, tidak ada yang menjelaskan apa-apa. Website resminya kurang informasi dan jarang update."
+V0189,2026-04-18,Google Maps,domestic,id,2,"Info jadwal di internet minim sekali, susah cari informasi. Proses pesan tiket lama dan membingungkan."
+V0190,2026-02-16,TikTok,domestic,id,3,"Booking ribet, harus transfer manual lalu konfirmasi lewat WhatsApp."
+V0191,2026-02-06,Instagram,domestic,id,2,"Pemesanan online error terus, akhirnya bayar di tempat. Awalnya membosankan, tidak ada yang menjelaskan apa-apa."
+V0192,2026-03-06,Instagram,domestic,en,5,Must visit if you come to North Sumatra.
+V0193,2026-02-02,Instagram,domestic,id,2,"Booking ribet, harus transfer manual lalu konfirmasi lewat WhatsApp."
+V0194,2025-11-20,TikTok,domestic,en,5,Would return for a longer stay. We first saw Lake Toba on TikTok and knew we had to go.
+V0195,2026-04-22,TripAdvisor,domestic,id,5,Dibanding Bali harganya lebih terjangkau. Pasti balik lagi tahun depan.
+V0196,2026-02-24,Google Maps,international,en,4,"Booking was a hassle: five steps, a bank transfer and a WhatsApp confirmation. Our guide told wonderful stories about the history of the village."
+V0197,2026-07-02,TripAdvisor,domestic,id,5,Ingin kembali lagi dan menginap lebih lama.
+V0198,2026-04-19,Google Maps,domestic,id,4,"Jadwal kapal tidak jelas, menunggu dua jam di pelabuhan. Pasti balik lagi tahun depan. Spot fotonya keren banget, cocok buat Instagram."
+V0199,2026-03-16,Google Maps,international,en,2,Very little information on the official website.
+V0200,2026-06-03,Instagram,international,en,3,Information online about opening hours and schedules was hard to find. The ferry schedule was unclear and we waited two hours at the port.
+V0201,2025-10-11,Google Maps,domestic,id,1,"Perjalanan dari Medan macet dan jalannya rusak, lima jam baru sampai. Booking ribet, harus transfer manual lalu konfirmasi lewat WhatsApp."
+V0202,2025-12-02,Google Maps,domestic,id,4,"Lihat postingan di Instagram, akhirnya ke sini juga. Ingin kembali lagi dan menginap lebih lama. Jadwal kapal tidak jelas, menunggu dua jam di pelabuhan."
+V0203,2026-07-03,TripAdvisor,international,en,3,"Booking was a hassle: five steps, a bank transfer and a WhatsApp confirmation."
+V0204,2025-12-09,Google Maps,international,en,3,The ferry schedule was unclear and we waited two hours at the port.
+V0205,2026-02-08,Google Maps,international,en,4,The Batak cultural show and the ulos weaving were amazing. We will definitely come back next year.
+V0206,2026-08-04,TripAdvisor,domestic,id,2,"Booking ribet, harus transfer manual lalu konfirmasi lewat WhatsApp."
+V0207,2026-01-30,Google Maps,domestic,id,4,"Proses pesan tiket lama dan membingungkan. Pertunjukan tortor dan tenun ulos luar biasa, sangat berkesan. Jadwal kapal tidak jelas, menunggu dua jam di pelabuhan."
+V0208,2026-03-29,Google Maps,domestic,id,4,"Wajib dikunjungi kalau ke Sumatera Utara. Pertunjukan tortor dan tenun ulos luar biasa, sangat berkesan. Sudah bandingkan beberapa paket, yang ini lebih murah."
+V0209,2025-12-08,TripAdvisor,domestic,id,5,"Spot fotonya keren banget, cocok buat Instagram."
+V0210,2026-01-08,Google Maps,domestic,id,3,"Pemandunya ramah dan menjelaskan sejarah dengan menarik. Perjalanan dari Medan macet dan jalannya rusak, lima jam baru sampai."
+V0211,2026-05-04,Google Maps,domestic,id,3,"Website resminya kurang informasi dan jarang update. Pertunjukan tortor dan tenun ulos luar biasa, sangat berkesan."
+V0212,2026-08-06,Google Maps,domestic,en,3,"The first hour was boring, nobody explained what we were looking at."
+V0213,2026-07-26,TripAdvisor,international,en,4,"The road from Medan was congested and damaged, it took five hours. Great spot for photos, our pictures got so many likes."
+V0214,2026-06-16,Google Maps,international,en,5,We first saw Lake Toba on TikTok and knew we had to go. Would return for a longer stay.
+V0215,2026-02-25,Google Maps,international,en,3,"We compared several tour packages and this one looked cheaper. The road from Medan was congested and damaged, it took five hours."
+V0216,2026-04-18,Google Maps,domestic,id,5,"Pertunjukan tortor dan tenun ulos luar biasa, sangat berkesan. Pasti balik lagi tahun depan."
+V0217,2026-06-14,Google Maps,domestic,id,2,"Booking ribet, harus transfer manual lalu konfirmasi lewat WhatsApp."
+V0218,2026-08-05,Instagram,international,en,4,The ferry schedule was unclear and we waited two hours at the port. We first saw Lake Toba on TikTok and knew we had to go.
+V0219,2026-03-09,TikTok,international,en,3,"Great spot for photos, our pictures got so many likes. The first hour was boring, nobody explained what we were looking at."
+V0220,2025-11-04,Instagram,domestic,id,5,"Awalnya membosankan, tidak ada yang menjelaskan apa-apa. Wajib dikunjungi kalau ke Sumatera Utara."
+V0221,2026-04-18,Google Maps,domestic,id,5,Wajib dikunjungi kalau ke Sumatera Utara.
+V0222,2026-05-02,TripAdvisor,international,en,5,We first saw Lake Toba on TikTok and knew we had to go.
+V0223,2026-06-10,Google Maps,domestic,id,3,"Pemesanan online error terus, akhirnya bayar di tempat. Rekomendasi banget buat teman-teman. Awalnya membosankan, tidak ada yang menjelaskan apa-apa."
+V0224,2026-06-08,Google Maps,international,en,3,"The views are perfect for Instagram. The road from Medan was congested and damaged, it took five hours."
+V0225,2026-05-04,Google Maps,international,en,3,Very little information on the official website.
+V0226,2026-04-09,Instagram,domestic,id,3,"Booking ribet, harus transfer manual lalu konfirmasi lewat WhatsApp."
+V0227,2026-08-07,Google Maps,domestic,id,5,"Pertunjukan tortor dan tenun ulos luar biasa, sangat berkesan. Ingin kembali lagi dan menginap lebih lama."
+V0228,2026-06-06,Google Maps,domestic,id,3,"Pemesanan online error terus, akhirnya bayar di tempat. Dibanding Bali harganya lebih terjangkau."
+V0229,2025-12-30,Google Maps,domestic,en,3,"The online payment page failed twice before we could book. The road from Medan was congested and damaged, it took five hours. The first hour was boring, nobody explained what we were looking at."
+V0230,2026-03-09,TripAdvisor,domestic,id,3,"Website resminya kurang informasi dan jarang update. Lihat postingan di Instagram, akhirnya ke sini juga."
+V0231,2026-01-21,TripAdvisor,domestic,en,5,The Batak cultural show and the ulos weaving were amazing.
+V0232,2026-03-29,Google Maps,international,en,2,"The first hour was boring, nobody explained what we were looking at. Booking was a hassle: five steps, a bank transfer and a WhatsApp confirmation."
+V0233,2026-02-10,Google Maps,international,en,3,Our guide told wonderful stories about the history of the village. The ferry schedule was unclear and we waited two hours at the port.
+V0234,2026-07-27,TripAdvisor,domestic,id,5,"Pertunjukan tortor dan tenun ulos luar biasa, sangat berkesan. Sudah bandingkan beberapa paket, yang ini lebih murah."
+V0235,2026-07-08,TikTok,domestic,id,3,"Pertunjukan tortor dan tenun ulos luar biasa, sangat berkesan. Perjalanan dari Medan macet dan jalannya rusak, lima jam baru sampai."
+V0236,2025-12-03,Google Maps,domestic,id,3,"Booking ribet, harus transfer manual lalu konfirmasi lewat WhatsApp. Pertunjukan tortor dan tenun ulos luar biasa, sangat berkesan."
+V0237,2026-02-26,Google Maps,international,en,4,Must visit if you come to North Sumatra. The online payment page failed twice before we could book.
+V0238,2026-02-08,Google Maps,domestic,id,2,"Perjalanan dari Medan macet dan jalannya rusak, lima jam baru sampai."
+V0239,2025-12-18,TripAdvisor,international,en,4,"The Batak cultural show and the ulos weaving were amazing. Booking was a hassle: five steps, a bank transfer and a WhatsApp confirmation."
+V0240,2025-10-16,Google Maps,domestic,id,4,"Spot fotonya keren banget, cocok buat Instagram."

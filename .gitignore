@@ -35,3 +35,9 @@ data/
 Thumbs.db
 .idea/
 .vscode/
+backend/dev-migrations.db
+
+# Static host build output
+.vercel/
+.netlify/
+.wrangler/

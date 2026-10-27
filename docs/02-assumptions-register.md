@@ -1,4 +1,4 @@
-# 02 · Assumptions Register
+# 02. Assumptions register
 
 Every assumption the build rests on, where it came from, how confident we are, and how it will be validated.
 Status values: **Open** (unvalidated), **Validated**, **Invalidated**, **Superseded**.

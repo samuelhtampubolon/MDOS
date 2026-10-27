@@ -1,0 +1,62 @@
+name: Bug report
+description: Something in MDOS does not work as described.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for the report. Please do not paste API keys, passwords, cookies or real respondent data.
+        Security problems go to the Security tab instead of an issue.
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Where does it happen?
+      options:
+        - Desktop app (Windows)
+        - Desktop app (macOS)
+        - Desktop app (Linux)
+        - Cloud or Docker
+        - Running from source
+    validations:
+      required: true
+  - type: dropdown
+    id: module
+    attributes:
+      label: Module
+      options:
+        - Research Lab
+        - Strategy Simulator
+        - Journey Designer
+        - Data, agents or reports
+        - Sign-in and settings
+        - Installation or start-up
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Numbered steps, starting from Home. The Lake Toba demo is a good shared starting point.
+      placeholder: |
+        1. Load the Lake Toba demo
+        2. Open Strategy
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected and what happened
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Shown in Settings, under Workspace.
+      placeholder: 0.1.0
+  - type: textarea
+    id: logs
+    attributes:
+      label: Error messages or screenshots
+      description: Remove personal data before attaching.

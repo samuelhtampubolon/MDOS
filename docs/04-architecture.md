@@ -1,4 +1,4 @@
-# 04 · System Architecture
+# 04. System architecture
 
 ## 1. Shape of the system
 
@@ -129,6 +129,7 @@ backend/                 Python package `mdos`, tests, Alembic migrations
   mdos/desktop.py        Desktop launcher (PyInstaller entry point)
 frontend/                React + TypeScript SPA and Playwright end-to-end tests
 docs/                    Specification artifacts (this folder)
+packaging/               PyInstaller spec and launcher for the desktop executable
 samples/                 Synthetic Lake Toba datasets (clearly labeled as synthetic)
-scripts/                 Sample data generator, desktop build helper
+scripts/                 Desktop build helper, sample data generator, secret scan
 ```
